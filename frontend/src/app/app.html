@@ -523,84 +523,27 @@
     <!-- TAB 2: INFERENCE PLAYGROUND                                          -->
     <!-- ==================================================================== -->
     @if (activeTab() === 'playground') {
-      <div class="tab-pane">
-        <!-- Section Header -->
-        <div class="enterprise-banner">
-          <h2>Model Inference & Feature Attribution Playground</h2>
-          <p>
-            Test raw Discord message strings against our trained dual-stream pipelines in real time, inspect the 17 payload heuristics, 
-            and observe local additive SHAP feature attributions with live policy enforcement.
-          </p>
-        </div>
-
-        <!-- DYNAMIC FEATURE 1: Simulated Live Discord Ingestion Stream -->
-        <div class="hub-card live-stream-card">
-          <div class="stream-header-row">
-            <div class="stream-title-group">
-              <div class="stream-pulse-dot" [class.active]="isSimulatorRunning()"></div>
-              <div>
-                <span class="stream-main-title">Live Discord Message Ingestion Feed</span>
-                <span class="stream-sub-title">Simulating high-throughput live bot event loop (click any message to inspect in workbench)</span>
-              </div>
+      <div class="studio-playground-container">
+        <!-- TOP STUDIO CONTROL BAR (Anthropic / OpenAI Console Style) -->
+        <div class="studio-topbar">
+          <div class="studio-topbar-left">
+            <span class="studio-tag">INFERENCE WORKBENCH</span>
+            
+            <div class="studio-model-picker">
+              <label>Model Engine:</label>
+              <select [(ngModel)]="selectedModelTier" (change)="runPrediction()" class="studio-select">
+                <option value="hardened">Minimax-Hardened XGBoost (SOTA v2.4)</option>
+                <option value="baseline">Baseline Unhardened XGBoost</option>
+              </select>
             </div>
 
-            <div class="stream-controls-group">
-              <div class="stream-counters">
-                <span class="stream-stat"><strong class="font-mono text-blue">{{ totalMessagesScanned() }}</strong> Scanned</span>
-                <span class="stream-stat-sep">&bull;</span>
-                <span class="stream-stat"><strong class="font-mono text-red">{{ totalThreatsBlocked() }}</strong> Blocked</span>
-                <span class="stream-stat-sep">&bull;</span>
-                <span class="stream-stat"><strong class="font-mono text-green">{{ liveCpuLatency() }}ms</strong> Live CPU</span>
-              </div>
-
-              <button class="stream-toggle-btn" (click)="toggleSimulator()">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  @if (isSimulatorRunning()) {
-                    <rect x="6" y="4" width="4" height="16"/>
-                    <rect x="14" y="4" width="4" height="16"/>
-                  } @else {
-                    <polygon points="5 3 19 12 5 21 5 3"/>
-                  }
-                </svg>
-                {{ isSimulatorRunning() ? 'Pause Stream' : 'Resume Stream' }}
-              </button>
-            </div>
-          </div>
-
-          <!-- Live Ingestion Feed Items -->
-          <div class="stream-items-track">
-            @for (msg of liveMessageStream(); track msg.id) {
-              <div class="stream-row-item" (click)="selectStreamMessage(msg)" title="Click to load into inference workbench">
-                <div class="stream-user-avatar" [style.background]="msg.avatarBg">
-                  {{ msg.sender.substring(0, 2).toUpperCase() }}
-                </div>
-                <div class="stream-msg-details">
-                  <div class="stream-meta-line">
-                    <span class="stream-username">{{ msg.sender }}</span>
-                    <span class="stream-channel">{{ msg.channel }}</span>
-                    <span class="stream-time">{{ msg.timeStr }}</span>
-                    <span class="stream-category-tag">{{ msg.category }}</span>
-                  </div>
-                  <div class="stream-content-preview">{{ msg.content }}</div>
-                </div>
-                <div class="stream-verdict-tag" [class.tag-scam]="msg.isScam" [class.tag-clean]="!msg.isScam">
-                  {{ msg.isScam ? 'THREAT (' + (msg.score * 100).toFixed(0) + '%)' : 'CLEAN' }}
-                </div>
-              </div>
-            }
-          </div>
-        </div>
-
-        <!-- CHATGPT / ANTHROPIC WORKBENCH PROMPT CONSOLE -->
-        <div class="prompt-workbench-card">
-          <!-- Quick Prompt Suggestion Chips (ChatGPT style) -->
-          <div class="quick-prompts-bar">
-            <span class="prompts-label">Prompt Presets:</span>
-            <div class="prompt-chips-scroll">
+            <!-- Quick Preset Suggestion Chips (ChatGPT Style) -->
+            <div class="studio-preset-chips">
+              <span class="chips-label">Presets:</span>
               @for (p of presets; track p.id) {
                 @if (p.id !== 'custom') {
                   <button 
-                    class="prompt-chip-btn" 
+                    class="studio-chip-btn" 
                     [class.active]="selectedPreset() === p.id"
                     (click)="onPresetChange(p.id)">
                     {{ p.name }}
@@ -610,341 +553,266 @@
             </div>
           </div>
 
-          <!-- Multiline Prompt Box with Integrated Bottom Toolbar -->
-          <div class="prompt-input-container">
-            <textarea 
-              [ngModel]="chatInput()" 
-              (ngModelChange)="onChatInputChange($event)"
-              (keydown.control.enter)="runPrediction()"
-              rows="3" 
-              placeholder="Enter or paste Discord payload prompt to evaluate against dual-stream models... (Ctrl + Enter to run)" 
-              class="prompt-textarea"></textarea>
-
-            <!-- Bottom Integrated Action Toolbar (Claude / ChatGPT Console Style) -->
-            <div class="prompt-bottom-toolbar">
-              <div class="toolbar-left-controls">
-                <!-- Model Tier Selector Pill -->
-                <div class="toolbar-pill-dropdown">
-                  <label class="toolbar-pill-label">Model:</label>
-                  <select [(ngModel)]="selectedModelTier" (change)="runPrediction()" class="toolbar-select">
-                    <option value="hardened">Minimax-Hardened XGBoost (SOTA)</option>
-                    <option value="baseline">Baseline Unhardened XGBoost</option>
-                  </select>
-                </div>
-
-                <!-- Policy Threshold Slider Inline Pill -->
-                <div class="toolbar-threshold-pill">
-                  <span class="thresh-pill-label">Threshold &tau;:</span>
-                  <input 
-                    type="range" 
-                    min="0.10" 
-                    max="0.90" 
-                    step="0.05" 
-                    [(ngModel)]="decisionThreshold" 
-                    (ngModelChange)="runPrediction()" 
-                    class="toolbar-range-slider" 
-                    title="Operating Policy Threshold" />
-                  <span class="thresh-pill-val font-mono">{{ (decisionThreshold() * 100).toFixed(0) }}%</span>
-                </div>
-
-                <!-- Token & Char Counter -->
-                <div class="toolbar-token-counter">
-                  <span>{{ chatInput().length }} chars</span>
-                  <span class="counter-sep">&bull;</span>
-                  <span>~{{ getEstimatedTokens() }} tokens</span>
-                </div>
-              </div>
-
-              <div class="toolbar-right-actions">
-                <span class="as-you-type-beacon" title="Live background evaluation active">
-                  <span class="pulse-beacon"></span>
-                  Live
-                </span>
-
-                <!-- Send / Evaluate Button (ChatGPT Arrow / Pill Style) -->
-                <button 
-                  class="prompt-submit-btn" 
-                  (click)="runPrediction()" 
-                  [disabled]="isPredicting()" 
-                  title="Run Real-Time Inference (Ctrl + Enter)">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="12" y1="19" x2="12" y2="5"/>
-                    <polyline points="5 12 12 5 19 12"/>
-                  </svg>
-                  <span>{{ isPredicting() ? 'Evaluating...' : 'Run' }}</span>
-                  <kbd class="shortcut-kbd">Ctrl &crarr;</kbd>
-                </button>
-              </div>
+          <div class="studio-topbar-right">
+            <!-- Operating Policy Threshold Slider Pill -->
+            <div class="studio-param-pill">
+              <span class="param-lbl">Threshold &tau;:</span>
+              <input 
+                type="range" 
+                min="0.10" 
+                max="0.90" 
+                step="0.05" 
+                [(ngModel)]="decisionThreshold" 
+                (ngModelChange)="runPrediction()" 
+                class="studio-slider" 
+                title="Adjust Decision Policy Threshold" />
+              <span class="param-val font-mono">{{ (decisionThreshold() * 100).toFixed(0) }}%</span>
             </div>
+
+            <!-- Ingestion Stream Toggle -->
+            <button class="studio-stream-btn" [class.running]="isSimulatorRunning()" (click)="toggleSimulator()">
+              <span class="stream-dot" [class.active]="isSimulatorRunning()"></span>
+              <span>{{ isSimulatorRunning() ? 'Live Stream' : 'Paused' }}</span>
+            </button>
           </div>
         </div>
 
-        <!-- ANTHROPIC WORKBENCH MODEL COMPLETION OUTPUT CARD -->
-        @if (predictionResult(); as res) {
-          <div class="model-completion-card">
-            <!-- Output Header Bar -->
-            <div class="completion-header-bar">
-              <div class="completion-model-identity">
-                <div class="completion-avatar-icon">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                    <path d="m9 12 2 2 4-4"/>
-                  </svg>
-                </div>
-                <div>
-                  <div class="model-title-line">
-                    <strong>{{ selectedModelTier() === 'hardened' ? 'Minimax-Hardened Fused XGBoost' : 'Baseline Unhardened XGBoost' }}</strong>
-                    <span class="completion-version-tag">v2.4 IEEE</span>
-                  </div>
-                  <span class="completion-meta-sub">Dual-stream 3,017-dim sparse feature fusion &bull; Single CPU Execution</span>
-                </div>
-              </div>
-
-              <div class="completion-header-actions">
-                <div class="latency-pill-badge">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10"/>
-                    <polyline points="12 6 12 12 16 14"/>
-                  </svg>
-                  <span class="font-mono">{{ res.latency_ms }} ms latency</span>
-                </div>
-
-                <button class="completion-copy-btn" (click)="copyPayload(res.text)" title="Copy Evaluated Payload">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/>
-                    <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
-                  </svg>
-                  <span>{{ isCopied() ? 'Copied!' : 'Copy Payload' }}</span>
-                </button>
-              </div>
-            </div>
-
-            <!-- Primary Verdict Telemetry Grid -->
-            <div class="completion-verdict-grid">
-              <!-- Radial Animated Risk Gauge -->
-              <div class="radial-gauge-container">
-                <div class="gauge-svg-box">
-                  <svg class="radial-svg" width="120" height="120" viewBox="0 0 100 100">
-                    <circle class="gauge-bg-circle" cx="50" cy="50" r="40" />
-                    <circle 
-                      class="gauge-progress-circle" 
-                      cx="50" 
-                      cy="50" 
-                      r="40"
-                      [style.stroke-dashoffset]="getRiskGaugeOffset(res.scam_probability)"
-                      [style.stroke]="getRiskColor(res.scam_probability)" />
-                  </svg>
-                  <div class="gauge-center-text">
-                    <span class="gauge-pct" [style.color]="getRiskColor(res.scam_probability)">
-                      {{ (res.scam_probability * 100).toFixed(1) }}%
-                    </span>
-                    <span class="gauge-caption">Scam Risk</span>
-                  </div>
-                </div>
-                <div class="gauge-status-badge" [class.badge-danger]="res.scam_probability >= decisionThreshold()" [class.badge-safe]="res.scam_probability < decisionThreshold()">
-                  {{ res.scam_probability >= decisionThreshold() ? 'CRITICAL THREAT' : 'BENIGN PAYLOAD' }}
-                </div>
-              </div>
-
-              <!-- Verdict & Policy Enforcement Box -->
-              <div class="completion-decision-box">
-                <div class="decision-top-line">
-                  <span class="decision-label">POLICY CLASSIFICATION VERDICT</span>
-                  <span class="decision-badge" [class.badge-critical]="res.scam_probability >= decisionThreshold()" [class.badge-clean]="res.scam_probability < decisionThreshold()">
-                    {{ getEnforcementVerdict(res.scam_probability).verdict }}
-                  </span>
-                </div>
-
-                <div class="decision-action-callout" [style.border-left-color]="getEnforcementVerdict(res.scam_probability).color">
-                  <div class="action-title-row">
-                    <span class="action-tag">AUTOMATED PROTOCOL:</span>
-                    <strong class="action-name" [style.color]="getEnforcementVerdict(res.scam_probability).color">
-                      {{ getEnforcementVerdict(res.scam_probability).action }}
-                    </strong>
-                  </div>
-                  <p class="action-desc">{{ getEnforcementVerdict(res.scam_probability).note }}</p>
-                </div>
-
-                <div class="policy-stats-strip">
-                  <div class="policy-stat-item">
-                    <span class="stat-lbl">Active Threshold:</span>
-                    <strong class="stat-val font-mono">&tau; = {{ (decisionThreshold() * 100).toFixed(0) }}%</strong>
-                  </div>
-                  <div class="policy-stat-item">
-                    <span class="stat-lbl">Target Recall:</span>
-                    <strong class="stat-val font-mono text-green">99.8%</strong>
-                  </div>
-                  <div class="policy-stat-item">
-                    <span class="stat-lbl">Est. FP Friction:</span>
-                    <strong class="stat-val font-mono">&lt;0.02%</strong>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Homoglyph Deobfuscator Alert (if detected) -->
-            @if (res.homoglyphs_detected.length) {
-              <div class="deobfuscation-alert">
-                <div class="alert-head">
-                  <svg class="inline-alert-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
-                    <line x1="12" y1="9" x2="12" y2="13"/>
-                    <line x1="12" y1="17" x2="12.01" y2="17"/>
-                  </svg>
-                  Deobfuscation Alert: Unicode Homoglyph Injection Detected
-                </div>
-                <div class="chips-container">
-                  @for (h of res.homoglyphs_detected; track h.unicode) {
-                    <span class="homoglyph-chip font-mono">
-                      {{ h.char }} &rarr; {{ h.looks_like }} ({{ h.unicode }})
-                    </span>
-                  }
-                </div>
-              </div>
-            }
-
-            <!-- ANTHROPIC WORKBENCH TABBED ANALYSIS CONSOLE -->
-            <div class="completion-analysis-console">
-              <!-- Console Tab Bar -->
-              <div class="analysis-tabs-header">
-                <button 
-                  class="analysis-tab-btn" 
-                  [class.active]="selectedAnalysisTab() === 'shap'" 
-                  (click)="selectedAnalysisTab.set('shap')">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="18" y1="20" x2="18" y2="10"/>
-                    <line x1="12" y1="20" x2="12" y2="4"/>
-                    <line x1="6" y1="20" x2="6" y2="14"/>
-                  </svg>
-                  SHAP Attributions
-                </button>
-
-                <button 
-                  class="analysis-tab-btn" 
-                  [class.active]="selectedAnalysisTab() === 'invariants'" 
-                  (click)="selectedAnalysisTab.set('invariants')">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                    <path d="m9 12 2 2 4-4"/>
-                  </svg>
-                  17 Invariant Heuristics
-                </button>
-
-                <button 
-                  class="analysis-tab-btn" 
-                  [class.active]="selectedAnalysisTab() === 'json'" 
-                  (click)="selectedAnalysisTab.set('json')">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="16 18 22 12 16 6"/>
-                    <polyline points="8 6 2 12 8 18"/>
-                  </svg>
-                  Raw JSON Telemetry
-                </button>
-
-                <button 
-                  class="analysis-tab-btn" 
-                  [class.active]="selectedAnalysisTab() === 'sdk'" 
-                  (click)="selectedAnalysisTab.set('sdk')">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <!-- 2-COLUMN SPLIT STUDIO (Prompt on Left, Live Inspector on Right) -->
+        <div class="studio-split-grid">
+          <!-- LEFT COLUMN: PROMPT CONSOLE & LIVE BOT TRAFFIC -->
+          <div class="studio-col-left">
+            <!-- ChatGPT / Claude Prompt Input Card -->
+            <div class="studio-prompt-card">
+              <div class="prompt-card-header">
+                <div class="prompt-header-title-row">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <polyline points="4 17 10 11 4 5"/>
                     <line x1="12" y1="19" x2="20" y2="19"/>
                   </svg>
-                  Bot SDK Integration
-                </button>
+                  <span class="prompt-header-title">Prompt Payload Console</span>
+                </div>
+                <div class="prompt-header-meta">
+                  <span class="pulse-beacon"></span>
+                  <span class="live-eval-text">Live Evaluation Active</span>
+                </div>
               </div>
 
-              <!-- Tab 1: SHAP Attribution Chart -->
-              @if (selectedAnalysisTab() === 'shap') {
-                <div class="analysis-pane">
-                  <div class="pane-sub-head">Local Feature Attribution (Additive SHAP Values: Red Pushes Scam, Green Pushes Safe)</div>
-                  <div class="chart-box" style="height: 250px;">
-                    <canvas #shapCanvas></canvas>
-                  </div>
-                </div>
-              }
+              <textarea 
+                [ngModel]="chatInput()" 
+                (ngModelChange)="onChatInputChange($event)"
+                (keydown.control.enter)="runPrediction()"
+                rows="4" 
+                placeholder="Enter or paste Discord payload prompt to evaluate against dual-stream models... (Ctrl + Enter to run)" 
+                class="studio-textarea"></textarea>
 
-              <!-- Tab 2: 17 Structural Invariants Table -->
-              @if (selectedAnalysisTab() === 'invariants') {
-                <div class="analysis-pane">
-                  <div class="pane-sub-head">Extracted 17 Payload Structural Invariants (Hover for mathematical definitions)</div>
-                  <div class="table-container" style="max-height: 280px; overflow-y: auto;">
-                    <table class="corp-table small">
-                      <thead>
-                        <tr><th>Feature Invariant</th><th>Extracted Value</th><th>Invariant Classification</th></tr>
-                      </thead>
-                      <tbody>
-                        @for (item of res.features | keyvalue; track item.key) {
-                          <tr [title]="getFeatureDescription(item.key)" class="feature-info-row">
-                            <td>
-                              <strong class="feature-name">{{ item.key }}</strong>
-                              <svg class="inline-info-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="10"/>
-                                <line x1="12" y1="16" x2="12" y2="12"/>
-                                <line x1="12" y1="8" x2="12.01" y2="8"/>
-                              </svg>
-                            </td>
-                            <td class="font-mono"><strong>{{ item.value }}</strong></td>
-                            <td class="invariant-def-cell">{{ getFeatureDescription(item.key) }}</td>
-                          </tr>
-                        }
-                      </tbody>
-                    </table>
-                  </div>
+              <div class="prompt-card-footer">
+                <div class="token-stats">
+                  <span>{{ chatInput().length }} chars</span>
+                  <span class="sep">&bull;</span>
+                  <span>~{{ getEstimatedTokens() }} tokens</span>
                 </div>
-              }
 
-              <!-- Tab 3: Raw JSON Telemetry (Anthropic style) -->
-              @if (selectedAnalysisTab() === 'json') {
-                <div class="analysis-pane">
-                  <div class="json-header-row">
-                    <span class="pane-sub-head">REST API Response Payload (`POST /api/predict`)</span>
-                    <button class="json-copy-btn" (click)="copyPayload(getFormattedJson(res))">
-                      {{ isCopied() ? 'Copied JSON!' : 'Copy JSON' }}
+                <div class="prompt-actions">
+                  <button class="clear-btn" (click)="chatInput.set(''); runPrediction()" title="Clear Prompt">Clear</button>
+                  <button class="run-prompt-btn" (click)="runPrediction()" [disabled]="isPredicting()">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                      <polygon points="5 3 19 12 5 21 5 3"/>
+                    </svg>
+                    <span>{{ isPredicting() ? 'Running...' : 'Run Prompt' }}</span>
+                    <kbd>Ctrl &crarr;</kbd>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Compact Ingestion Stream Ticker (Directly Underneath Prompt) -->
+            <div class="studio-stream-ticker-card">
+              <div class="ticker-header">
+                <div class="ticker-title-group">
+                  <span class="ticker-dot" [class.active]="isSimulatorRunning()"></span>
+                  <span class="ticker-title">Live Discord Event Stream</span>
+                  <span class="ticker-sub">(Click any card to inject into prompt)</span>
+                </div>
+                <div class="ticker-counters">
+                  <span><strong>{{ totalMessagesScanned() }}</strong> Scanned</span>
+                  <span class="sep">&bull;</span>
+                  <span><strong class="text-red">{{ totalThreatsBlocked() }}</strong> Blocked</span>
+                  <span class="sep">&bull;</span>
+                  <span><strong class="text-green">{{ liveCpuLatency() }}ms</strong></span>
+                </div>
+              </div>
+
+              <div class="ticker-items-list">
+                @for (msg of liveMessageStream(); track msg.id) {
+                  <div class="ticker-row" (click)="selectStreamMessage(msg)" title="Click to test in prompt console">
+                    <div class="ticker-avatar" [style.background]="msg.avatarBg">
+                      {{ msg.sender.substring(0, 2).toUpperCase() }}
+                    </div>
+                    <div class="ticker-info">
+                      <div class="ticker-user-line">
+                        <span class="ticker-user">{{ msg.sender }}</span>
+                        <span class="ticker-chan">{{ msg.channel }}</span>
+                        <span class="ticker-time">{{ msg.timeStr }}</span>
+                        <span class="ticker-tag" [class.is-scam]="msg.isScam">{{ msg.isScam ? 'THREAT' : 'CLEAN' }}</span>
+                      </div>
+                      <div class="ticker-text">{{ msg.content }}</div>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+
+          <!-- RIGHT COLUMN: ANTHROPIC WORKBENCH MODEL INSPECTOR -->
+          <div class="studio-col-right">
+            @if (predictionResult(); as res) {
+              <div class="studio-inspector-card">
+                <!-- Inspector Header -->
+                <div class="inspector-header">
+                  <div class="inspector-model-badge">
+                    <svg class="inspector-shield-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                      <path d="m9 12 2 2 4-4"/>
+                    </svg>
+                    <strong>{{ selectedModelTier() === 'hardened' ? 'Minimax XGBoost (SOTA v2.4)' : 'Baseline XGBoost' }}</strong>
+                  </div>
+                  <div class="inspector-header-right">
+                    <span class="inspector-latency font-mono">{{ res.latency_ms }} ms CPU</span>
+                    <button class="inspector-copy-btn" (click)="copyPayload(res.text)">
+                      {{ isCopied() ? 'Copied!' : 'Copy' }}
                     </button>
                   </div>
-                  <pre class="raw-json-viewer font-mono"><code>{{ getFormattedJson(res) }}</code></pre>
                 </div>
-              }
 
-              <!-- Tab 4: Bot SDK Snippets -->
-              @if (selectedAnalysisTab() === 'sdk') {
-                <div class="analysis-pane">
-                  <div class="snippet-header-bar">
-                    <div class="snippet-title">
-                      Production Bot Integration Snippets
-                    </div>
-                    <div class="snippet-tabs">
-                      <button class="snip-tab-btn" [class.active]="selectedSnippetTab() === 'curl'" (click)="selectedSnippetTab.set('curl')">cURL / REST</button>
-                      <button class="snip-tab-btn" [class.active]="selectedSnippetTab() === 'python'" (click)="selectedSnippetTab.set('python')">Python (discord.py)</button>
-                      <button class="snip-tab-btn" [class.active]="selectedSnippetTab() === 'nodejs'" (click)="selectedSnippetTab.set('nodejs')">Node.js (discord.js)</button>
+                <!-- Verdict & Risk Dial Header Box -->
+                <div class="inspector-verdict-box">
+                  <div class="inspector-gauge-col">
+                    <svg class="mini-radial-svg" width="90" height="90" viewBox="0 0 100 100">
+                      <circle class="gauge-bg-circle" cx="50" cy="50" r="40" />
+                      <circle 
+                        class="gauge-progress-circle" 
+                        cx="50" 
+                        cy="50" 
+                        r="40"
+                        [style.stroke-dashoffset]="getRiskGaugeOffset(res.scam_probability)"
+                        [style.stroke]="getRiskColor(res.scam_probability)" />
+                    </svg>
+                    <div class="mini-gauge-text">
+                      <span class="mini-pct" [style.color]="getRiskColor(res.scam_probability)">
+                        {{ (res.scam_probability * 100).toFixed(1) }}%
+                      </span>
+                      <span class="mini-caption">Scam Risk</span>
                     </div>
                   </div>
 
-                  @if (selectedSnippetTab() === 'curl') {
-                    <pre class="font-mono"><code>curl -X POST "http://127.0.0.1:8000/api/predict" \
+                  <div class="inspector-decision-col">
+                    <div class="verdict-pill" [class.badge-critical]="res.scam_probability >= decisionThreshold()" [class.badge-clean]="res.scam_probability < decisionThreshold()">
+                      {{ getEnforcementVerdict(res.scam_probability).verdict }}
+                    </div>
+                    <div class="action-banner">
+                      <span class="action-lbl">PROTOCOL ACTION:</span>
+                      <strong class="action-val" [style.color]="getEnforcementVerdict(res.scam_probability).color">
+                        {{ getEnforcementVerdict(res.scam_probability).action }}
+                      </strong>
+                    </div>
+                    <div class="verdict-metrics-line">
+                      <span>&tau; = {{ (decisionThreshold() * 100).toFixed(0) }}%</span>
+                      <span class="sep">&bull;</span>
+                      <span>Recall: <strong class="text-green">99.8%</strong></span>
+                      <span class="sep">&bull;</span>
+                      <span>FP: &lt;0.02%</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Homoglyph Deobfuscator Alert (if any) -->
+                @if (res.homoglyphs_detected.length) {
+                  <div class="inspector-homoglyph-alert">
+                    <span class="alert-title">Unicode Lookalikes:</span>
+                    <div class="alert-chips-wrap">
+                      @for (h of res.homoglyphs_detected; track h.unicode) {
+                        <span class="h-chip font-mono">{{ h.char }} &rarr; {{ h.looks_like }}</span>
+                      }
+                    </div>
+                  </div>
+                }
+
+                <!-- Anthropic-Style Tabbed Inspection Console -->
+                <div class="inspector-tabs-container">
+                  <div class="inspector-nav-tabs">
+                    <button class="insp-tab-btn" [class.active]="selectedAnalysisTab() === 'shap'" (click)="selectedAnalysisTab.set('shap')">SHAP Weights</button>
+                    <button class="insp-tab-btn" [class.active]="selectedAnalysisTab() === 'invariants'" (click)="selectedAnalysisTab.set('invariants')">17 Invariants</button>
+                    <button class="insp-tab-btn" [class.active]="selectedAnalysisTab() === 'json'" (click)="selectedAnalysisTab.set('json')">Raw JSON</button>
+                    <button class="insp-tab-btn" [class.active]="selectedAnalysisTab() === 'sdk'" (click)="selectedAnalysisTab.set('sdk')">Bot SDK</button>
+                  </div>
+
+                  <div class="inspector-tab-content">
+                    @if (selectedAnalysisTab() === 'shap') {
+                      <div class="shap-pane">
+                        <div class="pane-caption">Additive SHAP Feature Weights (Red = Pushes Scam, Green = Pushes Safe)</div>
+                        <div class="chart-box" style="height: 200px;">
+                          <canvas #shapCanvas></canvas>
+                        </div>
+                      </div>
+                    }
+
+                    @if (selectedAnalysisTab() === 'invariants') {
+                      <div class="invariants-pane">
+                        <table class="corp-table small">
+                          <thead>
+                            <tr><th>Feature</th><th>Value</th><th>Definition</th></tr>
+                          </thead>
+                          <tbody>
+                            @for (item of res.features | keyvalue; track item.key) {
+                              <tr [title]="getFeatureDescription(item.key)">
+                                <td><strong>{{ item.key }}</strong></td>
+                                <td class="font-mono"><strong>{{ item.value }}</strong></td>
+                                <td class="desc-cell">{{ getFeatureDescription(item.key) }}</td>
+                              </tr>
+                            }
+                          </tbody>
+                        </table>
+                      </div>
+                    }
+
+                    @if (selectedAnalysisTab() === 'json') {
+                      <div class="json-pane">
+                        <div class="json-bar">
+                          <span>API Response Payload:</span>
+                          <button class="mini-copy-btn" (click)="copyPayload(getFormattedJson(res))">Copy JSON</button>
+                        </div>
+                        <pre class="json-code font-mono"><code>{{ getFormattedJson(res) }}</code></pre>
+                      </div>
+                    }
+
+                    @if (selectedAnalysisTab() === 'sdk') {
+                      <div class="sdk-pane">
+                        <div class="sdk-tabs">
+                          <button class="sdk-tab-btn" [class.active]="selectedSnippetTab() === 'curl'" (click)="selectedSnippetTab.set('curl')">cURL</button>
+                          <button class="sdk-tab-btn" [class.active]="selectedSnippetTab() === 'python'" (click)="selectedSnippetTab.set('python')">discord.py</button>
+                          <button class="sdk-tab-btn" [class.active]="selectedSnippetTab() === 'nodejs'" (click)="selectedSnippetTab.set('nodejs')">discord.js</button>
+                        </div>
+
+                        @if (selectedSnippetTab() === 'curl') {
+                          <pre class="sdk-code font-mono"><code>curl -X POST "http://127.0.0.1:8000/api/predict" \
   -H "Content-Type: application/json" \
   -d '{{"{"}}"text": "{{ res.text.slice(0, 45) }}...", "model_type": "{{ selectedModelTier() }}"{{"}"}}'</code></pre>
-                  }
+                        }
 
-                  @if (selectedSnippetTab() === 'python') {
-                    <pre class="font-mono"><code>import discord, requests
-from discord.ext import commands
-
-client = commands.Bot(command_prefix="!")
-
+                        @if (selectedSnippetTab() === 'python') {
+                          <pre class="sdk-code font-mono"><code>import discord, requests
+# discord.py bot hook
 @client.event
 async def on_message(message):
     if message.author.bot: return
     res = requests.post("http://127.0.0.1:8000/api/predict", json={{"{"}}"text": message.content, "model_type": "hardened"{{"}"}}).json()
     if res["scam_probability"] >= {{ decisionThreshold() }}:
         await message.delete()
-        await message.channel.send(f"⚠️ {{"{"}}message.author.mention{{"}"}} Phishing payload blocked ({{"{"}}res['verdict']{{"}"}} in {{"{"}}res['latency_ms']{{"}"}}ms)")</code></pre>
-                  }
+        await message.channel.send(f"⚠️ {{"{"}}message.author.mention{{"}"}} Phishing blocked ({{"{"}}res['verdict']{{"}"}})")</code></pre>
+                        }
 
-                  @if (selectedSnippetTab() === 'nodejs') {
-                    <pre class="font-mono"><code>const {{"{"}} Client, GatewayIntentBits {{"}"}} = require('discord.js');
-const client = new Client({{"{"}} intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] {{"}"}});
-
+                        @if (selectedSnippetTab() === 'nodejs') {
+                          <pre class="sdk-code font-mono"><code>// discord.js client hook
 client.on('messageCreate', async (msg) => {{"{"}}
   if (msg.author.bot) return;
   const res = await fetch('http://127.0.0.1:8000/api/predict', {{"{"}}
@@ -952,18 +820,17 @@ client.on('messageCreate', async (msg) => {{"{"}}
     headers: {{"{"}} 'Content-Type': 'application/json' {{"}"}},
     body: JSON.stringify({{"{"}} text: msg.content, model_type: 'hardened' {{"}"}})
   {{"}"}}).then(r => r.json());
-
-  if (res.scam_probability >= {{ decisionThreshold() }}) {{"{"}}
-    await msg.delete();
-    msg.channel.send(`🚨 Phishing payload blocked (${{"{"}}res.verdict{{"}"}} in ${{"{"}}res.latency_ms{{"}"}}ms)`);
-  {{"}"}}
+  if (res.scam_probability >= {{ decisionThreshold() }}) await msg.delete();
 {{"}"}});</code></pre>
-                  }
+                        }
+                      </div>
+                    }
+                  </div>
                 </div>
-              }
-            </div>
+              </div>
+            }
           </div>
-        }
+        </div>
       </div>
     }
 
