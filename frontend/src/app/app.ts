@@ -183,6 +183,24 @@ export class App {
   private shapChart: Chart | null = null;
 
   selectedSnippetTab = signal<'curl' | 'python' | 'nodejs'>('curl');
+  selectedAnalysisTab = signal<'shap' | 'invariants' | 'json' | 'sdk'>('shap');
+  isCopied = signal<boolean>(false);
+
+  getEstimatedTokens(): number {
+    return Math.max(1, Math.ceil(this.chatInput().length / 4));
+  }
+
+  copyPayload(text: string) {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text);
+      this.isCopied.set(true);
+      setTimeout(() => this.isCopied.set(false), 2000);
+    }
+  }
+
+  getFormattedJson(res: any): string {
+    return JSON.stringify(res, null, 2);
+  }
 
   featureDescriptions: Record<string, string> = {
     min_levenshtein_discord: 'Minimum edit distance to discord.com; <= 2 indicates typosquatting spoof',
