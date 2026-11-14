@@ -1,0 +1,3 @@
+Model Variant,Clean Precision,Clean Recall,Clean F1,Clean AUROC,Adv. Precision,Adv. Recall,Adv. F1,Adv. AUROC,Delta F1 Drop
+XGBoost Fused (Clean Baseline),0.9722,0.9831,0.9777,0.9988,0.9612,0.6966,0.8078,0.9579,-17.4%
+XGBoost Fused (Adversarially Hardened),0.9563,0.9831,0.9695,0.9989,0.957,1.0,0.978,1.0,--0.9%
