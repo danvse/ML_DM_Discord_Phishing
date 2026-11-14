@@ -23,10 +23,46 @@ Chart.register(...registerables);
 export class App {
   private sentinel = inject(SentinelService);
 
-  // Active Tab
-  activeTab = signal<'arch' | 'playground' | 'redteam' | 'training' | 'benchmarks'>('arch');
+  // Active Navigation Tab
+  activeTab = signal<'arch' | 'playground' | 'redteam' | 'training' | 'benchmarks'>('playground');
+  isSidebarCollapsed = signal<boolean>(false);
+  isUserMenuOpen = signal<boolean>(false);
+  sidebarSearch = signal<string>('');
 
   isOnline = this.sentinel.isBackendOnline;
+
+  getActiveTabTitle(): string {
+    switch (this.activeTab()) {
+      case 'arch': return 'System Architecture & SOTA Blueprint';
+      case 'playground': return 'Model Inference & Feature Attribution Playground';
+      case 'redteam': return 'Minimax Adversarial Red-Team Studio';
+      case 'training': return 'Training Dynamics & Optimization Loss';
+      case 'benchmarks': return 'Empirical Benchmarks & Latency Pareto';
+      default: return 'Dashboard Overview';
+    }
+  }
+
+  getActiveTabSubtitle(): string {
+    switch (this.activeTab()) {
+      case 'arch': return 'Dual-stream feature fusion & invariant defenses across 3,017 dimensions';
+      case 'playground': return 'Real-time inference with additive SHAP local explanation & payload heuristics';
+      case 'redteam': return 'Simulate homoglyphs, zero-width chars, and domain spoofing in adversarial runtime';
+      case 'training': return 'Gradient boosted log-loss convergence & early stopping checkpoint verification';
+      case 'benchmarks': return 'SOTA comparative ROC curves, AUROC 0.999 & sub-1.2ms latency guarantees';
+      default: return 'Welcome to Discord Sentinel Research Portal';
+    }
+  }
+
+  getActiveTabBreadcrumb(): string {
+    switch (this.activeTab()) {
+      case 'arch': return 'Architecture & Blueprint';
+      case 'playground': return 'Inference Playground';
+      case 'redteam': return 'Red-Team Studio';
+      case 'training': return 'Training Dynamics';
+      case 'benchmarks': return 'Empirical Benchmarks';
+      default: return 'Overview';
+    }
+  }
 
   // TAB 2: Playground State
   chatInput = signal<string>('@everyone Steam is giving away free Discord Nitro! Claim here: https://discoord-app.com/free');
@@ -79,6 +115,14 @@ export class App {
       this.runPrediction();
       this.runMutation();
     });
+  }
+
+  toggleSidebar() {
+    this.isSidebarCollapsed.update(v => !v);
+  }
+
+  toggleUserMenu() {
+    this.isUserMenuOpen.update(v => !v);
   }
 
   setTab(tab: 'arch' | 'playground' | 'redteam' | 'training' | 'benchmarks') {
@@ -160,7 +204,7 @@ export class App {
 
     const labels = res.contributions.map(c => c.feature);
     const data = res.contributions.map(c => c.impact);
-    const bgColors = data.map(v => v > 0 ? '#dc2626' : '#059669');
+    const bgColors = data.map(v => v > 0 ? '#ef4444' : '#10b981');
 
     this.shapChart = new Chart(canvas, {
       type: 'bar',
@@ -278,11 +322,11 @@ export class App {
           {
             label: 'Minimax Hardened Val Loss',
             data: sampleRounds.map(r => data.hardened_val_loss[r - 1]),
-            borderColor: '#059669',
+            borderColor: '#10b981',
             borderWidth: 2.5,
             tension: 0.2,
             pointRadius: sampleRounds.map(r => r === 82 ? 6 : 0),
-            pointBackgroundColor: '#059669'
+            pointBackgroundColor: '#10b981'
           }
         ]
       },
@@ -322,7 +366,7 @@ export class App {
           {
             label: 'Hardened Fused XGBoost (AUC = 0.999)',
             data: data.roc_curves.hardened_fused,
-            borderColor: '#059669',
+            borderColor: '#10b981',
             borderWidth: 3,
             tension: 0.1
           },
@@ -343,7 +387,7 @@ export class App {
           {
             label: 'AutoMod Regex (AUC = 0.720)',
             data: data.roc_curves.automod_regex,
-            borderColor: '#dc2626',
+            borderColor: '#ef4444',
             borderWidth: 1.5,
             borderDash: [4, 4]
           }
@@ -391,7 +435,7 @@ export class App {
         datasets: [{
           label: 'Models (Latency vs F1)',
           data: points,
-          backgroundColor: points.map(p => p.winner ? '#059669' : '#2563eb'),
+          backgroundColor: points.map(p => p.winner ? '#10b981' : '#2563eb'),
           pointRadius: points.map(p => p.winner ? 10 : 7),
           pointHoverRadius: 12
         }]

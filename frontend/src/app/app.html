@@ -1,87 +1,310 @@
 <div class="enterprise-app">
-  <!-- 1. CORPORATE ENTERPRISE HEADER -->
-  <header class="corp-header">
-    <div class="header-inner">
-      <div class="brand-group">
-        <div class="brand-logo">
-          <!-- Custom Vector Shield Logo -->
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#64ffda" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-            <path d="m9 12 2 2 4-4"/>
-          </svg>
-        </div>
-        <div>
-          <div class="title-row">
-            <h1>DISCORD PHISHING SENTINEL: MODEL INTELLIGENCE & RESEARCH HUB</h1>
-            <span class="version-chip">v2.4 IEEE</span>
-          </div>
-          <p class="subtitle">Dual-Stream Feature-Fused Gradient Boosted Decision Trees with Minimax Adversarial Hardening</p>
-        </div>
+  <!-- 1. PHOENIXCODED-INSPIRED SLEEK TOP NAVBAR -->
+  <header class="top-navbar">
+    <!-- Brand Box (Vibrant Blue block matching PhoenixCoded Mega Able) -->
+    <div class="navbar-brand-box">
+      <div class="brand-logo-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          <path d="m9 12 2 2 4-4"/>
+        </svg>
       </div>
-
-      <div class="header-metadata">
-        <div class="meta-tag">
-          <span class="meta-lbl">Research Team #18</span>
-          <span class="meta-val">Edwin Lin &bull; Tin Chak Lam</span>
-        </div>
-        <div class="status-indicator" [class.live]="isOnline()" [class.mock]="!isOnline()">
-          <span class="indicator-dot"></span>
-          <span>{{ isOnline() ? 'Pipeline Operational (1.2ms CPU)' : 'Client Engine Active' }}</span>
-        </div>
+      <div class="brand-text-block">
+        <span class="brand-title">SENTINEL HUB</span>
+        <span class="brand-badge">IEEE v2.4</span>
       </div>
     </div>
 
-    <!-- Navigation Tabs Bar with Custom Vector Icons -->
-    <nav class="hub-nav">
-      <button class="nav-btn" [class.active]="activeTab() === 'arch'" (click)="setTab('arch')">
-        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polygon points="12 2 2 7 12 12 22 7 12 2"/>
-          <polyline points="2 17 12 22 22 17"/>
-          <polyline points="2 12 12 17 22 12"/>
+    <!-- Topbar Left Actions (Toggle & Search) -->
+    <div class="navbar-left-actions">
+      <button class="nav-icon-btn" (click)="toggleSidebar()" title="Toggle Navigation Sidebar">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="12" x2="21" y2="12"/>
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <line x1="3" y1="18" x2="21" y2="18"/>
         </svg>
-        System Architecture & SOTA
       </button>
 
-      <button class="nav-btn" [class.active]="activeTab() === 'playground'" (click)="setTab('playground')">
-        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="4 17 10 11 4 5"/>
-          <line x1="12" y1="19" x2="20" y2="19"/>
+      <div class="topbar-search-box">
+        <svg class="search-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"/>
         </svg>
-        Interactive Inference Playground
+        <input type="text" placeholder="Search models, heuristics, benchmarks..." class="topbar-search-input" />
+      </div>
+    </div>
+
+    <!-- Topbar Right Actions (Status, Notifications, User Profile) -->
+    <div class="navbar-right-actions">
+      <!-- Live Status Badge -->
+      <div class="status-indicator-pill" [class.live]="isOnline()" [class.mock]="!isOnline()">
+        <span class="indicator-dot"></span>
+        <span class="indicator-text">{{ isOnline() ? '1.2ms CPU Live' : 'Client Mode' }}</span>
+      </div>
+
+      <!-- Notification Bell -->
+      <button class="nav-icon-btn with-badge" title="Notifications">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+          <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+        </svg>
+        <span class="badge-dot"></span>
       </button>
 
-      <button class="nav-btn" [class.active]="activeTab() === 'redteam'" (click)="setTab('redteam')">
-        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="10"/>
-          <line x1="22" y1="12" x2="18" y2="12"/>
-          <line x1="6" y1="12" x2="2" y2="12"/>
-          <line x1="12" y1="6" x2="12" y2="2"/>
-          <line x1="12" y1="22" x2="12" y2="18"/>
-        </svg>
-        Adversarial Red-Team Studio
-      </button>
+      <!-- User Profile Dropdown Pill -->
+      <div class="user-profile-menu-container">
+        <button class="user-profile-pill" (click)="toggleUserMenu()">
+          <div class="user-avatar-circle">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
+          </div>
+          <div class="user-info-text">
+            <span class="user-name">Edwin &amp; Tin Chak</span>
+            <span class="user-role">Team #18</span>
+          </div>
+          <svg class="chevron-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </button>
 
-      <button class="nav-btn" [class.active]="activeTab() === 'training'" (click)="setTab('training')">
-        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
-          <polyline points="17 6 23 6 23 12"/>
-        </svg>
-        Training Dynamics & Optimization
-      </button>
-
-      <button class="nav-btn" [class.active]="activeTab() === 'benchmarks'" (click)="setTab('benchmarks')">
-        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="18" y1="20" x2="18" y2="10"/>
-          <line x1="12" y1="20" x2="12" y2="4"/>
-          <line x1="6" y1="20" x2="6" y2="14"/>
-        </svg>
-        Empirical Benchmarks & Evaluation
-      </button>
-    </nav>
+        @if (isUserMenuOpen()) {
+          <div class="user-dropdown-panel">
+            <div class="dropdown-header">
+              <strong>Research Team #18</strong>
+              <span>Discord Phishing Sentinel Lead</span>
+            </div>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="#specs">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+              Pipeline Settings
+            </a>
+            <a class="dropdown-item" href="http://127.0.0.1:8000/docs" target="_blank">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              FastAPI OpenAPI Spec
+            </a>
+          </div>
+        }
+      </div>
+    </div>
   </header>
 
-  <!-- 2. MAIN HUB WORKSPACE -->
-  <main class="hub-content">
+  <!-- 2. FACETED POLYGONAL HERO BREADCRUMB STRIP (Exact PhoenixCoded Mega Able style) -->
+  <section class="hero-faceted-banner">
+    <div class="faceted-bg-overlay"></div>
+    <div class="hero-content-inner">
+      <div class="hero-left-text">
+        <h1 class="hero-section-title">{{ getActiveTabTitle() }}</h1>
+        <p class="hero-section-subtitle">{{ getActiveTabSubtitle() }}</p>
+      </div>
+
+      <nav class="hero-breadcrumb-nav" aria-label="Breadcrumb">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+          <polyline points="9 22 9 12 15 12 15 22"/>
+        </svg>
+        <span class="bc-sep">&rsaquo;</span>
+        <span class="bc-parent">Sentinel Core</span>
+        <span class="bc-sep">&rsaquo;</span>
+        <span class="bc-current">{{ getActiveTabBreadcrumb() }}</span>
+      </nav>
+    </div>
+  </section>
+
+  <!-- 3. DASHBOARD MAIN LAYOUT (Sidebar + Main Content Grid) -->
+  <div class="dashboard-body-layout">
+    <!-- LEFT SIDEBAR -->
+    <aside class="dashboard-sidebar" [class.collapsed]="isSidebarCollapsed()">
+      <!-- User Profile Mini-Badge -->
+      <div class="sidebar-user-badge">
+        <div class="sidebar-avatar">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+          </svg>
+          <span class="avatar-status-dot"></span>
+        </div>
+        <div class="sidebar-user-text">
+          <div class="user-display-name">Team #18 Lead</div>
+          <div class="user-sub-label">Online &bull; Research Admin</div>
+        </div>
+      </div>
+
+      <!-- Quick Search inside Sidebar -->
+      <div class="sidebar-search-box">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input type="text" placeholder="Search modules..." class="sidebar-search-input" />
+      </div>
+
+      <!-- Categorized Navigation -->
+      <div class="sidebar-nav-group">
+        <div class="sidebar-group-heading">CORE RESEARCH</div>
+        
+        <button class="sidebar-nav-item" [class.active]="activeTab() === 'playground'" (click)="setTab('playground')">
+          <svg class="sidebar-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="4 17 10 11 4 5"/>
+            <line x1="12" y1="19" x2="20" y2="19"/>
+          </svg>
+          <span class="sidebar-item-label">Inference Playground</span>
+          <span class="nav-chip live-chip">LIVE</span>
+        </button>
+
+        <button class="sidebar-nav-item" [class.active]="activeTab() === 'arch'" (click)="setTab('arch')">
+          <svg class="sidebar-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="12 2 2 7 12 12 22 7 12 2"/>
+            <polyline points="2 17 12 22 22 17"/>
+            <polyline points="2 12 12 17 22 12"/>
+          </svg>
+          <span class="sidebar-item-label">Architecture &amp; SOTA</span>
+        </button>
+
+        <button class="sidebar-nav-item" [class.active]="activeTab() === 'redteam'" (click)="setTab('redteam')">
+          <svg class="sidebar-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="22" y1="12" x2="18" y2="12"/>
+            <line x1="6" y1="12" x2="2" y2="12"/>
+            <line x1="12" y1="6" x2="12" y2="2"/>
+            <line x1="12" y1="22" x2="12" y2="18"/>
+          </svg>
+          <span class="sidebar-item-label">Red-Team Arena</span>
+          <span class="nav-chip alert-chip">ATTACK</span>
+        </button>
+      </div>
+
+      <div class="sidebar-nav-group">
+        <div class="sidebar-group-heading">MODEL ANALYTICS</div>
+
+        <button class="sidebar-nav-item" [class.active]="activeTab() === 'training'" (click)="setTab('training')">
+          <svg class="sidebar-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+            <polyline points="17 6 23 6 23 12"/>
+          </svg>
+          <span class="sidebar-item-label">Training Dynamics</span>
+        </button>
+
+        <button class="sidebar-nav-item" [class.active]="activeTab() === 'benchmarks'" (click)="setTab('benchmarks')">
+          <svg class="sidebar-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="20" x2="18" y2="10"/>
+            <line x1="12" y1="20" x2="12" y2="4"/>
+            <line x1="6" y1="20" x2="6" y2="14"/>
+          </svg>
+          <span class="sidebar-item-label">Empirical Benchmarks</span>
+        </button>
+      </div>
+
+      <div class="sidebar-nav-group">
+        <div class="sidebar-group-heading">SPECIFICATIONS</div>
+        <div class="sidebar-info-card">
+          <div class="info-card-title">IEEE v2.4 Report</div>
+          <div class="info-card-desc">Dual-Stream Feature-Fused Gradient Boosted Decision Trees with Minimax Adversarial Hardening.</div>
+          <div class="info-card-meta">Authors: Edwin Lin &bull; Tin Chak Lam</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN DASHBOARD CONTENT AREA -->
+    <main class="dashboard-main-content">
+      <!-- 4 TOP KPI STAT CARDS (PhoenixCoded exact colored bottom accent strips) -->
+      <section class="kpi-metric-strip">
+        <!-- Card 1: Blue bottom bar -->
+        <div class="kpi-card">
+          <div class="kpi-card-top">
+            <div class="kpi-card-info">
+              <span class="kpi-card-val">99.8%</span>
+              <span class="kpi-card-label">Calibrated Scam Confidence</span>
+            </div>
+            <div class="kpi-card-icon blue-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="20" x2="18" y2="10"/>
+                <line x1="12" y1="20" x2="12" y2="4"/>
+                <line x1="6" y1="20" x2="6" y2="14"/>
+              </svg>
+            </div>
+          </div>
+          <div class="kpi-bottom-strip strip-blue">
+            <span class="strip-text">% Calibrated Precision</span>
+            <svg class="strip-trend" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+              <polyline points="17 6 23 6 23 12"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Card 2: Green bottom bar -->
+        <div class="kpi-card">
+          <div class="kpi-card-top">
+            <div class="kpi-card-info">
+              <span class="kpi-card-val">0.978</span>
+              <span class="kpi-card-label">Minimax Robust F1 Score</span>
+            </div>
+            <div class="kpi-card-icon green-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                <path d="m9 12 2 2 4-4"/>
+              </svg>
+            </div>
+          </div>
+          <div class="kpi-bottom-strip strip-green">
+            <span class="strip-text">+2.4% vs Unhardened Baseline</span>
+            <svg class="strip-trend" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+              <polyline points="17 6 23 6 23 12"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Card 3: Red bottom bar -->
+        <div class="kpi-card">
+          <div class="kpi-card-top">
+            <div class="kpi-card-info">
+              <span class="kpi-card-val">1.2 ms</span>
+              <span class="kpi-card-label">Single CPU Latency</span>
+            </div>
+            <div class="kpi-card-icon red-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+              </svg>
+            </div>
+          </div>
+          <div class="kpi-bottom-strip strip-red">
+            <span class="strip-text">300x Faster than DistilBERT</span>
+            <svg class="strip-trend" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+              <polyline points="17 6 23 6 23 12"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Card 4: Cyan bottom bar -->
+        <div class="kpi-card">
+          <div class="kpi-card-top">
+            <div class="kpi-card-info">
+              <span class="kpi-card-val">2,000</span>
+              <span class="kpi-card-label">Adversarial Eval Samples</span>
+            </div>
+            <div class="kpi-card-icon cyan-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <ellipse cx="12" cy="5" rx="9" ry="3"/>
+                <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/>
+                <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
+              </svg>
+            </div>
+          </div>
+          <div class="kpi-bottom-strip strip-cyan">
+            <span class="strip-text">0.0% Degradation on Invariants</span>
+            <svg class="strip-trend" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+              <polyline points="17 6 23 6 23 12"/>
+            </svg>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB CONTENT PANES -->
     
     <!-- ==================================================================== -->
     <!-- TAB 1: ARCHITECTURE & SOTA                                           -->
@@ -746,5 +969,6 @@
       </div>
     }
 
-  </main>
+    </main>
+  </div>
 </div>
