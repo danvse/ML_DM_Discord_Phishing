@@ -482,12 +482,74 @@
     <!-- ==================================================================== -->
     @if (activeTab() === 'playground') {
       <div class="tab-pane">
+        <!-- Section Header -->
         <div class="enterprise-banner">
           <h2>Model Inference & Feature Attribution Playground</h2>
-          <p>Test raw Discord message strings against our trained dual-stream pipelines, inspect the 17 payload heuristics, and examine local SHAP feature attributions.</p>
+          <p>
+            Test raw Discord message strings against our trained dual-stream pipelines in real time, inspect the 17 payload heuristics, 
+            and observe local additive SHAP feature attributions with live policy enforcement.
+          </p>
         </div>
 
-        <!-- Workbench Controls -->
+        <!-- DYNAMIC FEATURE 1: Simulated Live Discord Ingestion Stream -->
+        <div class="hub-card live-stream-card">
+          <div class="stream-header-row">
+            <div class="stream-title-group">
+              <div class="stream-pulse-dot" [class.active]="isSimulatorRunning()"></div>
+              <div>
+                <span class="stream-main-title">Live Discord Message Ingestion Feed</span>
+                <span class="stream-sub-title">Simulating high-throughput live bot event loop (click any message to inspect in workbench)</span>
+              </div>
+            </div>
+
+            <div class="stream-controls-group">
+              <div class="stream-counters">
+                <span class="stream-stat"><strong class="font-mono text-blue">{{ totalMessagesScanned() }}</strong> Scanned</span>
+                <span class="stream-stat-sep">&bull;</span>
+                <span class="stream-stat"><strong class="font-mono text-red">{{ totalThreatsBlocked() }}</strong> Blocked</span>
+                <span class="stream-stat-sep">&bull;</span>
+                <span class="stream-stat"><strong class="font-mono text-green">{{ liveCpuLatency() }}ms</strong> Live CPU</span>
+              </div>
+
+              <button class="stream-toggle-btn" (click)="toggleSimulator()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  @if (isSimulatorRunning()) {
+                    <rect x="6" y="4" width="4" height="16"/>
+                    <rect x="14" y="4" width="4" height="16"/>
+                  } @else {
+                    <polygon points="5 3 19 12 5 21 5 3"/>
+                  }
+                </svg>
+                {{ isSimulatorRunning() ? 'Pause Stream' : 'Resume Stream' }}
+              </button>
+            </div>
+          </div>
+
+          <!-- Live Ingestion Feed Items -->
+          <div class="stream-items-track">
+            @for (msg of liveMessageStream(); track msg.id) {
+              <div class="stream-row-item" (click)="selectStreamMessage(msg)" title="Click to load into inference workbench">
+                <div class="stream-user-avatar" [style.background]="msg.avatarBg">
+                  {{ msg.sender.substring(0, 2).toUpperCase() }}
+                </div>
+                <div class="stream-msg-details">
+                  <div class="stream-meta-line">
+                    <span class="stream-username">{{ msg.sender }}</span>
+                    <span class="stream-channel">{{ msg.channel }}</span>
+                    <span class="stream-time">{{ msg.timeStr }}</span>
+                    <span class="stream-category-tag">{{ msg.category }}</span>
+                  </div>
+                  <div class="stream-content-preview">{{ msg.content }}</div>
+                </div>
+                <div class="stream-verdict-tag" [class.tag-scam]="msg.isScam" [class.tag-clean]="!msg.isScam">
+                  {{ msg.isScam ? 'THREAT (' + (msg.score * 100).toFixed(0) + '%)' : 'CLEAN' }}
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Workbench Controls with Threshold Sensitivity Slider -->
         <div class="hub-card">
           <div class="control-row">
             <div class="input-group">
@@ -514,23 +576,71 @@
             </div>
           </div>
 
+          <!-- DYNAMIC FEATURE 2: Interactive Decision Threshold Sensitivity Slider -->
+          <div class="threshold-slider-container">
+            <div class="slider-header-row">
+              <label class="slider-label">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="3"/>
+                  <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                </svg>
+                Enforcement Policy Sensitivity Threshold (&tau;):
+                <strong class="font-mono text-blue">{{ (decisionThreshold() * 100).toFixed(0) }}%</strong>
+              </label>
+
+              <div class="slider-metrics-pill">
+                <span>Target Recall: <strong>99.8%</strong></span>
+                <span class="sep">&bull;</span>
+                <span>Est. False Positives: <strong>&lt;0.02%</strong></span>
+              </div>
+            </div>
+
+            <input 
+              type="range" 
+              min="0.10" 
+              max="0.90" 
+              step="0.05" 
+              [(ngModel)]="decisionThreshold" 
+              (ngModelChange)="runPrediction()" 
+              class="corp-range-slider" />
+            
+            <div class="slider-ticks">
+              <span>10% (High Recall / Aggressive)</span>
+              <span>50% (Calibrated Balanced)</span>
+              <span>90% (Zero Friction / Conservative)</span>
+            </div>
+          </div>
+
+          <!-- DYNAMIC FEATURE 3: As-You-Type Live Evaluation Message Input -->
           <div class="message-input-block">
-            <label>Discord Message Payload String:</label>
+            <div class="input-header-row">
+              <label>Discord Message Payload String:</label>
+              <span class="as-you-type-badge">
+                <span class="pulse-beacon"></span>
+                Live type-ahead active (evaluates dynamically)
+              </span>
+            </div>
+
             <textarea 
-              [(ngModel)]="chatInput" 
+              [ngModel]="chatInput()" 
+              (ngModelChange)="onChatInputChange($event)"
               rows="3" 
-              placeholder="Paste or enter Discord message text..." 
+              placeholder="Paste or type any Discord message payload to evaluate in real-time..." 
               class="corp-textarea"></textarea>
-            <button class="corp-btn-primary" (click)="runPrediction()" [disabled]="isPredicting()">
-              <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
-              </svg>
-              {{ isPredicting() ? 'Extracting Heuristics...' : 'Run Real-Time Inference (1.2ms)' }}
-            </button>
+
+            <div class="action-btn-row">
+              <button class="corp-btn-primary" (click)="runPrediction()" [disabled]="isPredicting()">
+                <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                </svg>
+                {{ isPredicting() ? 'Extracting Heuristics...' : 'Run Real-Time Inference (1.2ms)' }}
+              </button>
+              <span class="keyboard-tip">Tip: Press any key to see real-time SHAP attributions update</span>
+            </div>
           </div>
         </div>
 
-        <!-- Telemetry Results -->
+        <!-- Telemetry Results with DYNAMIC FEATURE 4: Animated Radial Risk Gauge -->
         @if (predictionResult(); as res) {
           <div class="hub-card telemetry-card">
             <div class="card-title">
@@ -540,28 +650,63 @@
               Real-Time Classification Telemetry
             </div>
 
-            <div class="metrics-quad-grid">
-              <div class="metric-card">
-                <span class="m-lbl">Scam Confidence</span>
-                <span class="m-val">{{ (res.scam_probability * 100).toFixed(1) }}%</span>
-                <span class="m-sub">Calibrated Probability</span>
+            <div class="telemetry-split-layout">
+              <!-- Radial Animated SVG Risk Gauge -->
+              <div class="radial-gauge-container">
+                <div class="gauge-svg-box">
+                  <svg class="radial-svg" width="130" height="130" viewBox="0 0 100 100">
+                    <circle class="gauge-bg-circle" cx="50" cy="50" r="40" />
+                    <circle 
+                      class="gauge-progress-circle" 
+                      cx="50" 
+                      cy="50" 
+                      r="40"
+                      [style.stroke-dashoffset]="getRiskGaugeOffset(res.scam_probability)"
+                      [style.stroke]="getRiskColor(res.scam_probability)" />
+                  </svg>
+                  <div class="gauge-center-text">
+                    <span class="gauge-pct" [style.color]="getRiskColor(res.scam_probability)">
+                      {{ (res.scam_probability * 100).toFixed(1) }}%
+                    </span>
+                    <span class="gauge-caption">Scam Risk</span>
+                  </div>
+                </div>
+                <div class="gauge-status-badge" [class.badge-danger]="res.scam_probability >= decisionThreshold()" [class.badge-safe]="res.scam_probability < decisionThreshold()">
+                  {{ res.scam_probability >= decisionThreshold() ? 'CRITICAL THREAT' : 'BENIGN PAYLOAD' }}
+                </div>
               </div>
-              <div class="metric-card">
-                <span class="m-lbl">Model Verdict</span>
-                <span class="m-val" [class.text-red]="res.badge === 'critical'" [class.text-amber]="res.badge === 'warning'" [class.text-green]="res.badge === 'success'">
-                  {{ res.verdict }}
-                </span>
-                <span class="m-sub">Operating Threshold: 0.50</span>
-              </div>
-              <div class="metric-card">
-                <span class="m-lbl">Enforcement Action</span>
-                <span class="m-val" style="font-size: 16px;">{{ res.recommended_action }}</span>
-                <span class="m-sub">Platform Security Protocol</span>
-              </div>
-              <div class="metric-card">
-                <span class="m-lbl">Inference Latency</span>
-                <span class="m-val text-blue font-mono">{{ res.latency_ms }} ms</span>
-                <span class="m-sub">Single CPU Execution</span>
+
+              <!-- Metrics Quad Grid -->
+              <div class="metrics-quad-grid">
+                <div class="metric-card">
+                  <span class="m-lbl">Model Policy Verdict</span>
+                  <span class="m-val" [style.color]="getEnforcementVerdict(res.scam_probability).color">
+                    {{ getEnforcementVerdict(res.scam_probability).verdict }}
+                  </span>
+                  <span class="m-sub">Policy &tau; = {{ (decisionThreshold() * 100).toFixed(0) }}%</span>
+                </div>
+
+                <div class="metric-card">
+                  <span class="m-lbl">Automated Protocol Action</span>
+                  <span class="m-val action-text" [style.color]="getEnforcementVerdict(res.scam_probability).color">
+                    {{ getEnforcementVerdict(res.scam_probability).action }}
+                  </span>
+                  <span class="m-sub">{{ getEnforcementVerdict(res.scam_probability).note }}</span>
+                </div>
+
+                <div class="metric-card">
+                  <span class="m-lbl">Inference Latency</span>
+                  <span class="m-val text-blue font-mono">{{ res.latency_ms }} ms</span>
+                  <span class="m-sub">Single CPU Execution</span>
+                </div>
+
+                <div class="metric-card">
+                  <span class="m-lbl">Active Architecture Tier</span>
+                  <span class="m-val" style="font-size: 15px; color: #0f172a;">
+                    {{ selectedModelTier() === 'hardened' ? 'Minimax Hardened (SOTA)' : 'Unhardened Baseline' }}
+                  </span>
+                  <span class="m-sub">3,017 Fused Dimensions</span>
+                </div>
               </div>
             </div>
 

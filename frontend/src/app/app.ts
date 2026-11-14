@@ -13,6 +13,19 @@ import { Chart, registerables } from 'chart.js';
 
 Chart.register(...registerables);
 
+export interface StreamMessage {
+  id: string;
+  sender: string;
+  avatarBg: string;
+  channel: string;
+  content: string;
+  timeStr: string;
+  isScam: boolean;
+  score: number;
+  latencyMs: number;
+  category: string;
+}
+
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -30,6 +43,75 @@ export class App {
   sidebarSearch = signal<string>('');
 
   isOnline = this.sentinel.isBackendOnline;
+
+  // DYNAMIC FEATURE 1: Live Simulated Ingestion Feed State
+  isSimulatorRunning = signal<boolean>(true);
+  totalMessagesScanned = signal<number>(3142);
+  totalThreatsBlocked = signal<number>(528);
+  liveCpuLatency = signal<number>(1.18);
+  private streamIntervalId: any = null;
+  private typeDebounceTimer: any = null;
+
+  liveMessageStream = signal<StreamMessage[]>([
+    {
+      id: 'msg-4',
+      sender: 'CryptoAirdrop#9912',
+      avatarBg: '#ef4444',
+      channel: '#announcements',
+      content: 'URGENT: 5000 USDT Binance Airdrop live now! Mint here: https://binance-airdrop-claim.top',
+      timeStr: 'Just now',
+      isScam: true,
+      score: 0.999,
+      latencyMs: 1.15,
+      category: 'Crypto Scam'
+    },
+    {
+      id: 'msg-3',
+      sender: 'AlexGamer#4011',
+      avatarBg: '#3b82f6',
+      channel: '#general',
+      content: 'anyone down for a valorant 5-stack tonight? need 2 more',
+      timeStr: '4s ago',
+      isScam: false,
+      score: 0.002,
+      latencyMs: 1.12,
+      category: 'Legitimate'
+    },
+    {
+      id: 'msg-2',
+      sender: 'DiscordGiftBot#0001',
+      avatarBg: '#8b5cf6',
+      channel: '#nitro-drops',
+      content: '@everyone Steam is giving away free Discord Nitro! Claim here: https://discoord-app.com/free',
+      timeStr: '9s ago',
+      isScam: true,
+      score: 0.998,
+      latencyMs: 1.21,
+      category: 'Typosquatting'
+    },
+    {
+      id: 'msg-1',
+      sender: 'TechDev#1337',
+      avatarBg: '#10b981',
+      channel: '#bot-dev',
+      content: 'check this sick synthwave music video on youtube https://www.youtube.com/watch?v=5qap5aO4i9A',
+      timeStr: '15s ago',
+      isScam: false,
+      score: 0.006,
+      latencyMs: 1.17,
+      category: 'Legitimate'
+    }
+  ]);
+
+  private trafficSimulationPool = [
+    { sender: 'NitroPromo#8812', avatarBg: '#ef4444', channel: '#giveaways', content: '@everyone Steam Nitro gift drop! Claim fast: https://discoord-promo.xyz/claim', isScam: true, score: 0.997, category: 'Typosquatting' },
+    { sender: 'DevKyle#2091', avatarBg: '#3b82f6', channel: '#general', content: 'hey team did anyone deploy the latest migration script to staging yet?', isScam: false, score: 0.001, category: 'Legitimate' },
+    { sender: 'GiftClaim#0492', avatarBg: '#f59e0b', channel: '#announcements', content: 'Fr33 N1tr0 gіft fоr еvеryоnе! Сlісk https://dlscord-drop.xyz/claim', isScam: true, score: 0.994, category: 'Homoglyph' },
+    { sender: 'Maya#6541', avatarBg: '#10b981', channel: '#gaming', content: 'good game everyone! gg and see you all tomorrow at practice', isScam: false, score: 0.003, category: 'Legitimate' },
+    { sender: 'IndieDev#7719', avatarBg: '#dc2626', channel: '#playtesting', content: 'Hey bro, we made an indie horror demo on itch, could you test the demo build? https://game-alpha-build.xyz/demo.zip', isScam: true, score: 0.988, category: 'Malware' },
+    { sender: 'SamCodes#3141', avatarBg: '#06b6d4', channel: '#dev-chat', content: 'has anyone tested the new Python 3.14 free-threaded build with numpy?', isScam: false, score: 0.002, category: 'Legitimate' },
+    { sender: 'AirdropSentinel#1102', avatarBg: '#ef4444', channel: '#crypto', content: 'CLAIM 10,000 ARB TOKENS IMMEDIATELY: Connect wallet at https://arbitrum-foundation-airdrop.top', isScam: true, score: 0.999, category: 'Web3 Drainer' }
+  ];
 
   getActiveTabTitle(): string {
     switch (this.activeTab()) {
@@ -114,7 +196,111 @@ export class App {
       this.loadAllData();
       this.runPrediction();
       this.runMutation();
+      this.startTrafficSimulator();
     });
+  }
+
+  toggleSimulator() {
+    if (this.isSimulatorRunning()) {
+      this.stopTrafficSimulator();
+      this.isSimulatorRunning.set(false);
+    } else {
+      this.startTrafficSimulator();
+      this.isSimulatorRunning.set(true);
+    }
+  }
+
+  startTrafficSimulator() {
+    if (this.streamIntervalId) clearInterval(this.streamIntervalId);
+    this.streamIntervalId = setInterval(() => {
+      if (!this.isSimulatorRunning()) return;
+      
+      const pool = this.trafficSimulationPool;
+      const pick = pool[Math.floor(Math.random() * pool.length)];
+      const jitterMs = +(1.10 + Math.random() * 0.15).toFixed(2);
+      
+      const newMsg: StreamMessage = {
+        id: 'msg-' + Date.now(),
+        sender: pick.sender,
+        avatarBg: pick.avatarBg,
+        channel: pick.channel,
+        content: pick.content,
+        timeStr: 'Just now',
+        isScam: pick.isScam,
+        score: pick.score,
+        latencyMs: jitterMs,
+        category: pick.category
+      };
+
+      this.liveMessageStream.update(list => [newMsg, ...list.slice(0, 7)]);
+      this.totalMessagesScanned.update(c => c + 1);
+      if (pick.isScam) {
+        this.totalThreatsBlocked.update(c => c + 1);
+      }
+      this.liveCpuLatency.set(jitterMs);
+    }, 2400);
+  }
+
+  stopTrafficSimulator() {
+    if (this.streamIntervalId) {
+      clearInterval(this.streamIntervalId);
+      this.streamIntervalId = null;
+    }
+  }
+
+  selectStreamMessage(msg: StreamMessage) {
+    this.chatInput.set(msg.content);
+    this.runPrediction();
+  }
+
+  onChatInputChange(newVal: string) {
+    this.chatInput.set(newVal);
+    if (this.typeDebounceTimer) clearTimeout(this.typeDebounceTimer);
+    this.typeDebounceTimer = setTimeout(() => {
+      this.runPrediction();
+    }, 240);
+  }
+
+  getRiskColor(score: number): string {
+    if (score >= this.decisionThreshold()) return '#ef4444'; // Red (Scam)
+    if (score >= this.decisionThreshold() - 0.20) return '#f59e0b'; // Amber (Suspicious)
+    return '#10b981'; // Green (Safe)
+  }
+
+  getRiskGaugeOffset(score: number): number {
+    // Circle circumference with r=40 is ~251.3
+    const maxOffset = 251.3;
+    const clamped = Math.max(0, Math.min(1, score));
+    return maxOffset * (1 - clamped);
+  }
+
+  getEnforcementVerdict(score: number) {
+    const thresh = this.decisionThreshold();
+    if (score >= thresh) {
+      return {
+        verdict: 'MALICIOUS PHISHING SCAM',
+        action: 'AUTO-DELETE & BAN SENDER',
+        color: '#ef4444',
+        badgeClass: 'verdict-critical',
+        note: 'Payload violated verified structural invariants.'
+      };
+    } else if (score >= thresh - 0.20) {
+      return {
+        verdict: 'BORDERLINE / SUSPICIOUS',
+        action: 'QUARANTINE & DISCORD NOTIFY',
+        color: '#f59e0b',
+        badgeClass: 'verdict-warning',
+        note: 'Elevated entropy or minor typosquat similarity.'
+      };
+    } else {
+      return {
+        verdict: 'BENIGN GAMER MESSAGE',
+        action: 'ALLOW & DELIVER INSTANTLY',
+        color: '#10b981',
+        badgeClass: 'verdict-safe',
+        note: 'Payload conforms to standard non-adversarial text.'
+      };
+    }
   }
 
   toggleSidebar() {
