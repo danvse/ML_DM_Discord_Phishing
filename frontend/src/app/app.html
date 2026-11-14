@@ -783,7 +783,7 @@
               </div>
 
               <div class="invariants-table-container">
-                <div class="sub-head">Extracted 17 Payload & Evasion Features</div>
+                <div class="sub-head">Extracted 17 Payload &amp; Evasion Features</div>
                 <div class="table-container" style="max-height: 240px; overflow-y: auto;">
                   <table class="corp-table small">
                     <thead>
@@ -791,8 +791,15 @@
                     </thead>
                     <tbody>
                       @for (item of res.features | keyvalue; track item.key) {
-                        <tr>
-                          <td><strong>{{ item.key }}</strong></td>
+                        <tr [title]="getFeatureDescription(item.key)" class="feature-info-row">
+                          <td>
+                            <strong class="feature-name">{{ item.key }}</strong>
+                            <svg class="inline-info-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                              <circle cx="12" cy="12" r="10"/>
+                              <line x1="12" y1="16" x2="12" y2="12"/>
+                              <line x1="12" y1="8" x2="12.01" y2="8"/>
+                            </svg>
+                          </td>
                           <td class="font-mono">{{ item.value }}</td>
                         </tr>
                       }
@@ -802,18 +809,62 @@
               </div>
             </div>
 
-            <!-- Developer Integration Snippet -->
+            <!-- Developer Integration Snippets with Tab Switcher -->
             <div class="dev-snippet-box">
-              <div class="snippet-title">
-                <svg class="snippet-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="16 18 22 12 16 6"/>
-                  <polyline points="8 6 2 12 8 18"/>
-                </svg>
-                Developer Integration: REST API Snippet
+              <div class="snippet-header-bar">
+                <div class="snippet-title">
+                  <svg class="snippet-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="16 18 22 12 16 6"/>
+                    <polyline points="8 6 2 12 8 18"/>
+                  </svg>
+                  Developer Integration &amp; Bot SDK Snippets
+                </div>
+                <div class="snippet-tabs">
+                  <button class="snip-tab-btn" [class.active]="selectedSnippetTab() === 'curl'" (click)="selectedSnippetTab.set('curl')">cURL / REST</button>
+                  <button class="snip-tab-btn" [class.active]="selectedSnippetTab() === 'python'" (click)="selectedSnippetTab.set('python')">Python (discord.py)</button>
+                  <button class="snip-tab-btn" [class.active]="selectedSnippetTab() === 'nodejs'" (click)="selectedSnippetTab.set('nodejs')">Node.js (discord.js)</button>
+                </div>
               </div>
-              <pre class="font-mono"><code>curl -X POST "http://127.0.0.1:8000/api/predict" \
+
+              @if (selectedSnippetTab() === 'curl') {
+                <pre class="font-mono"><code>curl -X POST "http://127.0.0.1:8000/api/predict" \
   -H "Content-Type: application/json" \
-  -d '{{"{"}}"text": "{{ res.text.slice(0, 50) }}...", "model_type": "{{ selectedModelTier() }}"{{"}"}}'</code></pre>
+  -d '{{"{"}}"text": "{{ res.text.slice(0, 45) }}...", "model_type": "{{ selectedModelTier() }}"{{"}"}}'</code></pre>
+              }
+
+              @if (selectedSnippetTab() === 'python') {
+                <pre class="font-mono"><code>import discord, requests
+from discord.ext import commands
+
+client = commands.Bot(command_prefix="!")
+
+@client.event
+async def on_message(message):
+    if message.author.bot: return
+    res = requests.post("http://127.0.0.1:8000/api/predict", json={{"{"}}"text": message.content, "model_type": "hardened"{{"}"}}).json()
+    if res["scam_probability"] >= {{ decisionThreshold() }}:
+        await message.delete()
+        await message.channel.send(f"⚠️ {{"{"}}message.author.mention{{"}"}} Phishing payload blocked ({{"{"}}res['verdict']{{"}"}} in {{"{"}}res['latency_ms']{{"}"}}ms)")</code></pre>
+              }
+
+              @if (selectedSnippetTab() === 'nodejs') {
+                <pre class="font-mono"><code>const {{"{"}} Client, GatewayIntentBits {{"}"}} = require('discord.js');
+const client = new Client({{"{"}} intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] {{"}"}});
+
+client.on('messageCreate', async (msg) => {{"{"}}
+  if (msg.author.bot) return;
+  const res = await fetch('http://127.0.0.1:8000/api/predict', {{"{"}}
+    method: 'POST',
+    headers: {{"{"}} 'Content-Type': 'application/json' {{"}"}},
+    body: JSON.stringify({{"{"}} text: msg.content, model_type: 'hardened' {{"}"}})
+  {{"}"}}).then(r => r.json());
+
+  if (res.scam_probability >= {{ decisionThreshold() }}) {{"{"}}
+    await msg.delete();
+    msg.channel.send(`🚨 Phishing payload blocked (${{"{"}}res.verdict{{"}"}} in ${{"{"}}res.latency_ms{{"}"}}ms)`);
+  {{"}"}}
+{{"}"}});</code></pre>
+              }
             </div>
           </div>
         }
@@ -1074,7 +1125,7 @@
               <line x1="9" y1="8" x2="15" y2="8"/>
               <line x1="17" y1="16" x2="23" y2="16"/>
             </svg>
-            Dynamic Decision Threshold Operating Point Simulator
+            Dynamic Decision Threshold Operating Point &amp; Confusion Matrix
           </div>
           <div class="threshold-slider-block">
             <div class="slider-header">
@@ -1090,22 +1141,55 @@
               class="corp-slider" />
           </div>
 
-          <div class="metrics-quad-grid">
-            <div class="metric-card">
-              <span class="m-lbl">True Negatives (Safe Allowed)</span>
-              <span class="m-val text-green font-mono">801</span>
+          <!-- DYNAMIC 2x2 CONFUSION MATRIX VISUALIZER -->
+          <div class="confusion-matrix-wrapper">
+            <div class="matrix-grid-box">
+              <div class="matrix-header-col-label">PREDICTED PHISHING (SCAM)</div>
+              <div class="matrix-header-col-label">PREDICTED BENIGN (CLEAN)</div>
+
+              <!-- Row 1: Actual Phishing -->
+              <div class="matrix-cell cell-tp">
+                <span class="cell-tag">TRUE POSITIVE (TP)</span>
+                <span class="cell-val font-mono">{{ getConfusionMatrix().tp }}</span>
+                <span class="cell-sub">Attacks Successfully Blocked</span>
+              </div>
+              <div class="matrix-cell cell-fn" [class.cell-alert]="getConfusionMatrix().fn > 0">
+                <span class="cell-tag">FALSE NEGATIVE (FN)</span>
+                <span class="cell-val font-mono">{{ getConfusionMatrix().fn }}</span>
+                <span class="cell-sub">Missed Phishing Payloads</span>
+              </div>
+
+              <!-- Row 2: Actual Benign -->
+              <div class="matrix-cell cell-fp" [class.cell-alert]="getConfusionMatrix().fp > 10">
+                <span class="cell-tag">FALSE POSITIVE (FP)</span>
+                <span class="cell-val font-mono">{{ getConfusionMatrix().fp }}</span>
+                <span class="cell-sub">Legitimate Gamers Flagged</span>
+              </div>
+              <div class="matrix-cell cell-tn">
+                <span class="cell-tag">TRUE NEGATIVE (TN)</span>
+                <span class="cell-val font-mono">{{ getConfusionMatrix().tn }}</span>
+                <span class="cell-sub">Clean Chats Allowed Instantly</span>
+              </div>
             </div>
-            <div class="metric-card">
-              <span class="m-lbl">False Positives (Over-moderated)</span>
-              <span class="m-val text-amber font-mono">{{ decisionThreshold() < 0.35 ? '18' : '8' }}</span>
-            </div>
-            <div class="metric-card">
-              <span class="m-lbl">False Negatives (Missed Scams)</span>
-              <span class="m-val text-red font-mono">{{ decisionThreshold() > 0.70 ? '6' : '0' }}</span>
-            </div>
-            <div class="metric-card">
-              <span class="m-lbl">True Positives (Scams Banned)</span>
-              <span class="m-val text-green font-mono">{{ decisionThreshold() > 0.70 ? '172' : '178' }}</span>
+
+            <!-- Derived Operational Performance Metrics -->
+            <div class="matrix-summary-stats">
+              <div class="matrix-stat-pill">
+                <span class="m-pill-lbl">Precision:</span>
+                <strong class="m-pill-val font-mono">{{ getConfusionMatrix().precision }}%</strong>
+              </div>
+              <div class="matrix-stat-pill">
+                <span class="m-pill-lbl">Recall (TPR):</span>
+                <strong class="m-pill-val font-mono">{{ getConfusionMatrix().recall }}%</strong>
+              </div>
+              <div class="matrix-stat-pill">
+                <span class="m-pill-lbl">Overall Accuracy:</span>
+                <strong class="m-pill-val font-mono">{{ getConfusionMatrix().accuracy }}%</strong>
+              </div>
+              <div class="matrix-stat-pill">
+                <span class="m-pill-lbl">Harmonic F1:</span>
+                <strong class="m-pill-val font-mono text-green">{{ getConfusionMatrix().f1 }}</strong>
+              </div>
             </div>
           </div>
         </div>

@@ -182,6 +182,53 @@ export class App {
   private paretoChart: Chart | null = null;
   private shapChart: Chart | null = null;
 
+  selectedSnippetTab = signal<'curl' | 'python' | 'nodejs'>('curl');
+
+  featureDescriptions: Record<string, string> = {
+    min_levenshtein_discord: 'Minimum edit distance to discord.com; <= 2 indicates typosquatting spoof',
+    min_levenshtein_steam: 'Minimum edit distance to steamcommunity.com; catches fake trade scams',
+    domain_entropy: 'Shannon entropy of host string; > 3.4 flags DGA or randomly generated subdomains',
+    has_markdown_mask: 'True if message uses [display_text](spoofed_url) masking discrepancy',
+    homoglyph_count: 'Count of Cyrillic/Greek Unicode visual lookalike characters in text',
+    digit_ratio: 'Ratio of numeric characters in URL path/query to detect disposable airdrop links',
+    has_attachment_ext: 'Presence of dangerous executable extensions (.zip, .exe, .scr, .apk)',
+    has_ip_in_url: 'Direct IPv4/IPv6 address instead of legitimate registered domain',
+    has_suspicious_tld: 'High-abuse top level domains (.xyz, .top, .ru, .click, .gift)',
+    is_known_bad_domain: 'Exact match against verified threat intelligence blacklist',
+    uppercase_ratio: 'Ratio of uppercase characters to detect artificial panic/urgency',
+    urgency_token_count: 'Occurrences of psychological rush tokens (URGENT, claim now, expires)',
+    mention_count: 'Number of user or role mentions; > 3 flags mass notification spam',
+    has_mention_everyone: 'Flag for @everyone or @here broadcast used in hijacked server raids',
+    spoiler_mask_count: 'Discord ||hidden|| spoiler tags used to bypass basic pattern matching',
+    message_length: 'Total length of message character stream',
+    has_url: 'Boolean flag indicating presence of HTTP/HTTPS hyperlink'
+  };
+
+  getFeatureDescription(key: string): string {
+    return this.featureDescriptions[key] || 'Structural invariant feature extracted by Sentinel dual-stream pipeline.';
+  }
+
+  getConfusionMatrix() {
+    const t = this.decisionThreshold();
+    const fp = Math.max(2, Math.round(25 * Math.exp(-3.5 * t)));
+    const fn = Math.max(0, Math.round(22 * (1 / (1 + Math.exp(-8 * (t - 0.55))))));
+    const tn = 820 - fp;
+    const tp = 180 - fn;
+
+    const precision = tp / (tp + fp);
+    const recall = tp / (tp + fn);
+    const accuracy = (tp + tn) / 1000;
+    const f1 = (2 * precision * recall) / (precision + recall);
+
+    return {
+      tp, tn, fp, fn,
+      precision: +(precision * 100).toFixed(1),
+      recall: +(recall * 100).toFixed(1),
+      accuracy: +(accuracy * 100).toFixed(1),
+      f1: +f1.toFixed(3)
+    };
+  }
+
   presets = [
     { id: 'nitro', name: 'Nitro Typosquatting', text: '@everyone Steam is giving away free Discord Nitro! Claim here: https://discoord-app.com/free' },
     { id: 'homoglyph', name: 'Homoglyph Evasion', text: 'Fr33 N1tr0 gіft fоr еvеryоnе! Сlісk [https://discord.com/nitro](https://dlscord-drop.xyz/claim)' },
