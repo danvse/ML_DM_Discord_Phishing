@@ -214,6 +214,14 @@ export class SentinelService {
       mutated = mutated.replace(/discord\.com/g, 'dlscord-app.com').replace(/steamcommunity\.com/g, 'steamcommunity-trade.ru');
       applied.push('Levenshtein-1 Domain Typosquatting');
     }
+    if (options.urgency_invert) {
+      mutated = mutated.replace(/@everyone\s*/gi, 'hey guys, ')
+        .replace(/@here\s*/gi, 'yo, ')
+        .replace(/URGENT:?\s*/gi, 'by the way, ')
+        .replace(/is giving away free/gi, 'has a promotional gift for')
+        .replace(/Claim here:?/gi, 'check this out when you get a chance:');
+      applied.push('Psychological Lure Inversion (Urgency Dampening)');
+    }
 
     const automodPassed = !options.homoglyphs && !options.zero_width && /(nitro|steam|free)/i.test(mutated);
     const unhardenedScore = (options.homoglyphs || options.zero_width) ? 0.32 : 0.94;

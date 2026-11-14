@@ -188,8 +188,47 @@ export class App {
     { id: 'gametester', name: 'Malware Game Tester', text: 'Hey bro, me and my team made an indie game on steam/itch, could you test the demo build? https://game-alpha-build.xyz/demo.zip' },
     { id: 'crypto', name: 'Web3 Airdrop Scam', text: 'URGENT: 5000 USDT Binance Airdrop live now for Discord members! Mint here: https://binance-airdrop-claim.top' },
     { id: 'benign', name: 'Benign Gamer Banter', text: 'hey anyone want to play valorant tonight? we need one more for competitive queue' },
-    { id: 'legitlink', name: 'Benign with YouTube Link', text: 'check out this funny cat video on youtube https://www.youtube.com/watch?v=dQw4w9WgXcQ' }
+    { id: 'legitlink', name: 'Benign with YouTube Link', text: 'check out this funny cat video on youtube https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
+    { id: 'custom', name: 'Custom / Ingested Stream Message', text: '' }
   ];
+
+  isNotificationsOpen = signal<boolean>(false);
+  notifications = signal<Array<{ id: string; time: string; title: string; desc: string; type: 'threat' | 'system' }>>([
+    { id: '1', time: '1m ago', title: 'Adversarial Evasion Blocked', desc: 'Homoglyph spoof neutralized on #announcements in 1.18ms.', type: 'threat' },
+    { id: '2', time: '4m ago', title: 'Minimax XGBoost Verified', desc: 'SOTA invariant bounds maintained across 2,000 samples.', type: 'system' },
+    { id: '3', time: '12m ago', title: 'Typosquat Pattern Detected', desc: 'Levenshtein-1 variant dlscord-drop.xyz auto-flagged.', type: 'threat' }
+  ]);
+
+  toggleNotifications() {
+    this.isNotificationsOpen.update(v => !v);
+    if (this.isNotificationsOpen()) this.isUserMenuOpen.set(false);
+  }
+
+  onGlobalSearch(query: string) {
+    this.sidebarSearch.set(query);
+  }
+
+  onSearchEnter() {
+    const q = this.sidebarSearch().toLowerCase().trim();
+    if (!q) return;
+    if (q.includes('arch') || q.includes('sota') || q.includes('flow') || q.includes('radar')) {
+      this.setTab('arch');
+    } else if (q.includes('red') || q.includes('attack') || q.includes('mutat') || q.includes('arena')) {
+      this.setTab('redteam');
+    } else if (q.includes('train') || q.includes('loss') || q.includes('dynam')) {
+      this.setTab('training');
+    } else if (q.includes('bench') || q.includes('roc') || q.includes('paret') || q.includes('eval')) {
+      this.setTab('benchmarks');
+    } else {
+      this.setTab('playground');
+    }
+  }
+
+  isNavItemVisible(title: string): boolean {
+    const q = this.sidebarSearch().toLowerCase().trim();
+    if (!q) return true;
+    return title.toLowerCase().includes(q);
+  }
 
   constructor() {
     afterNextRender(() => {
@@ -249,11 +288,13 @@ export class App {
   }
 
   selectStreamMessage(msg: StreamMessage) {
+    this.selectedPreset.set('custom');
     this.chatInput.set(msg.content);
     this.runPrediction();
   }
 
   onChatInputChange(newVal: string) {
+    this.selectedPreset.set('custom');
     this.chatInput.set(newVal);
     if (this.typeDebounceTimer) clearTimeout(this.typeDebounceTimer);
     this.typeDebounceTimer = setTimeout(() => {

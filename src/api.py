@@ -204,6 +204,15 @@ def mutate_and_test(req: MutationRequest):
         text = text.replace("discord.com", "dlscord-app.com").replace("steamcommunity.com", "steamcommunity-trade.ru")
         applied.append("Levenshtein-1 Domain Typosquatting")
 
+    if req.urgency_invert:
+        # Replaces mass mentions and loud urgency keywords with casual peer lure
+        text = re.sub(r"@everyone\s*", "hey guys, ", text, flags=re.IGNORECASE)
+        text = re.sub(r"@here\s*", "yo, ", text, flags=re.IGNORECASE)
+        text = re.sub(r"URGENT:?\s*", "by the way ", text, flags=re.IGNORECASE)
+        text = re.sub(r"is giving away free", "has a promotional gift for", text, flags=re.IGNORECASE)
+        text = re.sub(r"Claim here:?", "check this out when you get a chance:", text, flags=re.IGNORECASE)
+        applied.append("Psychological Lure Inversion (Urgency Dampening)")
+
     automod_res = run_automod(text)
 
     # Unhardened
