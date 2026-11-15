@@ -431,6 +431,19 @@ export class App {
     this.isChatPopoutOpen.update(v => !v);
   }
 
+  onPopoutKeydown(event: KeyboardEvent) {
+    if (event.key === 'Enter') {
+      if (event.ctrlKey || event.metaKey) {
+        event.preventDefault();
+        this.sendChatMessage();
+        this.closeChatPopout();
+      } else if (!event.shiftKey) {
+        event.preventDefault();
+        this.sendChatMessage();
+      }
+    }
+  }
+
   clearChatThread() {
     this.chatThreadMessages.set([]);
   }

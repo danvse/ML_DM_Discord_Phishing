@@ -970,11 +970,10 @@ client.on('messageCreate', async (msg) => {{"{"}}
                   <textarea 
                     [ngModel]="chatInput()" 
                     (ngModelChange)="onChatInputChange($event)"
-                    (keydown.control.enter)="sendChatMessage(); closeChatPopout()"
-                    (keydown.enter)="$event.shiftKey ? null : ($event.preventDefault(); sendChatMessage())"
+                    (keydown)="onPopoutKeydown($any($event))"
                     rows="5" 
                     class="popout-input-textarea" 
-                    placeholder="Type or paste any Discord payload message here... (Enter to send, Shift + Enter for new line)"
+                    placeholder="Type or paste any Discord payload message here... (Enter to send, Shift + Enter for new line, Ctrl + Enter to send &amp; close)"
                     autofocus></textarea>
 
                   <div class="popout-meta-row">
