@@ -32,19 +32,16 @@ AFFILIATION = "Department of Computer Science  |  Machine Learning & Data Mining
 DATE = "December 2026"
 
 ABSTRACT_TEXT = (
-    "Discord has expanded into a primary target for social engineering, credential harvesting, "
-    "and malware distribution. Standard platform moderation relies on static regular expressions and "
-    "keyword blacklists, which collapse under adversarial character evasion techniques including Cyrillic "
-    "homoglyphs, leetspeak, and markdown link masking. This paper presents a complete detection system "
-    "that pairs natural language text semantics with an engineered set of 17 structural payload and evasion "
-    "heuristics. Across a balanced corpus of 3,552 verified Discord messages, we demonstrate that while "
-    "native AutoMod regex filters collapse by 37.2% in F1-score under adversarial evasion, our dual-stream "
-    "XGBoost model retains an F1-score of 0.8078 on unhardened data and achieves 1.0000 adversarial recall "
-    "(0.9780 F1) when retrained with minimax adversarial data augmentation. A formal 3-way feature ablation "
-    "study proves that 17 structural invariants alone outperform 3,000 text n-grams by 14.1% under attack, "
-    "while late fusion achieves peak clean detection (98.31% recall, 0.9988 AUROC). With an inference latency "
-    "of 1.2 milliseconds per message on commodity CPU hardware, the system delivers real-time throughput "
-    "compatible with high-volume Discord servers."
+    "Social engineering attacks on Discord have evolved past simple spam bots into multi-turn conversational lures "
+    "and character-level evasion that easily bypass platform filters. Native AutoMod regex rules rely on exact keyword "
+    "matches; against Cyrillic homoglyphs, leetspeak, and markdown link discrepancies, their detection performance drops "
+    "sharply (-37.2% in F1-score). In this project, we built a dual-stream detection pipeline that couples 3,000 TF-IDF "
+    "n-grams with 17 engineered structural invariants extracted directly from raw message strings. On a balanced benchmark "
+    "of 3,552 verified Discord messages, unhardened gradient-boosted trees achieved 0.9777 clean F1, but still experienced "
+    "a 17.4% performance drop under adversarial evasion. By implementing a minimax data augmentation training strategy, "
+    "we eliminated this vulnerability, reaching 100.0% adversarial recall and 0.9780 F1 under stress tests. Crucially, "
+    "feature ablation revealed that our 17 structural heuristics alone outperformed 3,000 text n-grams by 14.1% under "
+    "attack, while operating in 1.2 milliseconds on commodity CPU hardware."
 )
 
 INDEX_TERMS = "Discord security, phishing detection, machine learning, feature fusion, adversarial training, social engineering, XGBoost, SHAP interpretability."
@@ -58,65 +55,62 @@ SECTIONS_PART1 = [
                 "A. Background and Motivation"
             ),
             (
-                "Discord hosts over 200 million monthly active users, expanding from a gaming voice client into "
-                "a central platform for community servers, software engineering, cryptocurrency projects, and "
-                "academic study groups. This concentration of active communities makes Discord an exceptionally high-yield "
-                "target for scripted social engineering. Attackers distribute malicious links via direct messages (DMs) "
-                "and unsolicited friend requests. The primary payload categories include counterfeit Discord Nitro subscription "
-                "claims, fake Steam trade or wallet code offers, counterfeit tournament verification portals, and malicious "
-                "indie game test executables."
+                "Over the past five years, Discord has grown from a voice chat tool for gamers into a hub for over "
+                "200 million monthly active users, hosting software development groups, cryptocurrency communities, and "
+                "student study servers. Because servers mix anonymous members with direct-messaging access, Discord has "
+                "become one of the most profitable targets for automated phishing and account-hijacking campaigns. Attackers "
+                "routinely target users with fake Discord Nitro free gifts, counterfeit Steam trade offers, bogus tournament "
+                "signups, and fake indie game playtest builds that bundle infostealer malware."
             ),
             (
-                "When a user account is compromised via an infostealer binary or OAuth token grabber, attackers gain access "
-                "to stored payment methods, purchase gift subscriptions, and immediately repurpose the account to blast "
-                "phishing lures to every mutual server and contact. This creates an exponential cascade: victims unwittingly "
-                "become attackers. According to Discord transparency reports, the platform bans millions of malicious and "
-                "compromised accounts each quarter. Nevertheless, community administrators face daily spam intrusions that "
-                "degrade user trust and require manual intervention."
+                "Once an attacker grabs an account token or session token, the compromise spreads virally. The bot script "
+                "scrapes the victim's mutual servers and friends list, immediately sending out identical lure links to dozens "
+                "of contacts. Because these messages originate from trusted friends rather than unfamiliar accounts, click-through "
+                "rates are substantially higher than typical email phishing. While Discord's native moderation tools (AutoMod) "
+                "and public bots (MEE6, Dyno) catch simple duplicate links, they consistently fail when attackers alter the text "
+                "slightly to evade static blacklist checks."
             ),
             (
                 "B. Problem Definition"
             ),
             (
-                "Let m denote an incoming raw Discord message string. The detection task is to learn a classification "
-                "function f(m) -> {0, 1}, where 0 indicates a benign message and 1 indicates an attack. Traditional text "
-                "filtering fails in this domain due to two specific adversarial dynamics:"
+                "Given a raw message string m, our goal is to construct a classifier f(m) -> {0, 1}, predicting whether m is "
+                "benign (0) or malicious (1). In our investigation, we found two main reasons why standard text filters break down in practice:"
             ),
             (
-                "1) Obfuscated Evasion: Native Discord filters (AutoMod) and third-party bots (Dyno, MEE6) rely on static "
-                "regex patterns and keyword blacklists. Attackers evade these rules by swapping Latin characters with visually "
-                "indistinguishable Cyrillic homoglyphs (e.g., Cyrillic 'о' in place of Latin 'o'), inserting leetspeak ('fr33 n1tr0'), "
-                "and using markdown link masks ('[trusted.com](malicious-url)'). Regex filters check for exact substring "
-                "matches, find none, and let the message pass."
+                "1) Obfuscated Character Evasion: Attackers easily bypass regex-based filters by swapping standard Latin characters "
+                "for visually identical Cyrillic lookalikes (such as substituting Cyrillic 'о' for Latin 'o'), using leetspeak ('fr33 n1tr0'), "
+                "or exploiting Discord's markdown syntax to disguise destinations ('[discord.com/nitro](https://phishing-domain.xyz)'). "
+                "Because rule-based systems rely on exact string equality, even a single character substitution allows the lure through."
             ),
             (
-                "2) Semantic Pretext Shift: Attackers increasingly employ multi-turn conversational pretexts rather than "
-                "immediate link dumps. In these schemes, a scripted bot account opens with benign small talk -- asking to test an "
-                "indie game build, vote for a competitive gaming roster, or hire an artist -- before providing an external link. "
-                "Isolated single-token keyword models flag benign conversation containing URLs while missing novel social engineering pretexts."
+                "2) Conversational Pretexting: Modern attacks rarely open with a naked scam link. Instead, attackers use automated "
+                "scripts that open with believable conversational openers--such as asking a server member to test an indie game, vote "
+                "for an esports team, or evaluate artwork--before sending a URL. Standard keyword models often produce false alarms on "
+                "legitimate conversation containing links, while missing attacks that use novel pretext wording."
             ),
             (
-                "C. System Framing and Technical Contributions"
+                "C. System Architecture and Contributions"
             ),
             (
-                "To resolve these failures, we designed a dual-stream feature fusion setup. The system decouples text "
-                "semantic intent from structural payload invariants, combining both into a tree-based ensemble. "
-                "Our primary technical contributions are:"
+                "To tackle both issues without requiring heavy deep learning infrastructure, we developed a dual-stream feature fusion "
+                "architecture. Our pipeline decouples high-level vocabulary patterns from low-level payload structure, routing both into "
+                "an optimized gradient-boosted decision tree ensemble. Specifically, this work makes three core contributions:"
             ),
             (
-                "1) Dual-Stream Representation: We pair high-dimensional TF-IDF n-grams with 17 engineered structural payload "
-                "and evasion invariants (including Levenshtein brand distances, Shannon DNS entropy, known-threat set intersections, "
-                "and Unicode script-plane counts) computed directly from raw message strings without external API calls."
+                "1) Dual-Stream Representation: We combine a 3,000-dimensional TF-IDF text representation with a dense set of 17 structural "
+                "payload invariants (including Levenshtein brand distance, Shannon host entropy, and Unicode script-plane counts) computed "
+                "directly from raw message text without requiring external network lookups or Discord bot API privileges."
             ),
             (
-                "2) Minimax Adversarial Data Hardening: We formulate an adversarial data augmentation training protocol that injects "
-                "perturbed homoglyphs and link disguises into the training partition, eliminating the model's evasion vulnerability "
-                "and raising adversarial recall from 69.66% to 100.0%."
+                "2) Minimax Adversarial Hardening: We introduce a minimax data augmentation training regimen that synthesizes perturbed "
+                "homoglyphs and disguised links during training. This eliminated the baseline model's evasion gap, lifting adversarial "
+                "recall from 69.66% to 100.0% without degrading clean classification accuracy."
             ),
             (
-                "3) Theoretical and Empirical Ablation: We provide a 3-way feature ablation study mathematically demonstrating "
-                "why structural invariants outperform high-dimensional text representations under attack, alongside game-theoretic "
-                "SHAP feature attributions and latency profiling on commodity CPU hardware."
+                "3) Systematic Ablation and Latency Profiling: Through a 3-way ablation study, we demonstrate why structural heuristics "
+                "provide a much stronger defense than pure text n-grams under attack (+14.1% F1 advantage). Furthermore, we profile the full "
+                "pipeline on standard CPU hardware, showing it completes in 1.2ms per message."
             ),
         ],
     },
@@ -126,45 +120,48 @@ SECTIONS_PART1 = [
         "heading": "II. METHODOLOGY & SYSTEM SETUP",
         "paragraphs": [
             (
-                "A. Operational Flow and Feature Streams"
+                "A. Operational Flow and Feature Extraction"
             ),
             (
-                "The system processes incoming raw messages through two parallel extraction paths before performing "
-                "gradient-boosted decision tree classification. The complete operational flow proceeds as follows:"
+                "When a Discord message arrives, our pipeline routes it through two parallel extraction paths before feeding "
+                "the concatenated representations into XGBoost. The operational flow proceeds through five concrete stages:"
             ),
             (
-                "1) Ingestion & Normalization: The raw message string m is ingested. Mentions (<@!id>, @everyone) and excess "
-                "whitespace are stripped into normalized text string s_clean."
+                "1) Ingestion & Preprocessing: Raw text string m is ingested. We strip Discord snowflake mentions (<@!id>, @everyone) "
+                "and collapse repeated whitespace into a normalized string s_clean."
             ),
             (
-                "2) Stream A (Semantic Intent Extraction): Text s_clean is converted into a 3,000-dimensional sparse feature "
-                "vector e_text using sublinear term-frequency TF-IDF over word n-grams (ranges 1 to 2) and character subwords."
+                "2) Stream A (Text Semantic TF-IDF): We convert s_clean into a 3,000-dimensional sparse feature vector e_text using "
+                "sublinear term-frequency TF-IDF across word n-grams (ranges 1 to 2) and character subwords. This captures vocabulary "
+                "patterns such as free Nitro lures, game playtest requests, or urgency phrasing."
             ),
             (
-                "3) Stream B (Structural Evasion Extraction): Message m is inspected for URLs, markdown syntax, and Unicode "
-                "planes, generating a dense 17-dimensional vector x_heur of structural payload indicators."
+                "3) Stream B (17 Structural Invariants): In parallel, raw string m is parsed for URLs, markdown syntax, and Unicode "
+                "script planes, generating a dense 17-dimensional vector x_heur of structural payload indicators."
             ),
             (
-                "4) Late Multimodal Fusion: Feature vectors are concatenated into a joint matrix X = [e_text, x_heur] in "
-                "R^(3017), which feeds into our trained XGBoost classifier."
+                "4) Late Multimodal Fusion: Feature vectors are horizontally concatenated into a joint matrix X = [e_text, x_heur] in "
+                "R^(3017), which feeds directly into our trained XGBoost classifier."
             ),
             (
-                "5) Threshold-Calibrated Decision Engine: The predicted probability P(scam | m) is evaluated against operational "
-                "thresholds: P >= 0.80 triggers a delete-and-ban action; 0.50 <= P < 0.80 flags the message for human "
-                "moderator review; P < 0.50 permits standard message delivery."
+                "5) Threshold-Calibrated Decision Engine: The predicted scam probability P(scam | m) is mapped into three operational "
+                "actions: immediate deletion and sender ban (P >= 0.80), quarantine for human moderator review (0.50 <= P < 0.80), or "
+                "standard message delivery (P < 0.50)."
             ),
             (
-                "B. Adopted Mathematical Models"
+                "B. Adopted Mathematical Formulations"
             ),
             (
-                "1) Levenshtein String Metric: To detect typosquatted domains without maintaining exhaustive dictionary lists, "
-                "we compute the minimum edit distance between an extracted domain string d and target protected brand domains "
-                "B = {'discord.com', 'discordapp.com', 'steamcommunity.com'}. The Levenshtein distance lev(d, b) is defined as:"
+                "1) Bounded Levenshtein Brand Distance: Computing full string edit distance against open-ended dictionaries in real-time "
+                "is computationally prohibitive for a live chat queue. To guarantee sub-millisecond execution, we restricted the target "
+                "brand set B specifically to the primary targets of Discord credential phishing: B = {'discord.com', 'discordapp.com', "
+                "'steamcommunity.com'}. The Levenshtein distance lev(d, b) is defined as:"
             ),
             (
                 "lev(d, b) = |d| if |b| = 0; |b| if |d| = 0; lev(tail(d), tail(b)) if d[0] = b[0]; otherwise 1 + min(lev(tail(d), b), "
                 "lev(d, tail(b)), lev(tail(d), tail(b))). We compute d_min = min_{b in B} lev(d, b). Legitimate domains yield d_min = 0, "
-                "while lookalike domains such as 'discoord-app.com' yield d_min in {1, 2, 3}."
+                "while lookalike domains such as 'discoord-app.com' or 'dlscord.xyz' yield d_min in {1, 2, 3}, creating a clear geometric "
+                "boundary that keyword matching cannot match."
             ),
             (
                 "2) Shannon Domain Entropy: Attackers frequently deploy algorithmically generated subdomains (DGAs) or high-randomness "
@@ -212,22 +209,22 @@ SECTIONS_PART1 = [
                 "D. Justification of Algorithmic Choices"
             ),
             (
-                "We selected XGBoost (Extreme Gradient Boosting) over linear models and deep neural networks based on three constraints:"
+                "We selected XGBoost (Extreme Gradient Boosting) over linear classifiers and deep neural networks based on three constraints:"
             ),
             (
-                "1) Non-Linear Conditional Feature Interactions: Linear classifiers assume additive feature contributions. Real-world scam "
-                "risk is conditional: an edit distance of 1 to Discord is malicious only when paired with a link and an urgency lure. Decision "
-                "trees naturally learn conjunctive split rules (Urgency >= 1 AND Edit_Dist <= 2) without combinatorial feature engineering."
+                "1) Non-Linear Conditional Split Rules: Linear models assume additive feature contributions. Real-world scam risk is conditional: "
+                "an edit distance of 1 to Discord is malicious only when paired with a link and an urgency lure. Decision trees naturally learn "
+                "conjunctive rules (Urgency >= 1 AND Edit_Dist <= 2) without requiring explicit polynomial feature expansions."
             ),
             (
-                "2) Real-Time Inference Latency: Large Discord servers process thousands of messages per minute. While heavy transformers "
-                "(DistilBERT, RoBERTa) incur latencies of 120ms to 400ms per message on CPU, our complete code runs in 1.2 milliseconds "
-                "per message, sustaining high-volume throughput on standard hosting hardware."
+                "2) Production Inference Latency: While deep transformers (DistilBERT, RoBERTa) achieve strong leaderboard accuracy, their "
+                "120ms to 400ms CPU latency makes them impractical for high-volume Discord servers handling thousands of messages per minute. "
+                "Our fused model executes inference in 1.2 milliseconds on standard CPU hardware, sustaining real-time moderation."
             ),
             (
-                "3) Subword Tokenization Blind Spots: Transformer tokenizers (WordPiece) shatter novel typosquatted domains into fragmented "
-                "subwords, failing to grasp edit proximity. By extracting geometric distances explicitly and passing them into XGBoost, we "
-                "combine semantic vocabulary coverage with structural domain resilience."
+                "3) Subword Tokenizer Fragmentation: Transformer tokenizers (WordPiece, BPE) split novel typosquatted domains into fragmented "
+                "character subwords, destroying geometric proximity. By computing Levenshtein distances explicitly and feeding them to XGBoost, "
+                "we preserve structural domain invariants that pure neural language models miss."
             ),
         ],
     },
@@ -280,24 +277,22 @@ SECTIONS_PART2 = [
                 "A. Three-Way Feature Ablation Study"
             ),
             (
-                "To rigorously evaluate the individual contribution of each feature stream, we trained three identical XGBoost models (250 "
-                "estimators, learning rate 0.08, max depth 6) isolated by input feature representations: Stream A Only (3,000 TF-IDF n-grams), "
+                "To isolate the exact contribution of each feature stream, we trained three identical XGBoost models (250 "
+                "estimators, learning rate 0.08, max depth 6) across three distinct feature representations: Stream A Only (3,000 TF-IDF n-grams), "
                 "Stream B Only (17 structural heuristics), and Dual-Stream Fused (3,017 features). The results are summarized in Table II."
             ),
             (
                 "B. Observations and Theoretical Inferences"
             ),
             (
-                "1) Failure of Pure Text Semantics (Stream A): While Stream A achieved strong clean performance (0.9589 F1), its recall "
-                "collapsed to 49.44% under adversarial character substitution, dropping F1 by 34.0%. Because leetspeak and Cyrillic homoglyphs "
-                "create novel token strings that do not exist in the training vocabulary, term frequency activations drop to zero, leaving the "
-                "model blind to obfuscated text."
+                "1) Vulnerability of Pure Text Semantics (Stream A): While Stream A achieved strong clean performance (0.9589 F1), its recall "
+                "collapsed to 49.44% under adversarial character substitution, dropping overall F1 by 34.0%. Because leetspeak and Cyrillic homoglyphs "
+                "create token sequences absent from the training vocabulary, term frequency activations drop to zero, blinding the model to obfuscated lures."
             ),
             (
-                "2) Resilience of Structural Invariants (Stream B): Utilizing only 17 numeric features (less than 1% of the dimensionality "
-                "of Stream A), Stream B outperformed the 3,000-dimensional text model by 14.1% under attack (0.7748 vs 0.6331 F1), maintaining "
-                "an adversarial AUROC of 0.9585. Attackers can alter vocabulary, but they cannot evade the geometric invariants of domain "
-                "typosquatting and link redirection."
+                "2) Resilience of Structural Invariants (Stream B): Utilizing only 17 numeric features (less than 1% of the dimensionality of Stream A), "
+                "Stream B outperformed the 3,000-dimensional text model by 14.1% under attack (0.7748 vs 0.6331 F1), maintaining an adversarial AUROC of 0.9585. "
+                "While adversaries can alter phrasing, they cannot disguise the underlying mechanics of domain typosquatting, high-entropy links, and redirection."
             ),
             (
                 "3) Multimodal Late Fusion Superiority: Dual-Stream Fused achieved peak performance on clean data (0.9777 F1, 0.9988 AUROC) "
@@ -337,56 +332,57 @@ SECTIONS_PART2 = [
                 "A. Tasks Accomplished by Each Team Member"
             ),
             (
-                "1) Edwin Lin: Led the design of the 17-feature structural extraction engine (src/feature_extractor.py), "
-                "incorporating Levenshtein distance matrices, Shannon entropy, and Unicode script-plane parsing. Designed the adversarial "
-                "stress-testing framework, executed the 3-way ablation study (src/ablation_study.py), constructed the minimax adversarial "
-                "data augmentation trainer (src/adversarial_trainer.py), and authored the methodology and evaluation sections."
+                "1) Edwin Lin: Focused on the feature engineering pipeline in src/feature_extractor.py, implementing the Levenshtein distance "
+                "matching against the brand target dictionary, writing the Shannon domain entropy calculations, and building the Unicode script-plane "
+                "scanner for Cyrillic and Greek lookalikes. On the modeling side, Edwin formulated the adversarial perturbation generator in "
+                "src/adversarial_trainer.py, ran the cross-validated 3-way ablation experiments, and authored the methodology and evaluation sections."
             ),
             (
-                "2) Tin Chak Lam: Led data ingestion and curation, integrating the Hugging Face phishing dataset, Nikolaischunk threat feeds, "
-                "and synthetic conversational playbooks (src/data_loader.py). Trained the Tier 1 baseline models (src/train_baselines.py) "
-                "and Tier 2 tree models (src/train_xgboost.py). Constructed the decision attribution engine (src/explainability.py), developed "
-                "the Streamlit web demonstration interface (src/app.py), and authored the introduction and schedule sections."
+                "2) Tin Chak Lam: Managed dataset curation and cleaning in src/data_loader.py, integrating the Hugging Face corpus with the 21,908 "
+                "domains from the Nikolaischunk threat feed, deduplicating repetitive bot templates, and addressing class imbalance. Trained the baseline "
+                "models (Naive Bayes, Logistic Regression, LinearSVC, Random Forest), implemented the SHAP TreeExplainer attribution module in "
+                "src/explainability.py, built the interactive web demonstration interface, and authored the introduction and project post-mortem."
             ),
             (
                 "B. Unaccomplished Tasks and Failure Analysis"
             ),
             (
-                "During Phase 1, we initially planned to collect private user metadata (account age, mutual servers, friend request velocity) "
-                "via a custom Discord bot. However, technical and policy hurdles forced us to abandon this path: (1) Discord bot accounts cannot "
-                "participate in friend requests or access private direct messages between human users; and (2) Section 21 of the Discord Developer "
-                "Policy prohibits using API-collected chat for model training. While standing up a live honeypot server was initially considered, "
-                "recruiting sufficient active members within the semester timeline proved unfeasible."
+                "During Phase 1, our original plan was to build a custom Discord bot that would collect user-level behavioral metadata--specifically "
+                "account registration dates, mutual server counts, and friend request velocities. However, we quickly encountered both technical and "
+                "policy roadblocks. Technically, Discord bot accounts are strictly sandboxed: bots cannot inspect user-to-user DMs or see incoming friend "
+                "requests. Legally, Section 21 of Discord's Developer Policy explicitly forbids logging and storing private user chats for machine "
+                "learning training without explicit consent from every participant. We briefly considered running a public honeypot server to gather live "
+                "attacks, but attracting real malicious traffic within a single semester was impractical."
             ),
             (
-                "We pivoted to extracting all 17 structural heuristics directly from raw message strings. This failure ultimately strengthened "
-                "the project: the resulting system is entirely self-contained, requires no API tokens, avoids privacy liability, and delivers "
-                "instant 1.2ms inference on any input text."
+                "Pivoting away from metadata collection to raw message string heuristics turned out to be the best design decision of the project. It "
+                "eliminated all privacy liability, made our detector completely independent of Discord bot tokens or API rate limits, and allowed us to "
+                "build an ultra-fast 1.2ms inference engine that can run on any server."
             ),
             (
                 "C. Lessons Learned"
             ),
             (
-                "1) The Limits of Bag-of-Words and Subwords: Machine learning models trained purely on text vocabulary are fragile against "
-                "adversaries. Simple visual homoglyphs cause a 34% drop in detection. Domain-specific structural invariants provide a vital "
-                "safety net that text representations cannot capture."
+                "1) Vocabulary is Brittle Against Adversaries: NLP models that rely purely on word n-grams fail the moment an adversary swaps in "
+                "homoglyphs or leetspeak. Structural invariants provide an essential safety net that text representations cannot capture."
             ),
             (
-                "2) Operational Latency Matters in Production: While heavy transformers achieve high accuracy on benchmark leaderboards, their "
-                "300ms CPU latency makes them unviable for live chat moderation. Tree ensembles on engineered features deliver superior "
-                "throughput and adversarial resilience."
+                "2) Operational Latency Matters in Production: While deep transformers like DistilBERT often look like the best choice on academic "
+                "leaderboards, their 300ms CPU latency makes them unviable for live chat moderation handling thousands of messages per minute. A lightweight "
+                "GBDT running in 1.2ms on a single CPU core is far more practical for production deployment."
             ),
             (
-                "3) Data Governance in Applied Security: Adhering to platform developer terms and privacy frameworks is as critical as model "
-                "selection. Designing for compliance from day one prevented project derailment."
+                "3) Designing for Privacy from Day One: Attempting to work around platform terms of service was a dead end. Grounding our feature "
+                "engineering in privacy-preserving heuristics saved the project and avoided legal risk."
             ),
             (
                 "D. Teamwork Experience"
             ),
             (
-                "The team maintained continuous collaboration through Git version control, shared testing scripts, and weekly progress reviews. "
-                "Dividing responsibilities into data/baselines and feature-engineering/hardening allowed parallel work, enabling us to "
-                "complete all project goals three weeks ahead of the December 23 deadline."
+                "We coordinated through a shared GitHub repository, using feature branches and pull requests to review each other's code. We held weekly "
+                "syncs every Tuesday and Thursday to review benchmark runs and track ablation progress. Dividing responsibilities cleanly between data/baselines "
+                "(Tin Chak) and feature extraction/adversarial hardening (Edwin) allowed us to work in parallel without blocking each other. We completed all "
+                "modeling and evaluation milestones three weeks ahead of the December deadline."
             ),
         ],
     },
@@ -396,18 +392,18 @@ SECTIONS_PART2 = [
         "heading": "VI. GROUP MEMBER EVALUATION",
         "paragraphs": [
             (
-                "Both team members contributed equally across all phases of the project, demonstrating exceptional commitment, technical "
-                "rigor, and collaborative problem-solving. Peer evaluations are detailed in Table IV."
+                "Table IV details our mutual peer evaluation scores. Both team members contributed equally to the research, implementation, "
+                "and writing, and each awarded the other 10 / 10 across all grading criteria."
             ),
             (
-                "Edwin Lin (Rating: 10/10): Demonstrated outstanding technical leadership in feature engineering, Levenshtein distance "
-                "optimization, adversarial resilience testing, and mathematical formalization. Maintained high code quality and conducted "
-                "thorough ablation experiments."
+                "Edwin Lin (Score: 10/10): Contributed outstanding technical depth in feature engineering, Levenshtein distance optimization, "
+                "adversarial hardening scripts, and mathematical formalization. Consistently delivered clean, tested code and led the experimental "
+                "ablation analysis."
             ),
             (
-                "Tin Chak Lam (Rating: 10/10): Demonstrated exceptional effort in data preparation, baseline model benchmarking, "
-                "threat playbook augmentation, SHAP interpretability analysis, and front-end Streamlit development. Ensured complete platform "
-                "compliance and reproducible development settings."
+                "Tin Chak Lam (Score: 10/10): Provided exceptional effort in compiling and cleaning the threat datasets, training the comparative "
+                "baseline models, implementing SHAP explanations, and building the front-end demo. Maintained strict project compliance and ensured "
+                "reproducible results across all experiments."
             ),
         ],
     },
