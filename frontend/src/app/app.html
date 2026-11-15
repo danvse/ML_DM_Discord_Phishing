@@ -574,54 +574,135 @@
               <span class="stream-dot" [class.active]="isSimulatorRunning()"></span>
               <span>{{ isSimulatorRunning() ? 'Live Stream' : 'Paused' }}</span>
             </button>
+
+            <!-- Pop-out Chatbox Trigger Button in Studio Topbar -->
+            <button class="studio-popout-btn" (click)="openChatPopout()" title="Click to pop out the interactive chatbox console">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                <polyline points="15 3 21 3 21 9"/>
+                <line x1="10" y1="14" x2="21" y2="3"/>
+              </svg>
+              <span>Pop-out Chatbox</span>
+            </button>
           </div>
         </div>
 
-        <!-- 2-COLUMN SPLIT STUDIO (Prompt on Left, Live Inspector on Right) -->
+        <!-- 2-COLUMN SPLIT STUDIO (Chat Channel on Left, Live Inspector on Right) -->
         <div class="studio-split-grid">
-          <!-- LEFT COLUMN: PROMPT CONSOLE & LIVE BOT TRAFFIC -->
+          <!-- LEFT COLUMN: LIVE CHAT CHANNEL & SIMULATED INGESTION STREAM -->
           <div class="studio-col-left">
-            <!-- ChatGPT / Claude Prompt Input Card -->
-            <div class="studio-prompt-card">
-              <div class="prompt-card-header">
-                <div class="prompt-header-title-row">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="4 17 10 11 4 5"/>
-                    <line x1="12" y1="19" x2="20" y2="19"/>
-                  </svg>
-                  <span class="prompt-header-title">Prompt Payload Console</span>
+            <!-- Interactive Live Chat Channel Simulation Card -->
+            <div class="studio-chat-channel-card">
+              <!-- Channel Header -->
+              <div class="chat-channel-header">
+                <div class="channel-title-group">
+                  <span class="channel-hash">#</span>
+                  <div class="channel-info-text">
+                    <span class="channel-name">security-eval-sandbox</span>
+                    <span class="channel-status-dot"></span>
+                    <span class="channel-badge">Dual-Stream Pipe</span>
+                  </div>
                 </div>
-                <div class="prompt-header-meta">
-                  <span class="pulse-beacon"></span>
-                  <span class="live-eval-text">Live Evaluation Active</span>
+
+                <div class="channel-actions-group">
+                  <span class="chat-msg-count">{{ chatThreadMessages().length }} messages</span>
+                  <button class="channel-action-btn btn-popout" (click)="openChatPopout()" title="Click to pop out expanded interactive chatbox">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                      <polyline points="15 3 21 3 21 9"/>
+                      <line x1="10" y1="14" x2="21" y2="3"/>
+                    </svg>
+                    <span>Pop-out Chatbox</span>
+                  </button>
+                  <button class="channel-action-btn" (click)="clearChatThread()" title="Clear Chat Thread">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="3 6 5 6 21 6"/>
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                    </svg>
+                  </button>
                 </div>
               </div>
 
-              <textarea 
-                [ngModel]="chatInput()" 
-                (ngModelChange)="onChatInputChange($event)"
-                (keydown.control.enter)="runPrediction()"
-                rows="4" 
-                placeholder="Enter or paste Discord payload prompt to evaluate against dual-stream models... (Ctrl + Enter to run)" 
-                class="studio-textarea"></textarea>
+              <!-- Chat Messages Stream Scroll Area -->
+              <div class="chat-messages-scroll">
+                @for (msg of chatThreadMessages(); track msg.id) {
+                  <div 
+                    class="chat-msg-card" 
+                    [class.selected]="activeChatMsgId() === msg.id"
+                    (click)="selectChatMessage(msg)">
+                    <div class="chat-avatar" [style.background]="msg.avatarBg">
+                      {{ msg.sender.substring(0, 2).toUpperCase() }}
+                    </div>
 
-              <div class="prompt-card-footer">
-                <div class="token-stats">
-                  <span>{{ chatInput().length }} chars</span>
-                  <span class="sep">&bull;</span>
-                  <span>~{{ getEstimatedTokens() }} tokens</span>
+                    <div class="chat-body">
+                      <div class="chat-author-row">
+                        <span class="chat-author">{{ msg.sender }}</span>
+                        @if (msg.senderRole) {
+                          <span class="chat-role-chip" [class.role-user]="msg.senderRole === 'USER'" [class.role-sim]="msg.senderRole === 'SIMULATOR'">
+                            {{ msg.senderRole }}
+                          </span>
+                        }
+                        <span class="chat-timestamp">{{ msg.timestamp }}</span>
+                      </div>
+
+                      <div class="chat-bubble-text">
+                        {{ msg.content }}
+                      </div>
+
+                      <!-- Sentinel Security Evaluation Card -->
+                      <div class="sentinel-verdict-card" [class.threat-bg]="msg.isScam" [class.clean-bg]="!msg.isScam">
+                        <div class="verdict-card-left">
+                          <svg class="shield-mini-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                            <path d="m9 12 2 2 4-4"/>
+                          </svg>
+                          <span class="verdict-tag" [class.threat-text]="msg.isScam" [class.clean-text]="!msg.isScam">
+                            {{ (msg.score * 100).toFixed(1) }}% {{ msg.verdict }}
+                          </span>
+                          <span class="verdict-action-pill" [class.action-threat]="msg.isScam" [class.action-clean]="!msg.isScam">
+                            {{ msg.action }}
+                          </span>
+                        </div>
+
+                        <div class="verdict-card-right">
+                          <span class="verdict-latency font-mono">{{ msg.latencyMs }}ms</span>
+                          <span class="inspect-hint">Click to inspect &rarr;</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                }
+              </div>
+
+              <!-- Bottom Chat Compose Bar -->
+              <div class="chat-bottom-compose-bar">
+                <button class="chat-popout-btn" (click)="openChatPopout()" title="Pop out expanded chat input console">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                    <polyline points="15 3 21 3 21 9"/>
+                    <line x1="10" y1="14" x2="21" y2="3"/>
+                  </svg>
+                  <span>Pop-out</span>
+                </button>
+
+                <div class="chat-input-wrapper">
+                  <input 
+                    type="text" 
+                    [ngModel]="chatInput()" 
+                    (ngModelChange)="onChatInputChange($event)"
+                    (keydown.enter)="sendChatMessage()"
+                    class="chat-inline-input" 
+                    placeholder="Type Discord payload or click Pop-out to expand... (Enter to send)" />
+                  <span class="inline-token-stat font-mono">~{{ getEstimatedTokens() }} tok</span>
                 </div>
 
-                <div class="prompt-actions">
-                  <button class="clear-btn" (click)="chatInput.set(''); runPrediction()" title="Clear Prompt">Clear</button>
-                  <button class="run-prompt-btn" (click)="runPrediction()" [disabled]="isPredicting()">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                      <polygon points="5 3 19 12 5 21 5 3"/>
-                    </svg>
-                    <span>{{ isPredicting() ? 'Running...' : 'Run Prompt' }}</span>
-                    <kbd>Ctrl &crarr;</kbd>
-                  </button>
-                </div>
+                <button class="chat-send-btn" (click)="sendChatMessage()" [disabled]="isPredicting() || !chatInput().trim()">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <line x1="22" y1="2" x2="11" y2="13"/>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                  </svg>
+                  <span>Send</span>
+                </button>
               </div>
             </div>
 
@@ -831,6 +912,138 @@ client.on('messageCreate', async (msg) => {{"{"}}
             }
           </div>
         </div>
+
+        <!-- ========================================================== -->
+        <!-- POP-OUT INTERACTIVE CHATBOX MODAL DIALOG                   -->
+        <!-- ========================================================== -->
+        @if (isChatPopoutOpen()) {
+          <div class="chat-popout-overlay" (click)="closeChatPopout()">
+            <div class="chat-popout-dialog" (click)="$event.stopPropagation()">
+              <!-- Popout Header -->
+              <div class="popout-header">
+                <div class="popout-title-row">
+                  <div class="popout-icon-box">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <div class="popout-title">Interactive Chatbox Console (Pop-out)</div>
+                    <div class="popout-subtitle">Type Discord messages, select evasion presets, and inspect real-time AI verdicts</div>
+                  </div>
+                </div>
+
+                <div class="popout-header-right">
+                  <span class="popout-model-chip font-mono">
+                    {{ selectedModelTier() === 'hardened' ? 'Minimax XGBoost v2.4' : 'Baseline XGBoost' }}
+                  </span>
+                  <button class="popout-close-btn" (click)="closeChatPopout()" title="Close Pop-out (Esc)">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <line x1="18" y1="6" x2="6" y2="18"/>
+                      <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Popout Body -->
+              <div class="popout-body">
+                <!-- Quick Preset Pills Carousel -->
+                <div class="popout-preset-strip">
+                  <span class="popout-strip-lbl">Load Presets:</span>
+                  <div class="popout-chips-wrap">
+                    @for (p of presets; track p.id) {
+                      @if (p.id !== 'custom') {
+                        <button 
+                          class="popout-preset-chip" 
+                          [class.active]="selectedPreset() === p.id"
+                          (click)="onPresetChange(p.id)">
+                          {{ p.name }}
+                        </button>
+                      }
+                    }
+                  </div>
+                </div>
+
+                <!-- Focused Textarea Input -->
+                <div class="popout-textarea-wrap">
+                  <textarea 
+                    [ngModel]="chatInput()" 
+                    (ngModelChange)="onChatInputChange($event)"
+                    (keydown.control.enter)="sendChatMessage(); closeChatPopout()"
+                    (keydown.enter)="$event.shiftKey ? null : ($event.preventDefault(); sendChatMessage())"
+                    rows="5" 
+                    class="popout-input-textarea" 
+                    placeholder="Type or paste any Discord payload message here... (Enter to send, Shift + Enter for new line)"
+                    autofocus></textarea>
+
+                  <div class="popout-meta-row">
+                    <div class="popout-char-count font-mono">
+                      <span>{{ chatInput().length }} characters</span>
+                      <span class="sep">&bull;</span>
+                      <span>~{{ getEstimatedTokens() }} tokens</span>
+                    </div>
+                    <div class="popout-shortcuts-hint">
+                      <kbd>&crarr; Send</kbd>
+                      <kbd>Shift + &crarr; New line</kbd>
+                      <kbd>Ctrl + &crarr; Send &amp; Close</kbd>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Real-time Live Threat Estimation Preview inside Popout -->
+                <div class="popout-preview-card" [style.border-left-color]="getRiskColor(predictionResult()?.scam_probability ?? 0)">
+                  <div class="popout-preview-top">
+                    <div class="preview-meter-title">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                      </svg>
+                      <span>Real-Time Threat Estimation:</span>
+                    </div>
+                    <span class="preview-pct font-mono" [style.color]="getRiskColor(predictionResult()?.scam_probability ?? 0)">
+                      {{ ((predictionResult()?.scam_probability ?? 0) * 100).toFixed(1) }}% Scam Probability
+                    </span>
+                  </div>
+
+                  <div class="popout-progress-track">
+                    <div 
+                      class="popout-progress-fill" 
+                      [style.width.%]="(predictionResult()?.scam_probability ?? 0) * 100"
+                      [style.background]="getRiskColor(predictionResult()?.scam_probability ?? 0)">
+                    </div>
+                  </div>
+
+                  <div class="popout-preview-bottom">
+                    <span class="popout-action-pill" [style.color]="getRiskColor(predictionResult()?.scam_probability ?? 0)">
+                      PROTOCOL: {{ getEnforcementVerdict(predictionResult()?.scam_probability ?? 0).action }}
+                    </span>
+                    <span class="popout-latency font-mono">{{ predictionResult()?.latency_ms ?? 1.2 }}ms CPU Latency</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Popout Footer -->
+              <div class="popout-footer">
+                <div class="popout-footer-info">
+                  <span class="popout-status-dot"></span>
+                  <span>Instant inference over 3,017 extracted invariant features</span>
+                </div>
+
+                <div class="popout-footer-btns">
+                  <button class="popout-btn-secondary" (click)="chatInput.set(''); runPrediction()">Clear</button>
+                  <button class="popout-btn-secondary" (click)="closeChatPopout()">Close</button>
+                  <button class="popout-btn-primary" (click)="sendChatMessage(); closeChatPopout()">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <line x1="22" y1="2" x2="11" y2="13"/>
+                      <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                    </svg>
+                    <span>Send &amp; Inspect</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
       </div>
     }
 
@@ -1205,4 +1418,14 @@ client.on('messageCreate', async (msg) => {{"{"}}
 
     </main>
   </div>
+
+  <!-- Persistent Floating Pop-out Chatbox Launcher Pill -->
+  <button class="floating-popout-pill" (click)="openChatPopout()" title="Click to pop out the interactive chatbox console">
+    <div class="floating-pill-glow"></div>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+    </svg>
+    <span>Pop-out Chatbox</span>
+    <span class="floating-shortcut font-mono">⌘K</span>
+  </button>
 </div>

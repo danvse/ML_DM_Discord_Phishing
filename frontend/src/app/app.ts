@@ -26,6 +26,23 @@ export interface StreamMessage {
   category: string;
 }
 
+export interface ChatMessage {
+  id: string;
+  sender: string;
+  senderRole?: 'USER' | 'SIMULATOR' | 'BOT';
+  avatarBg: string;
+  timestamp: string;
+  channel: string;
+  content: string;
+  isScam: boolean;
+  score: number;
+  latencyMs: number;
+  verdict: string;
+  action: string;
+  category?: string;
+  prediction?: PredictResponse;
+}
+
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -152,6 +169,56 @@ export class App {
   selectedModelTier = signal<'hardened' | 'baseline'>('hardened');
   predictionResult = signal<PredictResponse | null>(null);
   isPredicting = signal<boolean>(false);
+  isChatPopoutOpen = signal<boolean>(false);
+  activeChatMsgId = signal<string>('msg-seed-2');
+
+  chatThreadMessages = signal<ChatMessage[]>([
+    {
+      id: 'msg-seed-1',
+      sender: 'TechDev#1337',
+      senderRole: 'USER',
+      avatarBg: '#10b981',
+      timestamp: '10:41 AM',
+      channel: '#security-eval',
+      content: 'hey team, check this sick synthwave music video on youtube https://www.youtube.com/watch?v=5qap5aO4i9A',
+      isScam: false,
+      score: 0.006,
+      latencyMs: 1.17,
+      verdict: 'BENIGN GAMER MESSAGE',
+      action: 'ALLOW & DELIVER INSTANTLY',
+      category: 'Legitimate'
+    },
+    {
+      id: 'msg-seed-2',
+      sender: 'DiscordGiftBot#0001',
+      senderRole: 'SIMULATOR',
+      avatarBg: '#8b5cf6',
+      timestamp: '10:42 AM',
+      channel: '#security-eval',
+      content: '@everyone Steam is giving away free Discord Nitro! Claim here: https://discoord-app.com/free',
+      isScam: true,
+      score: 0.998,
+      latencyMs: 1.21,
+      verdict: 'MALICIOUS PHISHING SCAM',
+      action: 'AUTO-DELETE & BAN SENDER',
+      category: 'Typosquatting'
+    },
+    {
+      id: 'msg-seed-3',
+      sender: 'AirdropSentinel#1102',
+      senderRole: 'SIMULATOR',
+      avatarBg: '#ef4444',
+      timestamp: '10:44 AM',
+      channel: '#security-eval',
+      content: 'CLAIM 10,000 ARB TOKENS IMMEDIATELY: Connect wallet at https://arbitrum-foundation-airdrop.top',
+      isScam: true,
+      score: 0.999,
+      latencyMs: 1.19,
+      verdict: 'MALICIOUS PHISHING SCAM',
+      action: 'AUTO-DELETE & BAN SENDER',
+      category: 'Web3 Drainer'
+    }
+  ]);
 
   // TAB 3: Red-Team Arena State
   redTeamInput = signal<string>('@everyone Steam is giving away free Discord Nitro! Claim here: https://discord.com/nitro');
@@ -352,10 +419,81 @@ export class App {
     }
   }
 
+  openChatPopout() {
+    this.isChatPopoutOpen.set(true);
+  }
+
+  closeChatPopout() {
+    this.isChatPopoutOpen.set(false);
+  }
+
+  toggleChatPopout() {
+    this.isChatPopoutOpen.update(v => !v);
+  }
+
+  clearChatThread() {
+    this.chatThreadMessages.set([]);
+  }
+
   selectStreamMessage(msg: StreamMessage) {
     this.selectedPreset.set('custom');
     this.chatInput.set(msg.content);
-    this.runPrediction();
+    this.sendChatMessage(msg.content);
+  }
+
+  sendChatMessage(content?: string) {
+    const raw = content !== undefined ? content : this.chatInput();
+    const text = (raw || '').trim();
+    if (!text) return;
+
+    const msgId = 'msg-' + Date.now();
+    this.isPredicting.set(true);
+
+    this.sentinel.predict(text, this.selectedModelTier()).subscribe(res => {
+      this.predictionResult.set(res);
+      this.isPredicting.set(false);
+      this.activeChatMsgId.set(msgId);
+
+      const verdictInfo = this.getEnforcementVerdict(res.scam_probability);
+
+      const newMsg: ChatMessage = {
+        id: msgId,
+        sender: 'SecurityResearcher#4200',
+        senderRole: 'USER',
+        avatarBg: '#2196f3',
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        channel: '#security-eval',
+        content: text,
+        isScam: res.scam_probability >= this.decisionThreshold(),
+        score: res.scam_probability,
+        latencyMs: res.latency_ms,
+        verdict: verdictInfo.verdict,
+        action: verdictInfo.action,
+        category: res.scam_probability >= this.decisionThreshold() ? 'Threat Payload' : 'Clean Input',
+        prediction: res
+      };
+
+      this.chatThreadMessages.update(list => [...list, newMsg]);
+
+      // Scroll chat to bottom
+      setTimeout(() => {
+        const scrollEl = document.querySelector('.chat-messages-scroll');
+        if (scrollEl) scrollEl.scrollTop = scrollEl.scrollHeight;
+      }, 60);
+
+      setTimeout(() => this.renderShapChart(res), 60);
+    });
+  }
+
+  selectChatMessage(msg: ChatMessage) {
+    this.activeChatMsgId.set(msg.id);
+    this.chatInput.set(msg.content);
+    if (msg.prediction) {
+      this.predictionResult.set(msg.prediction);
+      setTimeout(() => this.renderShapChart(msg.prediction!), 60);
+    } else {
+      this.runPrediction();
+    }
   }
 
   onChatInputChange(newVal: string) {
