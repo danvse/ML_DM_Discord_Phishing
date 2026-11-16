@@ -1,5 +1,5 @@
 """
-Official IEEE Two-Column Final Project Report Generator (Full Length: 5 pages).
+Official IEEE Two-Column Final Project Report Generator (Full Length: 6 pages).
 Complies with course grading rubric (100 pts total):
 a. Introduction (10 points): background, motivation, problem definition, system overview
 b. Methodology (40 points): proposed methods, mathematical models, system flow, justifications, and analysis
@@ -14,6 +14,7 @@ Authentic Human Student Register:
 - Grounded developer realities (regex compilation, deduplication filtering, Levenshtein early-exit, threshold tuning).
 - Honest, candid discussion of the 100% test recall artifact, closed-generator overlap, and 5-fold CV variance.
 - Unified team authorial voice without canned corporate or AI transitions.
+- Proper document flow: every table rendered in its exact referencing section, preventing text corruption.
 """
 
 import os
@@ -50,14 +51,12 @@ ABSTRACT_TEXT = (
 
 INDEX_TERMS = "Discord security, phishing detection, machine learning, feature fusion, adversarial training, social engineering, XGBoost, SHAP interpretability."
 
-SECTIONS_PART1 = [
-    # a. INTRODUCTION (10 points)
+# Block 1: Sections I, II, III (Leading up to Table I)
+SECTIONS_BLOCK1 = [
     {
         "heading": "I. INTRODUCTION",
         "paragraphs": [
-            (
-                "A. Threat Context and Account Takeovers"
-            ),
+            "A. Threat Context and Account Takeovers",
             (
                 "Discord is built around private servers and direct messages, not an open public feed. If an attacker compromises "
                 "an account, they don't blast a public post—they send DMs directly to the victim's friends and fellow server members. "
@@ -75,9 +74,7 @@ SECTIONS_PART1 = [
                 "OAuth authorization, and (4) fake cryptocurrency giveaways. Recipients who click these links either download infostealers "
                 "or surrender their login credentials, continuing the propagation loop through their own account."
             ),
-            (
-                "B. Failure Modes of Deterministic Filters"
-            ),
+            "B. Failure Modes of Deterministic Filters",
             (
                 "Server administrators typically rely on Discord AutoMod or community moderation bots like MEE6 and Dyno to filter chat. "
                 "These systems operate almost entirely on static keyword blocklists and regular expression (regex) rules. For example, a common "
@@ -95,9 +92,7 @@ SECTIONS_PART1 = [
                 "We need one more tester for our game build') that contain zero URLs or banned keywords, sending the malicious link only after "
                 "the recipient replies."
             ),
-            (
-                "C. System Overview and Technical Goals"
-            ),
+            "C. System Overview and Technical Goals",
             (
                 "Instead of maintaining an endless regex blocklist or deploying an expensive deep learning model that requires a dedicated GPU, "
                 "we focused on what scammers cannot easily hide. An attacker can easily mutate their words, but they cannot avoid routing traffic "
@@ -113,31 +108,24 @@ SECTIONS_PART1 = [
             ),
         ],
     },
-
-    # b. METHODOLOGY (40 points)
     {
         "heading": "II. METHODOLOGY & SYSTEM ARCHITECTURE",
         "paragraphs": [
-            (
-                "A. End-to-End Processing Flow"
-            ),
+            "A. End-to-End Processing Flow",
             (
                 "When a message enters the moderation queue, it passes through five discrete processing stages: "
-                "First, a cleaning stage strips Discord-specific snowflake tags ('<@!...>', '<#...>') and collapses whitespace, while "
-                "carefully preserving raw URLs, Markdown formatting brackets, and Unicode codepoints for heuristic extraction. "
-                "Second, Stream A tokenizes the text into word unigrams and bigrams, projecting the message into a 3,000-dimensional sparse "
-                "TF-IDF matrix that captures high-frequency scam vocabulary. "
-                "Third, Stream B parses the raw message for embedded URLs using a globally compiled regex, running 17 specialized heuristics "
-                "across domain names, character distributions, and Discord-specific formatting flags. "
-                "Fourth, we horizontally concatenate the sparse TF-IDF array and the dense 17-element heuristic vector into a fused matrix X in R^3017. "
-                "Finally, an XGBoost tree ensemble evaluates the vector, returning a scam probability between 0.0 and 1.0. Messages scoring >= 0.80 "
-                "are quarantined immediately; messages between 0.50 and 0.80 are flagged for human moderator review; messages below 0.50 are "
-                "delivered normally. We set the auto-quarantine threshold at 0.80 rather than a naive 0.50 specifically to minimize false positives—in "
-                "an active Discord community, auto-banning an innocent guild member talking in casual slang causes immediate community backlash."
+                "(1) Cleaning: We strip user and channel snowflakes ('<@!...>') and collapse whitespace, but leave raw URLs, Markdown formatting, "
+                "and Unicode characters intact for heuristic extraction. "
+                "(2) Stream A (Text): We extract word unigrams and bigrams, projecting the message into a 3,000-dimensional sparse TF-IDF matrix. "
+                "(3) Stream B (Structural): We run 17 specific heuristics over the raw string and any extracted URLs, checking edit distances, "
+                "character entropy, and Discord-specific formatting flags. "
+                "(4) Fusion: We horizontally concatenate the sparse TF-IDF array and the dense 17-element heuristic vector into matrix X in R^3017. "
+                "(5) XGBoost Scoring: The model outputs a probability between 0.0 and 1.0. Messages scoring >= 0.80 are quarantined immediately; "
+                "messages between 0.50 and 0.80 are flagged for human moderator review; messages below 0.50 are delivered normally. We set the "
+                "auto-quarantine threshold at 0.80 rather than a naive 0.50 specifically to minimize false positives—in an active Discord community, "
+                "auto-banning an innocent guild member talking in casual slang causes immediate community backlash."
             ),
-            (
-                "B. Classifier Selection: Why We Used XGBoost"
-            ),
+            "B. Classifier Selection: Why We Used XGBoost",
             (
                 "Our initial instinct was to fine-tune DistilBERT or RoBERTa, but we dropped that approach after preliminary benchmarking. "
                 "Transformer models required between 150 ms and 300 ms per inference pass on our CPU test environment. If a moderation bot has "
@@ -148,9 +136,7 @@ SECTIONS_PART1 = [
                 "decision trees are exceptionally effective at modeling tabular combinations of continuous and binary rules—such as checking "
                 "whether an external link is present AND its edit distance to 'discord.com' is <= 2 AND the message exhibits an elevated uppercase ratio."
             ),
-            (
-                "C. Extracted Structural Heuristics"
-            ),
+            "C. Extracted Structural Heuristics",
             (
                 "Stream B computes 17 numerical features. To ensure low latency, all regex patterns are compiled globally once at module load "
                 "rather than recompiled inside the per-message loop. The 17 features comprise: "
@@ -172,9 +158,7 @@ SECTIONS_PART1 = [
                 "(16) message_length: total character length of the raw message; and "
                 "(17) digit_ratio: fraction of message characters that are numerical digits."
             ),
-            (
-                "D. Mathematical Formulations"
-            ),
+            "D. Mathematical Formulations",
             (
                 "1) Minimum Levenshtein Distance: To flag typosquatting domains (like 'dlscord.com' or 'discord-gift.info'), we compute the "
                 "minimum Levenshtein edit distance between each extracted domain d and our canonical platform set B = {'discord.com', "
@@ -202,14 +186,10 @@ SECTIONS_PART1 = [
             ),
         ],
     },
-
-    # c. EVALUATION (30 points)
     {
         "heading": "III. EXPERIMENTAL SETUP & BASELINE EVALUATION",
         "paragraphs": [
-            (
-                "A. Dataset Provenance and Deduplication"
-            ),
+            "A. Dataset Provenance and Deduplication",
             (
                 "Discord Developer Policy Section 21 strictly forbids logging user conversations for ML training without explicit consent. "
                 "That ruled out gathering data directly from live servers. Instead, we compiled our experimental corpus from public security sources: "
@@ -225,9 +205,7 @@ SECTIONS_PART1 = [
                 "to 3,552 messages with a 50/50 label split. We partitioned this into an 80/10/10 stratified split: 2,841 training, 355 validation, "
                 "and 356 test. We also created a 356-sample adversarial test set by mutating clean test scams with homoglyphs and disguised links."
             ),
-            (
-                "B. Multi-Model Baseline Comparisons"
-            ),
+            "B. Multi-Model Baseline Comparisons",
             (
                 "Table I compares six models across both clean test data and the adversarial stress set. AutoMod regex performed reasonably on clean "
                 "messages (0.8598 F1), but dropped by 37.2% to 0.4876 F1 under attack—the regexes simply failed to trigger once letters were swapped for "
@@ -240,30 +218,34 @@ SECTIONS_PART1 = [
     },
 ]
 
-SECTIONS_PART2 = [
+# Block 2: Section IV-A (Leading up to Table II)
+SECTIONS_BLOCK2 = [
     {
         "heading": "IV. ABLATION STUDY & ADVERSARIAL HARDENING",
         "paragraphs": [
-            (
-                "A. Feature Ablation Analysis"
-            ),
-            (
-                "Table II breaks down the empirical contributions of each stream:"
-            ),
+            "A. Feature Ablation Analysis",
+            "Table II breaks down the empirical contributions of each stream across identical train and evaluation splits:",
             (
                 "Stream A alone (3,000 TF-IDF features) scores 0.9589 clean F1, but drops to 0.4944 recall (0.6331 F1) under attack. Homoglyph swaps "
-                "turn familiar words into out-of-vocabulary tokens that generate zero activations."
+                "turn familiar words into out-of-vocabulary tokens that generate zero activations in the sparse feature vector."
             ),
             (
                 "Stream B alone (17 heuristics) reaches 0.9636 clean F1 and holds 0.7748 F1 under attack. It outperforms Stream A under attack by 14.1% "
                 "because domain edit distances, character entropy, and URL characteristics do not change when message text is scrambled."
             ),
             (
-                "The fused model gets 0.9777 clean F1 and 0.8078 adversarial F1 before hardening."
+                "The dual-stream fused model combines both feature spaces, achieving 0.9777 clean F1 and 0.8078 adversarial F1 before hardening."
             ),
-            (
-                "B. Minimax Hardening and Critical Review of 100% Recall"
-            ),
+        ],
+    },
+]
+
+# Block 3: Section IV-B and IV-C (Leading up to Table III)
+SECTIONS_BLOCK3 = [
+    {
+        "heading": "",
+        "paragraphs": [
+            "B. Minimax Hardening and Critical Review of 100% Recall",
             (
                 "When our evaluation script first printed 1.0000 recall on the hardened model (Table III), our initial reaction was that we had "
                 "introduced a label leak or evaluation bug. 178 out of 178 test scams were caught."
@@ -280,9 +262,7 @@ SECTIONS_PART2 = [
                 "mutation seeds: across the folds, adversarial recall averaged 0.9888 +/- 0.0112 (F1: 0.9780 +/- 0.0094). The heuristic features "
                 "clearly provide robustness, but real-world zero-day evasions will not yield 100% recall."
             ),
-            (
-                "C. Interactive Demonstration Interface"
-            ),
+            "C. Interactive Demonstration Interface",
             (
                 "We wrapped the pipeline in a Streamlit and Angular dashboard to verify usability. Moderators can paste a raw message or pick a pre-set "
                 "sample to inspect the prediction probability, highlighted homoglyphs, and local SHAP explanation bars showing which features drove "
@@ -290,23 +270,21 @@ SECTIONS_PART2 = [
             ),
         ],
     },
+]
 
-    # d. LEARNING OUTCOMES (18 points)
+# Block 4: Section V alone (Cleanly starting on Page 5)
+SECTIONS_BLOCK4 = [
     {
         "heading": "V. LEARNING OUTCOMES & TEAMWORK",
         "paragraphs": [
-            (
-                "A. Task Allocation and Individual Contributions"
-            ),
+            "A. Task Allocation and Individual Contributions",
             (
                 "We split implementation responsibilities: Edwin built 'src/feature_extractor.py' (Levenshtein distance, Shannon entropy, regex "
                 "compilation, and heuristic extraction), the mutation script in 'src/adversarial_trainer.py', and ran the ablation study. "
                 "Tin Chak handled data loading in 'src/data_loader.py' (cleaning the Hugging Face dataset, threat feed integration, and deduplication), "
                 "baseline model training, SHAP explainability, and the web dashboard. We co-authored all report sections."
             ),
-            (
-                "B. Project Post-Mortem: Why We Abandoned User Metadata"
-            ),
+            "B. Project Post-Mortem: Why We Abandoned User Metadata",
             (
                 "Ditching user metadata saved the project. Our original plan was to build a Discord bot that flagged scams based on account metadata: "
                 "account age, mutual server counts, avatar presence, and message frequency. We spent the first two weeks exploring this before hitting "
@@ -319,31 +297,36 @@ SECTIONS_PART2 = [
                 "their account is, or what servers they belong to. It inspects only the message payload, making it completely self-contained and "
                 "privacy-preserving."
             ),
-            (
-                "C. Key Lessons Learned"
-            ),
+            "C. Key Lessons Learned",
             (
                 "First, bag-of-words models break under adversarial evasion; structural invariants are necessary for stability. "
                 "Second, latency matters: a model that takes 300 ms on CPU is a non-starter for real-time Discord moderation. "
                 "Third, check API boundaries and platform policies early before building features that depend on inaccessible data."
             ),
-            (
-                "D. Team Collaboration"
-            ),
+            "D. Team Collaboration",
             (
                 "We collaborated using GitHub feature branches and pull requests, meeting twice a week on Discord to review model progress and debug "
                 "evaluation scripts."
             ),
         ],
     },
+]
 
-    # e. GROUP MEMBER EVALUATION (2 points)
+# Block 5: Section VI intro
+SECTIONS_BLOCK5 = [
     {
         "heading": "VI. GROUP MEMBER EVALUATION",
         "paragraphs": [
-            (
-                "Table IV presents our mutual peer evaluation matrix. Both partners contributed equally to the design, implementation, and writing."
-            ),
+            "Table IV presents our mutual peer evaluation matrix. Both partners contributed equally to the design, implementation, and writing."
+        ],
+    },
+]
+
+# Block 6: Section VI member reviews
+SECTIONS_BLOCK6 = [
+    {
+        "heading": "",
+        "paragraphs": [
             (
                 "Edwin Lin (Score: 10/10): Edwin developed the feature extraction algorithms, implemented the Levenshtein distance and Shannon "
                 "entropy logic, wrote the adversarial mutation script, ran the ablation experiments, and co-wrote the report."
@@ -417,7 +400,7 @@ REFERENCES = [
 
 
 # ==============================================================================
-# DOCX GENERATION (Official IEEE 2-Column Formatting)
+# DOCX GENERATION (Official IEEE 2-Column Formatting with Full-Width Spanning Tables)
 # ==============================================================================
 
 def set_section_columns(section, num_cols=2, space_pts=18):
@@ -434,6 +417,8 @@ def set_section_columns(section, num_cols=2, space_pts=18):
 
 
 def add_ieee_heading_docx(doc, heading_text):
+    if not heading_text:
+        return
     p = doc.add_paragraph()
     p.alignment = WD_ALIGN_PARAGRAPH.CENTER
     p.paragraph_format.space_before = Pt(10)
@@ -469,9 +454,17 @@ def add_ieee_body_docx(doc, text):
 
 
 def add_ieee_table_docx(doc, tbl_data):
+    # Full-width (1 column) continuous section for the table
+    sec_tbl = doc.add_section(WD_SECTION.CONTINUOUS)
+    sec_tbl.top_margin = Inches(0.75)
+    sec_tbl.bottom_margin = Inches(0.75)
+    sec_tbl.left_margin = Inches(0.65)
+    sec_tbl.right_margin = Inches(0.65)
+    set_section_columns(sec_tbl, num_cols=1)
+
     p_title = doc.add_paragraph()
     p_title.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    p_title.paragraph_format.space_before = Pt(10)
+    p_title.paragraph_format.space_before = Pt(8)
     p_title.paragraph_format.space_after = Pt(1)
     run_t = p_title.add_run(tbl_data["title"])
     run_t.bold = True
@@ -510,7 +503,23 @@ def add_ieee_table_docx(doc, tbl_data):
                     r.font.size = Pt(8.0)
 
     p_post = doc.add_paragraph()
-    p_post.paragraph_format.space_after = Pt(6)
+    p_post.paragraph_format.space_after = Pt(4)
+
+    # Resume 2-column continuous section
+    sec_resume = doc.add_section(WD_SECTION.CONTINUOUS)
+    sec_resume.top_margin = Inches(0.75)
+    sec_resume.bottom_margin = Inches(0.75)
+    sec_resume.left_margin = Inches(0.65)
+    sec_resume.right_margin = Inches(0.65)
+    set_section_columns(sec_resume, num_cols=2, space_pts=18)
+
+
+def write_block_docx(doc, block):
+    for sec in block:
+        if sec["heading"]:
+            add_ieee_heading_docx(doc, sec["heading"])
+        for p_txt in sec["paragraphs"]:
+            add_ieee_body_docx(doc, p_txt)
 
 
 def generate_docx(path):
@@ -591,29 +600,29 @@ def generate_docx(path):
     r_idx_txt.font.name = "Times New Roman"
     r_idx_txt.font.size = Pt(9.5)
 
-    # 2. Two-Column Body Section
-    body_section = doc.add_section(WD_SECTION.CONTINUOUS)
-    body_section.top_margin = Inches(0.75)
-    body_section.bottom_margin = Inches(0.75)
-    body_section.left_margin = Inches(0.65)
-    body_section.right_margin = Inches(0.65)
-    set_section_columns(body_section, num_cols=2, space_pts=18)
+    # 2. Two-Column Body Section - Block 1
+    body_sec = doc.add_section(WD_SECTION.CONTINUOUS)
+    body_sec.top_margin = Inches(0.75)
+    body_sec.bottom_margin = Inches(0.75)
+    body_sec.left_margin = Inches(0.65)
+    body_sec.right_margin = Inches(0.65)
+    set_section_columns(body_sec, num_cols=2, space_pts=18)
 
-    for sec in SECTIONS_PART1:
-        add_ieee_heading_docx(doc, sec["heading"])
-        for p_txt in sec["paragraphs"]:
-            add_ieee_body_docx(doc, p_txt)
-
+    write_block_docx(doc, SECTIONS_BLOCK1)
     add_ieee_table_docx(doc, TABLE_1_DATA)
+
+    write_block_docx(doc, SECTIONS_BLOCK2)
     add_ieee_table_docx(doc, TABLE_2_DATA)
 
-    for sec in SECTIONS_PART2:
-        add_ieee_heading_docx(doc, sec["heading"])
-        for p_txt in sec["paragraphs"]:
-            add_ieee_body_docx(doc, p_txt)
-
+    write_block_docx(doc, SECTIONS_BLOCK3)
     add_ieee_table_docx(doc, TABLE_3_DATA)
+
+    write_block_docx(doc, SECTIONS_BLOCK4)
+
+    write_block_docx(doc, SECTIONS_BLOCK5)
     add_ieee_table_docx(doc, TABLE_4_DATA)
+
+    write_block_docx(doc, SECTIONS_BLOCK6)
 
     # References
     add_ieee_heading_docx(doc, "REFERENCES")
@@ -637,7 +646,7 @@ def generate_docx(path):
 
 
 # ==============================================================================
-# PDF GENERATION (FPDF - Official Two-Column IEEE Formatting)
+# PDF GENERATION (FPDF - Official Two-Column IEEE Formatting with Spanning Tables)
 # ==============================================================================
 
 class IEEEFinalReportPDF(FPDF):
@@ -714,7 +723,13 @@ def sanitize_for_pdf(txt):
 
 
 def render_pdf_table(pdf, tbl_data, col_widths=None):
-    pdf.ln(3)
+    row_height = 5.4
+    table_height = 5.0 + 4.5 + 1.5 + 6.0 + len(tbl_data["rows"]) * row_height + 8.0
+    if pdf.get_y() + table_height > pdf.page_break_trigger:
+        pdf.add_page()
+    else:
+        pdf.ln(3)
+
     pdf.set_font("Times", "B", 9.5)
     pdf.set_text_color(0, 0, 0)
     pdf.cell(0, 5.0, tbl_data["title"], align="C", new_x="LMARGIN", new_y="NEXT")
@@ -747,12 +762,26 @@ def render_pdf_table(pdf, tbl_data, col_widths=None):
             pdf.set_fill_color(255, 255, 255)
 
         sanitized_row = [sanitize_for_pdf(val) for val in row_data]
-        row_height = 5.4
         for i, val in enumerate(sanitized_row):
             pdf.cell(scaled_widths[i], row_height, val, border=1, fill=True, align="C" if (i == 0 or "%" in val or val.replace(".", "").isdigit() or "/" in val) else "L")
         pdf.ln()
         fill = not fill
     pdf.ln(3)
+
+
+def write_block_to_pdf_cols(pdf, cols, block):
+    for sec in block:
+        if sec["heading"]:
+            pdf.set_font("Times", "B", 10.5)
+            pdf.set_text_color(0, 0, 0)
+            cols.write(f"\n{sec['heading']}\n\n")
+        for para in sec["paragraphs"]:
+            if len(para) < 55 and any(para.startswith(pfx) for pfx in ["A.", "B.", "C.", "D.", "E.", "1)", "2)", "3)"]) and not para.endswith("."):
+                pdf.set_font("Times", "BI", 9.5)
+                cols.write(f"\n{sanitize_for_pdf(para)}\n")
+            else:
+                pdf.set_font("Times", "", 10.0)
+                cols.write(f"  {sanitize_for_pdf(para)}\n\n")
 
 
 def generate_pdf(path):
@@ -802,46 +831,40 @@ def generate_pdf(path):
     pdf.set_right_margin(curr_r)
     pdf.ln(4)
 
-    # 3. Two-Column Body Part 1 (Sections I, II, III)
+    # 3. Two-Column Body Block 1 (Sections I, II, III)
     with pdf.text_columns(ncols=2, gutter=6.0) as cols:
-        for sec in SECTIONS_PART1:
-            pdf.set_font("Times", "B", 10.5)
-            pdf.set_text_color(0, 0, 0)
-            cols.write(f"\n{sec['heading']}\n")
-            for para in sec["paragraphs"]:
-                if len(para) < 55 and any(para.startswith(pfx) for pfx in ["A.", "B.", "C.", "D.", "E.", "1)", "2)", "3)"]) and not para.endswith("."):
-                    pdf.set_font("Times", "BI", 9.5)
-                    cols.write(f"\n{sanitize_for_pdf(para)}\n")
-                else:
-                    pdf.set_font("Times", "", 10.0)
-                    cols.write(f"  {sanitize_for_pdf(para)}\n\n")
+        write_block_to_pdf_cols(pdf, cols, SECTIONS_BLOCK1)
 
-    # 4. Spanning Table I (Multi-Model Benchmarks)
+    # 4. Table I (Model Benchmarks)
     render_pdf_table(pdf, TABLE_1_DATA, col_widths=[18, 28, 28, 13, 13, 14, 13, 14, 15])
 
-    # 5. Spanning Table II (Feature Ablation)
+    # 5. Two-Column Body Block 2 (Section IV-A)
+    with pdf.text_columns(ncols=2, gutter=6.0) as cols:
+        write_block_to_pdf_cols(pdf, cols, SECTIONS_BLOCK2)
+
+    # 6. Table II (Feature Ablation)
     render_pdf_table(pdf, TABLE_2_DATA, col_widths=[26, 10, 14, 14, 14, 14, 14, 14, 14, 14])
 
-    # 6. Two-Column Body Part 2 (Sections IV, V, VI)
+    # 7. Two-Column Body Block 3 (Section IV-B, IV-C)
     with pdf.text_columns(ncols=2, gutter=6.0) as cols:
-        for sec in SECTIONS_PART2:
-            pdf.set_font("Times", "B", 10.5)
-            pdf.set_text_color(0, 0, 0)
-            cols.write(f"\n{sec['heading']}\n")
-            for para in sec["paragraphs"]:
-                if len(para) < 55 and any(para.startswith(pfx) for pfx in ["A.", "B.", "C.", "D.", "E.", "1)", "2)", "3)"]) and not para.endswith("."):
-                    pdf.set_font("Times", "BI", 9.5)
-                    cols.write(f"\n{sanitize_for_pdf(para)}\n")
-                else:
-                    pdf.set_font("Times", "", 10.0)
-                    cols.write(f"  {sanitize_for_pdf(para)}\n\n")
+        write_block_to_pdf_cols(pdf, cols, SECTIONS_BLOCK3)
 
-    # 7. Spanning Table III (Adversarial Hardening) & Table IV (Peer Evaluation)
+    # 8. Table III (Adversarial Hardening)
     render_pdf_table(pdf, TABLE_3_DATA, col_widths=[32, 14, 14, 14, 14, 14, 14, 14, 14, 16])
+
+    # 9. Two-Column Body Block 4 (Section V)
+    with pdf.text_columns(ncols=2, gutter=6.0) as cols:
+        write_block_to_pdf_cols(pdf, cols, SECTIONS_BLOCK4)
+
+    # 10. Clean Page Break before Section VI & References (Page 6)
+    pdf.add_page()
+    with pdf.text_columns(ncols=2, gutter=6.0) as cols:
+        write_block_to_pdf_cols(pdf, cols, SECTIONS_BLOCK5)
+
     render_pdf_table(pdf, TABLE_4_DATA, col_widths=[20, 52, 14, 14, 14, 16])
 
-    # 8. References in Two Columns
     with pdf.text_columns(ncols=2, gutter=6.0) as cols:
+        write_block_to_pdf_cols(pdf, cols, SECTIONS_BLOCK6)
         pdf.set_font("Times", "B", 10.5)
         cols.write("\nREFERENCES\n")
         pdf.set_font("Times", "", 8.0)
