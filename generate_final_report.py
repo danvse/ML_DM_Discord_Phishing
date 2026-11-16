@@ -25,23 +25,27 @@ from fpdf import FPDF
 
 OUTPUT_DIR = r"c:\Users\Dan\Downloads\ML_DM"
 
-TITLE = "Detecting Scam and Phishing Messages on Discord Using Feature-Fused Machine Learning"
+TITLE = "Catching Discord Scam and Phishing Messages Using Words and Link Structure"
 SUBTITLE = "Final Project Report - Team #18"
 AUTHORS = "Edwin Lin, Tin Chak Lam"
 AFFILIATION = "Department of Computer Science  |  Machine Learning & Data Mining  |  Fall 2026"
 DATE = "December 2026"
 
 ABSTRACT_TEXT = (
-    "Social engineering attacks on Discord have evolved past simple spam bots into multi-turn conversational lures "
-    "and character-level evasion that easily bypass platform filters. Native AutoMod regex rules rely on exact keyword "
-    "matches; against Cyrillic homoglyphs, leetspeak, and markdown link discrepancies, their detection performance drops "
-    "sharply (-37.2% in F1-score). In this project, we built a dual-stream detection pipeline that couples 3,000 TF-IDF "
-    "n-grams with 17 engineered structural invariants extracted directly from raw message strings. On a balanced benchmark "
-    "of 3,552 verified Discord messages, unhardened gradient-boosted trees achieved 0.9777 clean F1, but still experienced "
-    "a 17.4% performance drop under adversarial evasion. By implementing a minimax data augmentation training strategy, "
-    "we eliminated this vulnerability, reaching 100.0% adversarial recall and 0.9780 F1 under stress tests. "
-    "Feature ablation showed that our 17 structural heuristics alone outperformed 3,000 text n-grams by 14.1% under "
-    "attack, while operating in 1.2 milliseconds on commodity CPU hardware."
+    "Scam messages on Discord have become a huge nuisance and security risk for millions of users. "
+    "Attackers steal user accounts and immediately use them to blast fake gift links, phony game test invites, "
+    "and wallet-draining sites to all of the victim's friends. Most Discord servers try to block these messages "
+    "using simple keyword lists and regular expressions (regex). Unfortunately, scammers easily slip past these "
+    "rules by swapping English letters for identical-looking Russian letters (like replacing 'o' with Cyrillic 'о'), "
+    "using leetspeak, or hiding fake links behind clickable labels. When tested against these trick messages, "
+    "standard regex filters missed almost half of all attacks, dropping their F1 score by 37.2%. In this project, "
+    "we built a fast, practical detection system that combines two things: the words in the message (using TF-IDF) "
+    "and 17 physical clues about the links and text (such as how close a domain name is spelled to 'discord.com', "
+    "how random the web address looks, and whether it uses hidden characters). We fed these clues into XGBoost, "
+    "a popular decision tree model. On a dataset of 3,552 verified Discord messages, our basic model caught 98.3% "
+    "of normal scams. When we trained it against simulated hacker tricks, it achieved 100.0% recall on disguised "
+    "attacks without slowing down clean chat. Best of all, our entire code runs in 1.2 milliseconds per message "
+    "on a basic laptop CPU, meaning it can run live on busy Discord servers without causing chat lag."
 )
 
 INDEX_TERMS = "Discord security, phishing detection, machine learning, feature fusion, adversarial training, social engineering, XGBoost, SHAP interpretability."
@@ -52,218 +56,247 @@ SECTIONS_PART1 = [
         "heading": "I. INTRODUCTION",
         "paragraphs": [
             (
-                "A. Background and Motivation"
+                "A. What Discord Is and Why Scammers Target It"
             ),
             (
-                "Over the past five years, Discord has grown from a voice chat tool for gamers into a hub for over "
-                "200 million monthly active users, hosting software development groups, cryptocurrency communities, and "
-                "student study servers. Because servers mix anonymous members with direct-messaging access, Discord has "
-                "become one of the most profitable targets for automated phishing and account-hijacking campaigns. Attackers "
-                "routinely target users with fake Discord Nitro free gifts, counterfeit Steam trade offers, bogus tournament "
-                "signups, and fake indie game playtest builds that bundle infostealer malware."
+                "Discord started as a voice chat app for gamers, but over the last five years it has expanded into a massive platform with over "
+                "200 million monthly active users. Today, people use Discord for everything: gaming teams, coding projects, university study groups, "
+                "and cryptocurrency communities. Unlike social networks like Twitter or Reddit where posts are mostly public, Discord is organized "
+                "into servers where users chat via direct messages (DMs) and group channels."
             ),
             (
-                "Once an attacker grabs an account token or session token, the compromise spreads virally. The bot script "
-                "scrapes the victim's mutual servers and friends list, immediately sending out identical lure links to dozens "
-                "of contacts. Because these messages originate from trusted friends rather than unfamiliar accounts, click-through "
-                "rates are substantially higher than typical email phishing. While Discord's native moderation tools (AutoMod) "
-                "and public bots (MEE6, Dyno) catch simple duplicate links, they consistently fail when attackers alter the text "
-                "slightly to evade static blacklist checks."
+                "Because users naturally trust messages coming from their friends or fellow server members, Discord has turned into a goldmine for "
+                "scammers. The attack usually starts with account theft: an attacker tricks someone into running a fake game file (an infostealer) or "
+                "scanning a fake QR code. The moment the attacker gets access to that account, an automated script takes over. It scrapes the user's "
+                "friends list and sends an identical lure message to every friend and server channel."
             ),
             (
-                "B. Problem Definition"
+                "Common lures follow a few predictable patterns: (1) Free Discord Nitro gifts ('Steam is giving away free Nitro! Claim here: https://...'), "
+                "(2) Steam wallet codes or trade offers, (3) Tournament team invites ('We need one more player for our tournament, please vote for our team here'), "
+                "and (4) Fake indie game playtests ('Hey bro, I made an indie game on Steam, can you test the demo build?'). When a friend clicks the link, "
+                "they are taken to a fake login screen that steals their password, and the cycle repeats."
             ),
             (
-                "Given a raw message string m, our goal is to construct a classifier f(m) -> {0, 1}, predicting whether m is "
-                "benign (0) or malicious (1). In our investigation, we found two main reasons why standard text filters break down in practice:"
+                "B. Why Existing Filters Keep Failing"
             ),
             (
-                "1) Obfuscated Character Evasion: Attackers easily bypass regex-based filters by swapping standard Latin characters "
-                "for visually identical Cyrillic lookalikes (such as substituting Cyrillic 'о' for Latin 'o'), using leetspeak ('fr33 n1tr0'), "
-                "or exploiting Discord's markdown syntax to disguise destinations ('[discord.com/nitro](https://phishing-domain.xyz)'). "
-                "Because rule-based systems rely on exact string equality, even a single character substitution allows the lure through."
+                "To fight this spam, Discord provides a built-in filter called AutoMod, and server owners often install moderation bots like MEE6 or Dyno. "
+                "Almost all of these tools work the exact same way: they check messages against a list of blocked words or regular expression patterns (regex). "
+                "For example, a server owner might write a rule that says: 'If a message contains discord.com/gifts and mentions @everyone, delete it.'"
             ),
             (
-                "2) Conversational Pretexting: Modern attacks rarely open with a naked scam link. Instead, attackers use automated "
-                "scripts that open with believable conversational openers--such as asking a server member to test an indie game, vote "
-                "for an esports team, or evaluate artwork--before sending a URL. Standard keyword models often produce false alarms on "
-                "legitimate conversation containing links, while missing attacks that use novel pretext wording."
+                "In practice, this approach fails because scammers know how regex works and easily dodge it. We observed two main evasion tricks:"
             ),
             (
-                "C. System Architecture and Contributions"
+                "1) Visual Trickery (Homoglyphs and Masks): Scammers take advantage of the fact that different alphabets have letters that look identical on computer "
+                "screens. For instance, the Latin letter 'o' (Unicode U+006F) and the Cyrillic letter 'о' (Unicode U+043E) look completely indistinguishable to a "
+                "human, but a computer sees them as totally different numbers. If a filter blocks 'discord.com', the scammer sends 'dіscord.com' with a Cyrillic 'і'. "
+                "The regex sees no match and lets the message through. Scammers also use Discord markdown syntax to make fake links: writing "
+                "'[https://discord.com/nitro](https://scam-site.xyz)' displays a blue, trusted link on screen, but clicking it takes the user to a malware page."
             ),
             (
-                "To tackle both issues without requiring heavy deep learning infrastructure, we developed a dual-stream feature fusion "
-                "architecture. Our pipeline decouples high-level vocabulary patterns from low-level payload structure, routing both into "
-                "an optimized gradient-boosted decision tree ensemble. Specifically, this work makes three core contributions:"
+                "2) Casual Pretexts: Scammers now write scripts that start with normal conversation instead of dropping a link immediately. A bot might send: "
+                "'Hey, are you free right now? We need a tester for our game.' Because the message has no links or banned words, filters ignore it. "
+                "Only after the user replies does the bot send the payload."
             ),
             (
-                "1) Dual-Stream Representation: We combine a 3,000-dimensional TF-IDF text representation with a dense set of 17 structural "
-                "payload invariants (including Levenshtein brand distance, Shannon host entropy, and Unicode script-plane counts) computed "
-                "directly from raw message text without requiring external network lookups or Discord bot API privileges."
+                "C. Our Strategy: Combining Words with Link Clues"
             ),
             (
-                "2) Minimax Adversarial Hardening: We introduce a minimax data augmentation training regimen that synthesizes perturbed "
-                "homoglyphs and disguised links during training. This eliminated the baseline model's evasion gap, lifting adversarial "
-                "recall from 69.66% to 100.0% without degrading clean classification accuracy."
+                "To solve this problem without needing giant, expensive AI computers, we asked a simple question: What can scammers change easily, and "
+                "what are they forced to keep?"
             ),
             (
-                "3) Systematic Ablation and Latency Profiling: Through a 3-way ablation study, we show why structural heuristics "
-                "provide a much stronger defense than pure text n-grams under attack (+14.1% F1 advantage). We also timed the full "
-                "pipeline on standard CPU hardware, showing it completes in 1.2ms per message."
+                "Scammers can easily change their words. They can switch from 'free nitro' to 'complimentary subscription', or swap letters for Russian lookalikes. "
+                "But here is what they cannot change: to steal your account or install malware, they MUST send you to a website they control. That website domain "
+                "is almost always newly registered, looks slightly misspelled compared to real brands, or contains suspicious characters. In other words, while "
+                "words are easy to disguise, the physical structure of the attack is much harder to hide."
+            ),
+            (
+                "Based on this insight, we built a two-stream machine learning system: one stream looks at the vocabulary in the message, and the other stream "
+                "inspects 17 structural clues about the links and text. We then feed both sets of clues into a fast decision tree model called XGBoost."
+            ),
+            (
+                "D. What We Built and Our Main Findings"
+            ),
+            (
+                "Here is what our project accomplished:"
+            ),
+            (
+                "1) A Two-Stream Feature System: We combined 3,000 word and character patterns with 17 engineered structural clues (like how close a link is to "
+                "'discord.com', how jumbled the domain looks, and whether it hides links inside spoiler tags)."
+            ),
+            (
+                "2) Training Against Hacker Tricks: We wrote an automated tool that mutated scam messages with real hacker tricks (swapping letters, masking links) "
+                "and forced our model to learn how to spot them during training. This raised the model's catch rate on disguised attacks from 69.7% to 100.0%."
+            ),
+            (
+                "3) Real-World Speed: Our model runs on a standard CPU in 1.2 milliseconds per message. That is 300 times faster than large language models like "
+                "BERT, meaning it can easily handle live chat queues on massive Discord servers without causing lag."
             ),
         ],
     },
 
     # b. METHODOLOGY (40 points)
     {
-        "heading": "II. METHODOLOGY & SYSTEM SETUP",
+        "heading": "II. METHODOLOGY & SYSTEM ARCHITECTURE",
         "paragraphs": [
             (
-                "A. Operational Flow and Feature Extraction"
+                "A. How a Message Gets Checked (System Flow)"
             ),
             (
-                "When a Discord message arrives, our pipeline routes it through two parallel extraction paths before feeding "
-                "the concatenated representations into XGBoost. The operational flow proceeds through five concrete stages:"
+                "When someone posts a message in a Discord channel, our system checks it in five straightforward steps:"
             ),
             (
-                "1) Ingestion & Preprocessing: Raw text string m is ingested. We strip Discord snowflake mentions (<@!id>, @everyone) "
-                "and collapse repeated whitespace into a normalized string s_clean."
+                "1) Clean the Text: First, we remove raw Discord user tags (like '<@!987654321>') and clean up weird spacing. This leaves us with clean, readable text."
             ),
             (
-                "2) Stream A (Text Semantic TF-IDF): We convert s_clean into a 3,000-dimensional sparse feature vector e_text using "
-                "sublinear term-frequency TF-IDF across word n-grams (ranges 1 to 2) and character subwords. This captures vocabulary "
-                "patterns such as free Nitro lures, game playtest requests, or urgency phrasing."
+                "2) Stream 1 (Analyze the Words): We convert the message into a list of 3,000 word numbers using TF-IDF (Term Frequency-Inverse Document Frequency). "
+                "This counts how often words like 'gift', 'nitro', 'urgent', or 'steam' show up compared to normal casual gaming talk."
             ),
             (
-                "3) Stream B (17 Structural Invariants): In parallel, raw string m is parsed for URLs, markdown syntax, and Unicode "
-                "script planes, generating a dense 17-dimensional vector x_heur of structural payload indicators."
+                "3) Stream 2 (Inspect the 17 Structural Clues): In parallel, our code scans the raw text for links, checks character encodings, and pulls out 17 "
+                "specific numbers (such as how many letters off a domain is from 'discord.com', whether the link is disguised, and whether it uses foreign alphabet characters)."
             ),
             (
-                "4) Late Multimodal Fusion: Feature vectors are horizontally concatenated into a joint matrix X = [e_text, x_heur] in "
-                "R^(3017), which feeds directly into our trained XGBoost classifier."
+                "4) Combine Both Sets of Clues: We glue the 3,000 word numbers and the 17 structural numbers side-by-side into a single row of 3,017 numbers."
             ),
             (
-                "5) Threshold-Calibrated Decision Engine: The predicted scam probability P(scam | m) is mapped into three operational "
-                "actions: immediate deletion and sender ban (P >= 0.80), quarantine for human moderator review (0.50 <= P < 0.80), or "
-                "standard message delivery (P < 0.50)."
+                "5) Score with XGBoost: We pass those 3,017 numbers to our trained XGBoost model. The model outputs a single risk score between 0.0% (completely safe) "
+                "and 100.0% (definitely a scam). If the score is 80% or higher, the bot immediately deletes the message and bans the sender. If it is between 50% and "
+                "80%, it flags the message for a human moderator to look at. If it is below 50%, the message goes through normally."
             ),
             (
-                "B. Adopted Mathematical Formulations"
+                "B. What Is XGBoost and Why Did We Choose It?"
             ),
             (
-                "1) Bounded Levenshtein Brand Distance: Computing full string edit distance against open-ended dictionaries in real-time "
-                "takes too much CPU time for a live chat queue. To keep latency under 0.2ms, we narrowed the target "
-                "brand set B specifically to the primary targets of Discord credential phishing: B = {'discord.com', 'discordapp.com', "
-                "'steamcommunity.com'}. The Levenshtein distance lev(d, b) is defined as:"
+                "For readers unfamiliar with machine learning: XGBoost stands for eXtreme Gradient Boosting. It is one of the most widely used and successful "
+                "algorithms in computer science for working with structured data and numbers."
+            ),
+            (
+                "Instead of being a massive neural network (like ChatGPT or BERT), XGBoost works by building a team of hundreds of small, fast decision trees. "
+                "You can picture a single decision tree like a flowchart of yes/no questions: (1) Does the message have a link? -> If yes, go to step 2. "
+                "(2) Is the link close to 'discord.com'? -> If yes, go to step 3. (3) Does the message mention 'free' or 'nitro'? -> If yes, flag as scam."
+            ),
+            (
+                "A single decision tree makes mistakes, but 'gradient boosting' means we train trees in a sequence: each new tree focuses specifically on fixing "
+                "the mistakes made by all the previous trees. In the end, all trees vote together to make the final prediction."
+            ),
+            (
+                "We chose XGBoost over deep neural networks (like DistilBERT or RoBERTa) for three practical reasons:"
+            ),
+            (
+                "1) Lightning Speed: Deep neural networks require expensive graphics cards (GPUs) and take between 120ms and 400ms to read a single message on a CPU. "
+                "In a Discord server with 50,000 members where messages arrive continuously, a 300ms delay causes messages to freeze and back up. XGBoost runs in "
+                "1.2ms on a normal CPU core, which is fast enough to scan every message in real time."
+            ),
+            (
+                "2) Tree Split Logic Fits Scam Patterns: Scam rules are almost always conditional: a link by itself is fine (like a YouTube video), and the word "
+                "'gift' by itself is fine (like a birthday chat). But having a link AND an edit distance of 1 to Discord AND the word 'free' is almost 100% "
+                "malicious. Decision trees learn these exact 'AND' conditions naturally."
+            ),
+            (
+                "3) Immunity to WordPiece Breaking: Deep neural networks split words into tiny syllables (called subwords). When a scammer writes 'dlscord-drop.xyz', "
+                "neural networks break it into meaningless pieces ('dl', 'sc', 'ord') and lose track of the fact that it is a direct copy of Discord. Decision "
+                "trees, when given exact distance measurements, do not suffer from this blind spot."
+            ),
+            (
+                "C. The 17 Structural Clues We Check"
+            ),
+            (
+                "Here is the exact list of the 17 clues our extractor looks for in every message: "
+                "(1) has_url: Is there any link in the message? (Yes=1, No=0); "
+                "(2) num_urls: How many total links were posted?; "
+                "(3) min_levenshtein_discord: How many single-letter edits (changes, additions, or deletions) separate the link's website address from 'discord.com' or 'discordapp.com'?; "
+                "(4) min_levenshtein_steam: How many single-letter edits separate the link from 'steamcommunity.com'?; "
+                "(5) domain_entropy: A measure of how random or jumbled the website name looks; "
+                "(6) is_known_bad_domain: Does the link match our database of 21,908 known scam sites?; "
+                "(7) has_suspicious_tld: Does the site end in a cheap, high-abuse extension like .xyz, .top, .buzz, or .click?; "
+                "(8) has_ip_in_url: Does the link use a raw IP address (like 192.168.1.1) instead of a regular name?; "
+                "(9) has_markdown_mask: Does the clickable text pretend to be one website while sending you to a different one?; "
+                "(10) homoglyph_count: How many sneaky lookalike letters from the Russian or Greek alphabets appear in the text?; "
+                "(11) urgency_token_count: How many rush words appear (like 'claim', 'free', 'gift', 'nitro', 'hurry')?; "
+                "(12) uppercase_ratio: What percentage of the message is in ALL CAPS?; "
+                "(13) mention_count: Does the message ping @everyone or @here to wake up the whole server?; "
+                "(14) spoiler_mask_count: Are links hidden inside Discord spoiler bars ('||link||')?; "
+                "(15) has_attachment_ext: Does the message link to a dangerous file download (like .exe, .zip, or .bat)?; "
+                "(16) message_length: Total number of characters in the message; and "
+                "(17) digit_ratio: What fraction of the message consists of numbers?"
+            ),
+            (
+                "D. Mathematical Formulas Used"
+            ),
+            (
+                "1) Levenshtein Distance (Catching Lookalike Websites): To measure how close a web address is to an official brand without checking a huge dictionary, "
+                "we calculate the Levenshtein edit distance. If d is the domain from the message and b is a real brand ('discord.com'), the distance lev(d, b) is the "
+                "smallest number of character inserts, deletes, or swaps needed to turn d into b. For example, 'discoord.com' takes 1 deletion to become 'discord.com', "
+                "giving a distance of 1. Real domains have a distance of 0, while lookalikes give 1, 2, or 3."
             ),
             (
                 "lev(d, b) = |d| if |b| = 0; |b| if |d| = 0; lev(tail(d), tail(b)) if d[0] = b[0]; otherwise 1 + min(lev(tail(d), b), "
-                "lev(d, tail(b)), lev(tail(d), tail(b))). We compute d_min = min_{b in B} lev(d, b). Legitimate domains yield d_min = 0, "
-                "while lookalike domains such as 'discoord-app.com' or 'dlscord.xyz' yield d_min in {1, 2, 3}, creating a clear geometric "
-                "boundary that keyword matching cannot match."
+                "lev(d, tail(b)), lev(tail(d), tail(b))). We compute d_min = min_{b in B} lev(d, b). To keep our code fast, we only checked against three target brands: "
+                "B = {'discord.com', 'discordapp.com', 'steamcommunity.com'}."
             ),
             (
-                "2) Shannon Domain Entropy: Attackers often use algorithmically generated subdomains (DGAs) or high-randomness "
-                "strings to bypass static filters. We quantify character randomness using Shannon entropy H(d) across the unique character "
-                "set C of the domain label: H(d) = - sum_{c in C} p(c) * log2(p(c)), where p(c) represents the empirical frequency of "
-                "character c in string d. Elevated entropy values (H > 3.2) strongly correlate with malicious phishing infrastructure."
+                "2) Shannon Entropy (Catching Jumbled Bot Domains): Hackers frequently register domains that look like random keyboard smashes (e.g., 'qx9-airdrop.xyz'). "
+                "We measure randomness using Shannon's entropy formula: H(d) = - sum p(c) * log2(p(c)), where p(c) is how often each letter c appears in the website "
+                "name. Normal English words have an entropy score around 2.0 to 2.8, while random machine-generated hacker domains score above 3.2."
             ),
             (
-                "3) Minimax Adversarial Hardening Formulation: Let D_clean denote the clean training distribution and delta in Delta "
-                "denote a bounded space of character-level evasion perturbations (homoglyphs, leetspeak, markdown masks). Standard empirical "
-                "risk minimization minimizes E_{(x, y) ~ D_clean} [L(f(x), y)]. This leaves the model vulnerable to adversarial shifts. "
-                "We adopt a minimax objective:"
-            ),
-            (
-                "min_{theta} E_{(x, y) ~ D} [ max_{delta in Delta} L(f_theta(x + delta), y) ]"
-            ),
-            (
-                "We realize this objective by programmatically generating adversarial variants during training across 25% of positive "
-                "scam instances, forcing tree split points to anchor onto structural features."
-            ),
-            (
-                "C. Detailed Specification of the 17 Structural Invariants"
-            ),
-            (
-                "The 17 numerical indicators comprising Stream B are defined as follows: "
-                "(1) has_url: binary indicator of link presence; "
-                "(2) num_urls: integer count of total embedded URLs; "
-                "(3) min_levenshtein_discord: minimum edit distance to discord.com or discordapp.com; "
-                "(4) min_levenshtein_steam: minimum edit distance to steamcommunity.com; "
-                "(5) domain_entropy: maximum Shannon character entropy across extracted domain labels; "
-                "(6) is_known_bad_domain: binary indicator matching the Nikolaischunk threat feed of 21,908 verified scam domains; "
-                "(7) has_suspicious_tld: binary indicator for abuse-heavy top-level domains (.xyz, .top, .buzz, .ru, .click, .cc); "
-                "(8) has_ip_in_url: binary indicator for links using direct IPv4 addresses; "
-                "(9) has_markdown_mask: binary detector for Discord markdown syntax where visible link text contradicts destination URL; "
-                "(10) homoglyph_count: count of non-Latin characters from Cyrillic (\\u0400-\\u04FF) and Greek (\\u0370-\\u03FF) Unicode blocks; "
-                "(11) urgency_token_count: frequency count of urgency and lure keywords ('nitro', 'free', 'claim', 'gift', 'tournament', 'beta'); "
-                "(12) uppercase_ratio: proportion of capital letters to total character length; "
-                "(13) mention_count: count of mass notification tokens (@everyone, @here); "
-                "(14) spoiler_mask_count: count of links hidden within spoiler tags ('||url||'); "
-                "(15) has_attachment_ext: matches for dangerous executable file extensions (.exe, .scr, .zip, .bat); "
-                "(16) message_length: total character count clamped to 1,000; and "
-                "(17) digit_ratio: ratio of numeric digits to total message length."
-            ),
-            (
-                "D. Why We Chose XGBoost"
-            ),
-            (
-                "We selected XGBoost (Extreme Gradient Boosting) over linear classifiers and deep neural networks based on three constraints:"
-            ),
-            (
-                "1) Non-Linear Conditional Split Rules: Linear models assume additive feature contributions. Real-world scam risk is conditional: "
-                "an edit distance of 1 to Discord is malicious only when paired with a link and an urgency lure. Decision trees naturally learn "
-                "conjunctive rules (Urgency >= 1 AND Edit_Dist <= 2) without requiring explicit polynomial feature expansions."
-            ),
-            (
-                "2) Production Inference Latency: While deep transformers (DistilBERT, RoBERTa) achieve strong leaderboard accuracy, their "
-                "120ms to 400ms CPU latency makes them impractical for high-volume Discord servers handling thousands of messages per minute. "
-                "Our fused model executes inference in 1.2 milliseconds on standard CPU hardware, sustaining real-time moderation."
-            ),
-            (
-                "3) Subword Tokenizer Fragmentation: Transformer tokenizers (WordPiece, BPE) split novel typosquatted domains into fragmented "
-                "character subwords, destroying geometric proximity. By computing Levenshtein distances explicitly and feeding them to XGBoost, "
-                "we preserve structural domain invariants that pure neural language models miss."
+                "3) Adversarial Hardening Formula: Normally, models are trained to do well on clean, normal examples. In math, this means minimizing standard loss: "
+                "min E[ L(f(x), y) ]. To stop scammers who actively try to fool our model, we used a minimax training strategy: min_theta E [ max_delta L(f_theta(x + delta), y) ]. "
+                "In plain words: for every scam message, we let an automated script add the worst possible hacker tricks (delta), and then forced our model parameters "
+                "(theta) to still get the answer right. This teaches the model to focus on clues that scammers cannot fake."
             ),
         ],
     },
 
     # c. EVALUATION (30 points)
     {
-        "heading": "III. EXPERIMENTAL EVALUATION & RESULTS",
+        "heading": "III. HOW WE TESTED OUR SYSTEM",
         "paragraphs": [
             (
-                "A. Experimental Settings and Dataset Provenance"
+                "A. Where Our Data Came From"
             ),
             (
-                "To satisfy platform compliance under Section 21 of the Discord Developer Policy (which prohibits using API-collected "
-                "chat messages for machine learning training without express user permission), our experimental corpus was compiled exclusively from "
-                "publicly published academic and open-source threat intelligence resources:"
+                "To train and test our system fairly, we needed real Discord messages. However, Discord has strict privacy rules: Section 21 of their Developer "
+                "Policy prohibits bots from saving private chat messages to train machine learning models without user permission. To respect privacy and follow "
+                "the rules, we gathered our data exclusively from public academic and security research sources:"
             ),
             (
-                "1) Hugging Face Discord Phishing Scam Dataset: 2,000 verified Discord messages (Wang et al.) giving us verified positive "
-                "scam samples and legitimate server chat."
+                "1) Public Phishing Dataset: We used 2,000 verified Discord messages published on Hugging Face by researchers (Wang et al.), containing both real scam messages and real public chat."
             ),
             (
-                "2) Nikolaischunk Threat Feed: 21,908 verified malicious Discord and Steam phishing domains maintained on GitHub."
+                "2) Threat Intel Feed: We integrated a public database of 21,908 verified scam domains compiled by security researcher Nikolaischunk."
             ),
             (
-                "3) Augmented Threat Playbooks: 1,500 synthetic samples modeling modern 2024-2026 conversational attack vectors (indie game "
-                "alpha tests, Steam tournament team votes, art commission infostealers) combined with 2,500 legitimate gaming chat lines."
+                "3) Modern Attack Playbooks: We added 1,500 synthetic messages modeling newer 2024-2026 scam tricks (like fake indie game test builds, crypto wallet "
+                "drainers, and Steam tournament voting scams), balanced against 2,500 real casual gamer chat lines."
             ),
             (
-                "4) Data Partitioning: The combined corpus was deduplicated to eliminate identical bot templates, yielding a balanced dataset "
-                "of 3,552 unique messages (1,776 clean, 1,776 scam). The data was partitioned into a stratified 80% training set (2,841 samples), "
-                "a 10% validation set (355 samples), and a 10% held-out test set (356 samples). In addition, an independent adversarial test "
-                "set of 356 samples was generated by applying programmatic Cyrillic homoglyph substitution, leetspeak, and markdown link masking "
-                "to positive test instances."
+                "After removing duplicate spam messages, we had a clean, balanced dataset of 3,552 messages (exactly 1,776 scams and 1,776 normal messages). "
+                "We split this 80% for training (2,841 messages), 10% for tuning (355 messages), and 10% for final testing (356 messages)."
             ),
             (
-                "B. Multi-Model Baseline Comparison"
+                "We also built an extra test set of 356 scrambled messages where we deliberately added Russian lookalike letters, leetspeak, and disguised links "
+                "to test how models handle real evasion attacks."
             ),
             (
-                "We evaluated six model setups across the clean test set and the adversarial stress-test set, as reported in Table I."
+                "B. Comparing Against Common Baselines"
+            ),
+            (
+                "We tested six different approaches on both our clean test set and our tricky evasion test set. Table I shows the results:"
+            ),
+            (
+                "Discord's standard AutoMod regex rules did okay on normal messages (85.98% F1), but completely fell apart on the evasion test set, dropping down "
+                "to 48.76% F1 (a massive 37.2% collapse). Scammers easily bypassed it."
+            ),
+            (
+                "Simple text classifiers like Naive Bayes and Logistic Regression did well on clean text (around 97-98% F1), but their performance dropped when letters were swapped."
+            ),
+            (
+                "Our unhardened XGBoost model scored 97.77% F1 on clean text and 80.78% under attack. It beat the other baselines because its structural clues gave it "
+                "a backup signal even when text words were scrambled."
             ),
         ],
     },
@@ -271,55 +304,50 @@ SECTIONS_PART1 = [
 
 SECTIONS_PART2 = [
     {
-        "heading": "IV. ABLATION STUDY & ADVERSARIAL HARDENING",
+        "heading": "IV. WHAT MADE THE SYSTEM WORK (ABLATION & HARDENING)",
         "paragraphs": [
             (
-                "A. Three-Way Feature Ablation Study"
+                "A. What Happens When You Test Each Stream Alone?"
             ),
             (
-                "To isolate the exact contribution of each feature stream, we trained three identical XGBoost models (250 "
-                "estimators, learning rate 0.08, max depth 6) across three distinct feature representations: Stream A Only (3,000 TF-IDF n-grams), "
-                "Stream B Only (17 structural heuristics), and Dual-Stream Fused (3,017 features). The results are summarized in Table II."
+                "To find out whether our 17 structural clues were actually doing anything, we ran an ablation experiment. We trained three identical XGBoost models: "
+                "one using ONLY the 3,000 words, one using ONLY our 17 structural clues, and one using BOTH together. The results in Table II tell a fascinating story:"
             ),
             (
-                "B. Observations and Theoretical Inferences"
+                "1) Words Alone Fail Under Attack: The model trained on 3,000 words scored 95.89% on clean text, but its catch rate (recall) was cut in half under attack, "
+                "dropping down to 49.44% (a 34.0% drop in F1). Why? Because when a scammer writes 'fr33 n1tr0' or swaps an English 'o' for a Russian 'о', the word "
+                "vectorizer sees a brand new word that was never in its dictionary. The word activations drop to zero, and the model is blind."
             ),
             (
-                "1) Vulnerability of Pure Text Semantics (Stream A): While Stream A achieved strong clean performance (0.9589 F1), its recall "
-                "collapsed to 49.44% under adversarial character substitution, dropping overall F1 by 34.0%. Because leetspeak and Cyrillic homoglyphs "
-                "create token sequences absent from the training vocabulary, term frequency activations drop to zero, blinding the model to obfuscated lures."
+                "2) The 17 Clues Hold the Line: The model using only 17 clues--less than 1% of the feature size--scored 77.48% F1 under attack. It beat the 3,000-word "
+                "model by 14.1% because scammers cannot change the fact that their link points to a fake domain."
             ),
             (
-                "2) Resilience of Structural Invariants (Stream B): Using only 17 numeric features (less than 1% of the dimensionality of Stream A), "
-                "Stream B outperformed the 3,000-dimensional text model by 14.1% under attack (0.7748 vs 0.6331 F1), maintaining an adversarial AUROC of 0.9585. "
-                "While adversaries can alter phrasing, they cannot disguise the underlying mechanics of domain typosquatting, high-entropy links, and redirection."
+                "3) Both Together Give the Best Result: Combining words and structural clues scored the highest on clean text (97.77% F1) and scored 80.78% under "
+                "attack before hardening."
             ),
             (
-                "3) Multimodal Late Fusion Superiority: Dual-Stream Fused achieved peak performance on clean data (0.9777 F1, 0.9988 AUROC) "
-                "and superior unhardened adversarial performance (0.8078 F1), confirming that decision trees successfully discover non-linear "
-                "interactions between vocabulary intent and structural payload markers."
+                "B. Hardening the Model Against Hacker Tricks"
             ),
             (
-                "C. Minimax Adversarial Hardening Evaluation"
+                "Even though our combined model beat all baselines, it still dropped 17.4% under attack. To fix this, we ran adversarial hardening: we added 348 "
+                "scrambled messages into our training set, teaching the model what Russian lookalike letters and masked links look like during training."
             ),
             (
-                "To eliminate the remaining 17.4% adversarial drop, we retrained the fused model using our adversarial data augmentation protocol, "
-                "injecting 348 perturbed samples into the training partition. As detailed in Table III, the hardened model achieved 100.0% "
-                "adversarial recall and 0.9780 adversarial F1 with zero degradation under attack (+0.9% gain over clean baseline)."
+                "As shown in Table III, the hardened model caught 100.0% of the evasion attacks (0.9780 F1 score) with zero drop in performance (+0.9% gain over clean baseline)."
             ),
             (
-                "Information Gain Shifts: Looking at tree split gains showed that hardening elevated homoglyph_count to the #5 most discriminative "
-                "feature across the entire model (Gain: 22.63), alongside has_url (64.54), urgency_token_count (33.29), and num_urls (25.55). "
-                "The model learned that any message combining non-Latin characters with a URL represents an active evasion attempt."
+                "When we checked which clues the model relied on most, we saw a major shift: the count of Russian lookalike letters ('homoglyph_count') jumped up to "
+                "become the #5 most important feature in the whole model. The model learned a simple, unbreakable rule: if a message combines a link with foreign "
+                "lookalike letters, it is almost certainly an attack."
             ),
             (
-                "D. Live Web Application Demo"
+                "C. Our Live Web Application Demo"
             ),
             (
-                "We built a self-contained web demo using Streamlit (src/app.py) and a command-line scoring tool (src/predict.py). "
-                "The interface accepts raw message strings, extracts all 17 heuristics, executes inference in 1.2ms, and displays calibrated risk "
-                "scores with feature attribution breakdowns. Our tests showed clean separation: benign chat scored 1.1% risk, legitimate "
-                "YouTube links scored 7.9%, while homoglyph-obfuscated attacks scored 99.85%."
+                "To prove that our model works in practice, we built an interactive web app using Streamlit and Angular. A user can paste any message or click preset "
+                "scam examples, and the app runs feature extraction and inference in 1.2ms. It shows an animated risk meter, flags the detected Russian letters or "
+                "lookalike links, and explains the decision using SHAP feature attribution bars. Benign chats score around 1.1% risk, while disguised scam payloads score 99.85%."
             ),
         ],
     },
@@ -329,60 +357,60 @@ SECTIONS_PART2 = [
         "heading": "V. LEARNING OUTCOMES & TEAMWORK",
         "paragraphs": [
             (
-                "A. Tasks Accomplished by Each Team Member"
+                "A. Who Did What on the Team"
             ),
             (
-                "1) Edwin Lin: Focused on the feature engineering pipeline in src/feature_extractor.py, implementing the Levenshtein distance "
-                "matching against the brand target dictionary, writing the Shannon domain entropy calculations, and building the Unicode script-plane "
-                "scanner for Cyrillic and Greek lookalikes. On the modeling side, Edwin formulated the adversarial perturbation generator in "
-                "src/adversarial_trainer.py, ran the cross-validated 3-way ablation experiments, and authored the methodology and evaluation sections."
+                "1) Edwin Lin: Edwin wrote the Python feature extraction engine in src/feature_extractor.py. He wrote the logic for calculating Levenshtein edit distance "
+                "against real brands, implemented Shannon entropy calculations for domains, and wrote the scanner that detects Russian and Greek characters. On the machine "
+                "learning side, Edwin wrote the attack mutation script in src/adversarial_trainer.py, ran the 3-way ablation tests, and wrote the methodology and evaluation "
+                "sections of this report."
             ),
             (
-                "2) Tin Chak Lam: Managed dataset curation and cleaning in src/data_loader.py, integrating the Hugging Face corpus with the 21,908 "
-                "domains from the Nikolaischunk threat feed, deduplicating repetitive bot templates, and addressing class imbalance. Trained the baseline "
-                "models (Naive Bayes, Logistic Regression, LinearSVC, Random Forest), implemented the SHAP TreeExplainer attribution module in "
-                "src/explainability.py, built the interactive web demo, and authored the introduction and project post-mortem."
+                "2) Tin Chak Lam: Tin Chak managed the data collection and cleaning in src/data_loader.py. He integrated the Hugging Face phishing messages with the 21,908 "
+                "domains from the Nikolaischunk threat feed, removed duplicate spam templates, and balanced the dataset. He trained the comparison baseline models (Naive Bayes, "
+                "SVM, Logistic Regression, Random Forest), set up SHAP explanations in src/explainability.py so we could inspect tree decisions, built the web demo, and "
+                "wrote the introduction and post-mortem sections."
             ),
             (
-                "B. Unaccomplished Tasks and Failure Analysis"
+                "B. What Failed and How We Pivoted (The Discord Bot Post-Mortem)"
             ),
             (
-                "During Phase 1, our original plan was to build a custom Discord bot that would collect user-level behavioral metadata--specifically "
-                "account registration dates, mutual server counts, and friend request velocities. However, we quickly encountered both technical and "
-                "policy roadblocks. Technically, Discord bot accounts are strictly sandboxed: bots cannot inspect user-to-user DMs or see incoming friend "
-                "requests. Legally, Section 21 of Discord's Developer Policy explicitly forbids logging and storing private user chats for machine "
-                "learning training without explicit consent from every participant. We briefly considered running a public honeypot server to gather live "
-                "attacks, but attracting real malicious traffic within a single semester was impractical."
+                "When we started this project, our original plan was very different: we wanted to build a Discord bot that would join real servers and collect user "
+                "metadata--like how old an account was, how many servers it shared with you, and how fast it was sending friend requests."
             ),
             (
-                "Pivoting away from metadata collection to raw message string heuristics turned out to be the best design decision of the project. It "
-                "eliminated all privacy liability, made our detector completely independent of Discord bot tokens or API rate limits, and allowed us to "
-                "build an ultra-fast 1.2ms inference engine that can run on any server."
+                "We quickly hit two major roadblocks that killed this idea: First, Discord bot accounts are strictly isolated by design: bots cannot read private direct "
+                "messages between two users, and they cannot see friend requests. Second, Discord's Developer Policy (Section 21) strictly prohibits storing user chat "
+                "messages for machine learning training without consent. We thought about running a public honeypot server to attract scammers, but getting real malicious "
+                "traffic in a single semester was impractical."
             ),
             (
-                "C. Lessons Learned"
+                "Giving up on user metadata turned out to be the best thing that happened to our project. It forced us to focus purely on the text of the message itself. "
+                "By extracting 17 physical clues directly from the raw string, our system requires zero bot permissions, zero private user data, and zero external API calls. "
+                "It is completely self-contained and runs in 1.2ms anywhere."
             ),
             (
-                "1) Word Vocabulary Alone Fails Against Active Attackers: NLP models that rely purely on word n-grams fail the moment an adversary swaps in "
-                "homoglyphs or leetspeak. Structural invariants provide an essential safety net that text representations cannot capture."
+                "C. What We Learned from the Project"
             ),
             (
-                "2) Operational Latency Matters in Production: While deep transformers like DistilBERT often look like the best choice on academic "
-                "leaderboards, their 300ms CPU latency makes them unviable for live chat moderation handling thousands of messages per minute. A lightweight "
-                "GBDT running in 1.2ms on a single CPU core is far more practical for production deployment."
+                "1) Word Counting Is Fragile: Normal NLP models that only look at words fail as soon as an attacker swaps letters or uses leetspeak. Structural clues (like "
+                "web addresses and character encodings) provide a strong safety net that scammers cannot fake."
             ),
             (
-                "3) Designing for Privacy from Day One: Attempting to work around platform terms of service was a dead end. Grounding our feature "
-                "engineering in privacy-preserving heuristics saved the project and avoided legal risk."
+                "2) Latency Matters in Production: In class, we often hear that giant transformer models (like BERT) are best for text. But in real life, a 300ms model is too "
+                "slow for a live chat queue and costs too much to run. A lightweight decision tree running in 1.2ms on a normal CPU is much better suited for real deployment."
             ),
             (
-                "D. Teamwork Experience"
+                "3) Build for Privacy from Day One: Trying to work around platform privacy rules was a waste of time. Designing a model that works without private data made "
+                "our project both legal and practical."
             ),
             (
-                "We coordinated through a shared GitHub repository, using feature branches and pull requests to review each other's code. We held weekly "
-                "syncs every Tuesday and Thursday to review benchmark runs and track ablation progress. Dividing responsibilities cleanly between data/baselines "
-                "(Tin Chak) and feature extraction/adversarial hardening (Edwin) allowed us to work in parallel without blocking each other. We completed all "
-                "modeling and evaluation milestones three weeks ahead of the December deadline."
+                "D. How We Worked Together as a Team"
+            ),
+            (
+                "We used a shared GitHub repository with feature branches and pull requests to review each other's code. We held quick sync meetings every Tuesday and "
+                "Thursday after class to review test results and plan next steps. Dividing the work cleanly between data/baselines (Tin Chak) and feature extraction/hardening "
+                "(Edwin) meant we could work at the same time without stepping on each other's toes. We finished all coding and evaluation milestones three weeks ahead of schedule."
             ),
         ],
     },
@@ -392,18 +420,18 @@ SECTIONS_PART2 = [
         "heading": "VI. GROUP MEMBER EVALUATION",
         "paragraphs": [
             (
-                "Table IV details our mutual peer evaluation scores. Both of us contributed equally to the coding, experiments, "
-                "and paper writing, and we awarded each other 10 / 10 across all grading categories."
+                "Table IV shows our mutual peer evaluations. Both of us put in equal effort across all coding, testing, and writing tasks, and we awarded each other "
+                "10 / 10 across all categories."
             ),
             (
-                "Edwin Lin (Score: 10/10): Edwin wrote the core feature extraction code from scratch, resolved tricky string-parsing "
-                "bugs with emojis and zero-width characters, implemented the Levenshtein brand comparisons, and ran the adversarial "
-                "ablation benchmarks. He kept our git branches clean, wrote thorough tests, and completed his writing sections on time."
+                "Edwin Lin (Score: 10/10): Edwin did an incredible job writing the feature extraction code from scratch, debugging tricky string-parsing edge cases "
+                "with Discord emojis and invisible characters, and setting up the adversarial training pipeline. His code was clean, well-tested, and he delivered all "
+                "his report sections on time."
             ),
             (
-                "Tin Chak Lam (Score: 10/10): Tin Chak gathered and cleaned the 3,552-message dataset, integrated the Nikolaischunk "
-                "threat feed, trained all baseline models, and hooked up SHAP feature attributions so we could debug tree decisions. "
-                "He also developed the interactive web demo and wrote the introduction, post-mortem, and literature references."
+                "Tin Chak Lam (Score: 10/10): Tin Chak was fantastic at gathering and cleaning our 3,552 messages, integrating the domain blocklist, training all the "
+                "baseline models, and hooking up SHAP explanations so we could see why trees made their choices. He also built our live web demo and authored the "
+                "introduction and post-mortem."
             ),
         ],
     },
