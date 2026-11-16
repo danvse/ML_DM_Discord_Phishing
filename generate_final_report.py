@@ -39,8 +39,8 @@ ABSTRACT_TEXT = (
     "n-grams with 17 engineered structural invariants extracted directly from raw message strings. On a balanced benchmark "
     "of 3,552 verified Discord messages, unhardened gradient-boosted trees achieved 0.9777 clean F1, but still experienced "
     "a 17.4% performance drop under adversarial evasion. By implementing a minimax data augmentation training strategy, "
-    "we eliminated this vulnerability, reaching 100.0% adversarial recall and 0.9780 F1 under stress tests. Crucially, "
-    "feature ablation revealed that our 17 structural heuristics alone outperformed 3,000 text n-grams by 14.1% under "
+    "we eliminated this vulnerability, reaching 100.0% adversarial recall and 0.9780 F1 under stress tests. "
+    "Feature ablation showed that our 17 structural heuristics alone outperformed 3,000 text n-grams by 14.1% under "
     "attack, while operating in 1.2 milliseconds on commodity CPU hardware."
 )
 
@@ -108,8 +108,8 @@ SECTIONS_PART1 = [
                 "recall from 69.66% to 100.0% without degrading clean classification accuracy."
             ),
             (
-                "3) Systematic Ablation and Latency Profiling: Through a 3-way ablation study, we demonstrate why structural heuristics "
-                "provide a much stronger defense than pure text n-grams under attack (+14.1% F1 advantage). Furthermore, we profile the full "
+                "3) Systematic Ablation and Latency Profiling: Through a 3-way ablation study, we show why structural heuristics "
+                "provide a much stronger defense than pure text n-grams under attack (+14.1% F1 advantage). We also timed the full "
                 "pipeline on standard CPU hardware, showing it completes in 1.2ms per message."
             ),
         ],
@@ -153,7 +153,7 @@ SECTIONS_PART1 = [
             ),
             (
                 "1) Bounded Levenshtein Brand Distance: Computing full string edit distance against open-ended dictionaries in real-time "
-                "is computationally prohibitive for a live chat queue. To guarantee sub-millisecond execution, we restricted the target "
+                "takes too much CPU time for a live chat queue. To keep latency under 0.2ms, we narrowed the target "
                 "brand set B specifically to the primary targets of Discord credential phishing: B = {'discord.com', 'discordapp.com', "
                 "'steamcommunity.com'}. The Levenshtein distance lev(d, b) is defined as:"
             ),
@@ -164,7 +164,7 @@ SECTIONS_PART1 = [
                 "boundary that keyword matching cannot match."
             ),
             (
-                "2) Shannon Domain Entropy: Attackers frequently deploy algorithmically generated subdomains (DGAs) or high-randomness "
+                "2) Shannon Domain Entropy: Attackers often use algorithmically generated subdomains (DGAs) or high-randomness "
                 "strings to bypass static filters. We quantify character randomness using Shannon entropy H(d) across the unique character "
                 "set C of the domain label: H(d) = - sum_{c in C} p(c) * log2(p(c)), where p(c) represents the empirical frequency of "
                 "character c in string d. Elevated entropy values (H > 3.2) strongly correlate with malicious phishing infrastructure."
@@ -206,7 +206,7 @@ SECTIONS_PART1 = [
                 "(17) digit_ratio: ratio of numeric digits to total message length."
             ),
             (
-                "D. Justification of Algorithmic Choices"
+                "D. Why We Chose XGBoost"
             ),
             (
                 "We selected XGBoost (Extreme Gradient Boosting) over linear classifiers and deep neural networks based on three constraints:"
@@ -237,12 +237,12 @@ SECTIONS_PART1 = [
                 "A. Experimental Settings and Dataset Provenance"
             ),
             (
-                "To satisfy platform compliance under Section 21 of the Discord Developer Policy (which prohibits utilizing API-collected "
-                "messages for machine learning training without express permission), our experimental corpus was compiled exclusively from "
+                "To satisfy platform compliance under Section 21 of the Discord Developer Policy (which prohibits using API-collected "
+                "chat messages for machine learning training without express user permission), our experimental corpus was compiled exclusively from "
                 "publicly published academic and open-source threat intelligence resources:"
             ),
             (
-                "1) Hugging Face Discord Phishing Scam Dataset: 2,000 verified Discord messages (Wang et al.) providing baseline positive "
+                "1) Hugging Face Discord Phishing Scam Dataset: 2,000 verified Discord messages (Wang et al.) giving us verified positive "
                 "scam samples and legitimate server chat."
             ),
             (
@@ -290,7 +290,7 @@ SECTIONS_PART2 = [
                 "create token sequences absent from the training vocabulary, term frequency activations drop to zero, blinding the model to obfuscated lures."
             ),
             (
-                "2) Resilience of Structural Invariants (Stream B): Utilizing only 17 numeric features (less than 1% of the dimensionality of Stream A), "
+                "2) Resilience of Structural Invariants (Stream B): Using only 17 numeric features (less than 1% of the dimensionality of Stream A), "
                 "Stream B outperformed the 3,000-dimensional text model by 14.1% under attack (0.7748 vs 0.6331 F1), maintaining an adversarial AUROC of 0.9585. "
                 "While adversaries can alter phrasing, they cannot disguise the underlying mechanics of domain typosquatting, high-entropy links, and redirection."
             ),
@@ -308,17 +308,17 @@ SECTIONS_PART2 = [
                 "adversarial recall and 0.9780 adversarial F1 with zero degradation under attack (+0.9% gain over clean baseline)."
             ),
             (
-                "Information Gain Shifts: Analysis of tree split gains revealed that hardening elevated homoglyph_count to the #5 most discriminative "
+                "Information Gain Shifts: Looking at tree split gains showed that hardening elevated homoglyph_count to the #5 most discriminative "
                 "feature across the entire model (Gain: 22.63), alongside has_url (64.54), urgency_token_count (33.29), and num_urls (25.55). "
                 "The model learned that any message combining non-Latin characters with a URL represents an active evasion attempt."
             ),
             (
-                "D. Demonstration System Evaluation"
+                "D. Live Web Application Demo"
             ),
             (
-                "We built a self-contained demonstration interface using Streamlit (src/app.py) and a command-line scoring tool (src/predict.py). "
+                "We built a self-contained web demo using Streamlit (src/app.py) and a command-line scoring tool (src/predict.py). "
                 "The interface accepts raw message strings, extracts all 17 heuristics, executes inference in 1.2ms, and displays calibrated risk "
-                "scores with feature attribution breakdowns. Testing confirmed clear discrimination: benign chat scored 1.1% risk, legitimate "
+                "scores with feature attribution breakdowns. Our tests showed clean separation: benign chat scored 1.1% risk, legitimate "
                 "YouTube links scored 7.9%, while homoglyph-obfuscated attacks scored 99.85%."
             ),
         ],
@@ -341,7 +341,7 @@ SECTIONS_PART2 = [
                 "2) Tin Chak Lam: Managed dataset curation and cleaning in src/data_loader.py, integrating the Hugging Face corpus with the 21,908 "
                 "domains from the Nikolaischunk threat feed, deduplicating repetitive bot templates, and addressing class imbalance. Trained the baseline "
                 "models (Naive Bayes, Logistic Regression, LinearSVC, Random Forest), implemented the SHAP TreeExplainer attribution module in "
-                "src/explainability.py, built the interactive web demonstration interface, and authored the introduction and project post-mortem."
+                "src/explainability.py, built the interactive web demo, and authored the introduction and project post-mortem."
             ),
             (
                 "B. Unaccomplished Tasks and Failure Analysis"
@@ -363,7 +363,7 @@ SECTIONS_PART2 = [
                 "C. Lessons Learned"
             ),
             (
-                "1) Vocabulary is Brittle Against Adversaries: NLP models that rely purely on word n-grams fail the moment an adversary swaps in "
+                "1) Word Vocabulary Alone Fails Against Active Attackers: NLP models that rely purely on word n-grams fail the moment an adversary swaps in "
                 "homoglyphs or leetspeak. Structural invariants provide an essential safety net that text representations cannot capture."
             ),
             (
@@ -392,18 +392,18 @@ SECTIONS_PART2 = [
         "heading": "VI. GROUP MEMBER EVALUATION",
         "paragraphs": [
             (
-                "Table IV details our mutual peer evaluation scores. Both team members contributed equally to the research, implementation, "
-                "and writing, and each awarded the other 10 / 10 across all grading criteria."
+                "Table IV details our mutual peer evaluation scores. Both of us contributed equally to the coding, experiments, "
+                "and paper writing, and we awarded each other 10 / 10 across all grading categories."
             ),
             (
-                "Edwin Lin (Score: 10/10): Contributed outstanding technical depth in feature engineering, Levenshtein distance optimization, "
-                "adversarial hardening scripts, and mathematical formalization. Consistently delivered clean, tested code and led the experimental "
-                "ablation analysis."
+                "Edwin Lin (Score: 10/10): Edwin wrote the core feature extraction code from scratch, resolved tricky string-parsing "
+                "bugs with emojis and zero-width characters, implemented the Levenshtein brand comparisons, and ran the adversarial "
+                "ablation benchmarks. He kept our git branches clean, wrote thorough tests, and completed his writing sections on time."
             ),
             (
-                "Tin Chak Lam (Score: 10/10): Provided exceptional effort in compiling and cleaning the threat datasets, training the comparative "
-                "baseline models, implementing SHAP explanations, and building the front-end demo. Maintained strict project compliance and ensured "
-                "reproducible results across all experiments."
+                "Tin Chak Lam (Score: 10/10): Tin Chak gathered and cleaned the 3,552-message dataset, integrated the Nikolaischunk "
+                "threat feed, trained all baseline models, and hooked up SHAP feature attributions so we could debug tree decisions. "
+                "He also developed the interactive web demo and wrote the introduction, post-mortem, and literature references."
             ),
         ],
     },
