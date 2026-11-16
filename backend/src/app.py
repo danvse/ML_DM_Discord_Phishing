@@ -195,7 +195,7 @@ st.markdown("""
     </div>
     <div class="badge-container">
         <span class="hub-badge">IEEE Reference: Team #18</span>
-        <span class="hub-badge alt">Authors: Edwin Lin &bull; Tin Chak Lam</span>
+        <span class="hub-badge alt">Author: Edwin Lin</span>
         <span class="hub-badge success">&bull; Pipeline Operational (1.2ms CPU Latency)</span>
         <span class="hub-badge alt">Privacy: Discord TOS Sec. 21 Compliant</span>
     </div>

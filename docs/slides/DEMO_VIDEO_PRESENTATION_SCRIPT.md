@@ -2,7 +2,7 @@
 
 **Project Title:** Dual-Stream Detection of Discord Phishing Campaigns Using Words and Link Structure  
 **Course:** Machine Learning & Data Mining (Fall 2026)  
-**Team #18:** Edwin Lin, Tin Chak Lam  
+**Team #18:** Edwin Lin (Solo Author)  
 **Target Video Duration:** ~20 Minutes (18:00 – 22:00)  
 **Video Setup Checklist:**
 - [x] Webcam active in the top-right or bottom-right corner throughout the entire recording.
@@ -36,7 +36,7 @@
 **[ON SCREEN: Presenter webcam visible in corner. Main screen displays project title card or introductory overview slide showing Discord interface with typical scam messages.]**
 
 > **[0:00 – 0:45] Spoken Dialogue:**  
-> "Hello everyone, and welcome to our final project demonstration for Machine Learning and Data Mining. My name is [Your Name], representing Team #18 alongside my project partner [Partner Name]. Today, we're presenting our project: **Dual-Stream Detection of Discord Scam and Phishing Messages Using Semantic and Structural Invariants**.  
+> "Hello everyone, and welcome to my final project demonstration for Machine Learning and Data Mining. My name is Edwin Lin, representing Team #18. Today, I am presenting my project: **Dual-Stream Detection of Discord Scam and Phishing Messages Using Semantic and Structural Invariants**.  
 >  
 > Over the next twenty minutes, I will walk you through the problem we tackled, the engineering architecture we developed, our experimental evaluations across multiple baseline models, and a live demonstration of our production-ready web application and moderation engine."
 
@@ -267,29 +267,29 @@ c:\Users\Dan\Downloads\ML_DM\
 **[ON SCREEN: Switch screen back to presenter camera and summary slides.]**
 
 > **[17:30 – 18:30] Spoken Dialogue:**  
-> "Before concluding, I want to discuss our **Architectural Post-Mortem and Failures**, which is a crucial part of our learning outcomes.  
+> "Before concluding, I want to discuss my **Architectural Post-Mortem and Failures**, which is a crucial part of the learning outcomes.  
 >  
-> When Edwin and I started this project in September, our original proposal was very different: we planned to build a Discord bot that evaluated sender credibility using account-level metadata—account age, mutual server count, avatar presence, and message frequency.  
+> When I started this project in September, my original proposal was very different: I planned to build a Discord bot that evaluated sender credibility using account-level metadata—account age, mutual server count, avatar presence, and message frequency.  
 >  
 > That approach hit two brick walls within the first three weeks:
 > 1. **Discord Bot Sandboxing:** By platform design, Discord bot accounts **cannot** inspect direct messages between users unless the bot itself is an explicit participant in the DM. Bots also cannot inspect incoming friend requests.
 > 2. **Discord Developer Policy Section 21:** Discord strictly bans saving or analyzing user chat data for machine learning without explicit opt-in consent. Running a client-side user proxy to intercept DM traffic would violate Discord's Terms of Service and create serious security risks."
 
 > **[18:30 – 19:30] Spoken Dialogue:**  
-> "Pivoting away from user metadata turned out to be the best decision we made. By focusing entirely on what we could parse from the raw message string and URLs, our final detector requires zero access to user profile databases, friends lists, or chat history. It is completely **self-contained and privacy-preserving**.  
+> "Pivoting away from user metadata turned out to be the best decision I made. By focusing entirely on what could be parsed from the raw message string and URLs, the final detector requires zero access to user profile databases, friends lists, or chat history. It is completely **self-contained and privacy-preserving**.  
 >  
-> Here are our top three engineering takeaways from this project:
+> Here are my top three engineering takeaways from this project:
 > 1. **Lexical Models Are Brittle:** Bag-of-words and pure NLP models fall apart under basic character evasion. Robust security classifiers must be grounded in structural domain invariants.
 > 2. **Latency is a Production Constraint:** A transformer with 99% accuracy is useless if it takes 300 ms on CPU and causes server chat lag. Tree ensembles running in 1.2 ms provide the throughput needed for live platform moderation.
 > 3. **Verify API Boundaries Early:** Always confirm platform data access policies before designing features around private user metadata."
 
 > **[19:30 – 20:00] Spoken Dialogue:**  
-> "To summarize our results:
-> - On a verified dataset of 3,552 messages, our dual-stream XGBoost model achieves **0.9777 F1** on clean messages.
-> - Under adversarial evasion, while Discord AutoMod regex collapses by 37.2%, our minimax-hardened model achieves **0.9780 F1** and **$0.9888 \pm 0.0112$ cross-validation recall**.
+> "To summarize my results:
+> - On a verified dataset of 3,552 messages, my dual-stream XGBoost model achieves **0.9777 F1** on clean messages.
+> - Under adversarial evasion, while Discord AutoMod regex collapses by 37.2%, my minimax-hardened model achieves **0.9780 F1** and **$0.9888 \pm 0.0112$ cross-validation recall**.
 > - The entire feature extraction and inference pipeline executes in **1.2 milliseconds** per message on a standard laptop CPU.  
 >  
-> Both the full 6-page IEEE technical report and our complete codebase with frontend and backend services are available in our repository. Thank you very much for your time, and we look forward to your questions!"
+> Both the full 6-page IEEE technical report and my complete codebase with frontend and backend services are available in the repository. Thank you very much for your time, and I look forward to your questions!"
 
 ---
 

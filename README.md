@@ -7,7 +7,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 > **Machine Learning & Data Mining (Fall 2026) — Final Project (Phase 3)**  
-> **Team #18:** Edwin Lin, Tin Chak Lam
+> **Author:** Edwin Lin (Team #18)
 
 ---
 
@@ -236,11 +236,10 @@ All deliverables for the **Phase 3 Final Submission** are organized in `docs/`:
 
 ---
 
-## 👥 Authors & Contributions
+## 👤 Author & Contributions
 
-**Team #18 (Machine Learning & Data Mining - Fall 2026):**
-- **Edwin Lin** (`50% contribution`): Feature engineering, Levenshtein DP optimization, AutoMod baseline failure simulation, adversarial dataset perturbation pipeline, and full-stack Angular 18 UI integration.
-- **Tin Chak Lam** (`50% contribution`): XGBoost hyperparameter tuning, minimax adversarial training implementation, SHAP TreeExplainer integration, statistical evaluation, and benchmark ablation studies.
+**Edwin Lin (Team #18 — Machine Learning & Data Mining, Fall 2026):**
+- **100% Solo Contribution:** Completed the entire end-to-end design, implementation, and evaluation of the project: data engineering and MD5 hash deduplication (`data_loader.py`), 17-feature structural extraction engine (`feature_extractor.py`), baseline model benchmarking (`train_baselines.py`), XGBoost and Random Forest training (`train_xgboost.py`), minimax adversarial hardening (`adversarial_trainer.py`), 3-way feature ablation studies (`ablation_study.py`), SHAP TreeExplainer attribution (`explainability.py`), and full-stack development across FastAPI and Angular 18.
 
 ---
 
