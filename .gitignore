@@ -1,0 +1,80 @@
+# ==============================================================================
+# Node & Frontend Dependencies
+# ==============================================================================
+node_modules/
+*/node_modules/
+.angular/
+*/.angular/
+dist/
+tmp/
+out-tsc/
+.npm/
+
+# ==============================================================================
+# Python & Virtual Environments
+# ==============================================================================
+.venv/
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*/__pycache__/
+*/*/__pycache__/
+*.py[cod]
+*$py.class
+*.so
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# ==============================================================================
+# Jupyter & Checkpoint Caches
+# ==============================================================================
+.checkpoints/
+*/.checkpoints/
+.ipynb_checkpoints/
+.pytest_cache/
+
+# ==============================================================================
+# OS & Editor Temporary Files
+# ==============================================================================
+.DS_Store
+Thumbs.db
+ehthumbs.db
+desktop.ini
+*.swp
+*.swo
+*~
+~$*.docx
+~$*.pptx
+~$*.xlsx
+
+# IDEs
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
