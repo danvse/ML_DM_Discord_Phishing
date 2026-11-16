@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discord Scam Detection - 20-Min Demo Presentation Slides</title>
+    <style>
+        :root {
+            --bg-dark: #121418;
+            --card-bg: #1c1f26;
+            --border-color: #2e3440;
+            --accent-cyan: #00d2ff;
+            --accent-purple: #9b59b6;
+            --accent-green: #2ecc71;
+            --text-main: #f0f3f6;
+            --text-muted: #9aa4b2;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        body {
+            background: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+        /* Top Navigation Bar */
+        .top-navbar {
+            background: #181b22;
+            border-bottom: 1px solid var(--border-color);
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .brand-title { font-size: 15px; font-weight: 700; color: var(--accent-cyan); display: flex; align-items: center; gap: 8px; }
+        .nav-controls { display: flex; gap: 10px; align-items: center; }
+        .nav-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .nav-btn:hover { background: var(--border-color); color: var(--accent-cyan); }
+        .nav-btn.primary { background: #007acc; border-color: #007acc; }
+        .counter-pill { font-size: 13px; color: var(--text-muted); font-weight: 600; padding: 0 8px; }
+
+        /* Presentation Slide Area */
+        .presentation-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 24px;
+        }
+        .slide-deck {
+            width: 100%;
+            max-width: 1200px;
+            min-height: 700px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: 0 16px 40px rgba(0,0,0,0.5);
+            position: relative;
+            overflow: hidden;
+        }
+        .slide {
+            display: none;
+            padding: 36px 44px;
+            animation: fadeIn 0.3s ease;
+        }
+        .slide.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Slide Components */
+        .slide-header { margin-bottom: 20px; }
+        .slide-num-pill {
+            background: rgba(0, 210, 255, 0.12);
+            color: var(--accent-cyan);
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .slide-time-pill {
+            background: rgba(46, 204, 113, 0.15);
+            color: var(--accent-green);
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 12px;
+            margin-left: 8px;
+        }
+        h2 { font-size: 26px; font-weight: 800; color: var(--text-main); margin-top: 10px; }
+        .subtitle { font-size: 14px; color: var(--text-muted); margin-top: 4px; }
+
+        .action-banner {
+            background: rgba(0, 210, 255, 0.08);
+            border-left: 4px solid var(--accent-cyan);
+            padding: 10px 16px;
+            border-radius: 4px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .action-badge {
+            background: var(--accent-cyan);
+            color: #000;
+            font-size: 10px;
+            font-weight: 800;
+            padding: 3px 8px;
+            border-radius: 4px;
+            letter-spacing: 0.5px;
+        }
+        .action-text { font-size: 13px; font-weight: 600; color: #d0f0ff; }
+
+        /* Grid */
+        .slide-content.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: start; }
+        .slide-content.single-col { display: block; }
+
+        .bullet-list { list-style: none; display: flex; flex-direction: column; gap: 14px; }
+        .bullet-list li.main-bullet {
+            position: relative;
+            padding-left: 24px;
+            font-size: 15px;
+            line-height: 1.5;
+            color: var(--text-main);
+        }
+        .bullet-list li.main-bullet::before {
+            content: "•";
+            position: absolute;
+            left: 6px;
+            color: var(--accent-cyan);
+            font-size: 20px;
+            top: -2px;
+        }
+        .bullet-list li.sub-bullet {
+            padding-left: 44px;
+            font-size: 14px;
+            line-height: 1.5;
+            color: var(--text-muted);
+        }
+
+        /* Image Display */
+        .image-wrapper {
+            background: #121418;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 8px;
+            text-align: center;
+        }
+        .image-wrapper img {
+            width: 100%;
+            height: auto;
+            max-height: 340px;
+            object-fit: contain;
+            border-radius: 4px;
+        }
+        .image-caption { font-size: 11px; color: var(--text-muted); margin-top: 6px; font-style: italic; }
+
+        /* Speaker Notes Drawer */
+        .speaker-notes-box {
+            margin-top: 28px;
+            background: #15181e;
+            border: 1px dashed #3a4252;
+            border-radius: 8px;
+            padding: 12px 18px;
+        }
+        .notes-header { display: flex; justify-content: space-between; align-items: center; }
+        .notes-header strong { font-size: 13px; color: #ffd166; }
+        .toggle-notes-btn {
+            background: transparent;
+            border: none;
+            color: var(--accent-cyan);
+            font-size: 12px;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+        .notes-body { margin-top: 8px; font-size: 13px; color: var(--text-muted); line-height: 1.5; display: none; }
+        .notes-body.open { display: block; }
+        .notes-body p { margin-bottom: 6px; }
+        .notes-body code { background: #222630; padding: 2px 6px; border-radius: 4px; color: #00d2ff; }
+
+        /* Keyboard Legend */
+        .footer-legend {
+            background: #14171d;
+            border-top: 1px solid var(--border-color);
+            padding: 10px 24px;
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        .kbd-key {
+            background: #252a36;
+            color: var(--text-main);
+            padding: 2px 8px;
+            border-radius: 4px;
+            border: 1px solid #3d4558;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <header class="top-navbar">
+        <div class="brand-title">
+            <span>🛡 Discord Scam Detection</span>
+            <span style="color: var(--text-muted); font-weight: 400;">| Final Demo Slides</span>
+        </div>
+        <div class="nav-controls">
+            <button class="nav-btn" onclick="prevSlide()">◀ Previous</button>
+            <span class="counter-pill" id="slideIndicator">1 / 10</span>
+            <button class="nav-btn primary" onclick="nextSlide()">Next ▶</button>
+            <button class="nav-btn" onclick="toggleAllNotes()">Toggle Script Cues</button>
+            <button class="nav-btn" onclick="toggleFullScreen()">⛶ Fullscreen</button>
+        </div>
+    </header>
+
+    <main class="presentation-container">
+        <div class="slide-deck">
+            
+        <section class="slide" data-slide="1">
+            <div class="slide-header">
+                <div class="slide-title-wrap">
+                    <span class="slide-num-pill">Slide 1 / 10</span>
+                    <span class="slide-time-pill"><i class="clock-icon">⏱</i> 0:00 - 1:00</span>
+                    <h2>Dual-Stream Detection of Discord Phishing Campaigns</h2>
+                    <p class="subtitle">Machine Learning & Data Mining (Fall 2026) | Final Project Demo
+Team #18: Edwin Lin, Tin Chak Lam</p>
+                </div>
+            </div>
+
+            <div class="action-banner">
+                <span class="action-badge">PRESENTER ACTION</span>
+                <span class="action-text">[ON CAMERA: Presenter intro with pinned webcam in corner]</span>
+            </div>
+
+            <div class="slide-content single-col">
+                <div class="slide-text-col">
+                    <ul class="bullet-list">
+                        <li class="main-bullet">Project Goal: Fast, machine-learning-based phishing detection built for Discord's unique chat invariants.</li>
+<li class="main-bullet">Novel Dual-Stream Pipeline: 3,000 TF-IDF word n-grams + 17 engineered structural features.</li>
+<li class="main-bullet">Target Operational Latency: Sub-2ms CPU inference to prevent server message queuing backlogs.</li>
+<li class="main-bullet">Demonstration Overview: Architecture ↳  Code & Data ↳  Model Benchmarks ↳  Live Angular 18 Demo.</li>
+
+                    </ul>
+                </div>
+                
+            </div>
+
+            <div class="speaker-notes-box">
+                <div class="notes-header">
+                    <strong>🎙 Presenter Speaking Cue (0:00 - 1:00)</strong>
+                    <button class="toggle-notes-btn" onclick="toggleNotes(this)">Show Full Dialogue</button>
+                </div>
+                <div class="notes-body">
+                    <p><em>Focus:</em> Introduce yourself and project partner. State the core goal of the project and set up the 20-minute agenda.</p>
+                    <p class="hint">Consult <code>DEMO_VIDEO_PRESENTATION_SCRIPT.md</code> for full word-for-word spoken dialogue.</p>
+                </div>
+            </div>
+        </section>
+        
+        <section class="slide" data-slide="2">
+            <div class="slide-header">
+                <div class="slide-title-wrap">
+                    <span class="slide-num-pill">Slide 2 / 10</span>
+                    <span class="slide-time-pill"><i class="clock-icon">⏱</i> 1:00 - 2:30</span>
+                    <h2>Threat Context: Why Discord Phishing is Dangerous</h2>
+                    <p class="subtitle">Localized Trust Networks & Lateral Account Exploitation</p>
+                </div>
+            </div>
+
+            <div class="action-banner">
+                <span class="action-badge">PRESENTER ACTION</span>
+                <span class="action-text">[SLIDE: Explain the 4 common attack pretexts]</span>
+            </div>
+
+            <div class="slide-content single-col">
+                <div class="slide-text-col">
+                    <ul class="bullet-list">
+                        <li class="main-bullet">Platform Topology: Discord is organized into semi-private servers and direct messages (DMs), not an open public feed.</li>
+<li class="main-bullet">Trust Exploitation: Compromised accounts blast malicious links to mutual servers and friends lists who inherently trust the sender.</li>
+<li class="main-bullet">Attack Vector 1: Fake Discord Nitro promotions (supposedly sponsored by Steam or Epic Games).</li>
+<li class="main-bullet">Attack Vector 2: Fake indie game beta playtest invites (.exe / .scr infostealers like RedLine).</li>
+<li class="main-bullet">Attack Vector 3: Community tournament voting links requiring third-party OAuth token grants.</li>
+<li class="main-bullet">Attack Vector 4: Fake cryptocurrency / wallet-drainer distribution portals.</li>
+
+                    </ul>
+                </div>
+                
+            </div>
+
+            <div class="speaker-notes-box">
+                <div class="notes-header">
+                    <strong>🎙 Presenter Speaking Cue (1:00 - 2:30)</strong>
+                    <button class="toggle-notes-btn" onclick="toggleNotes(this)">Show Full Dialogue</button>
+                </div>
+                <div class="notes-body">
+                    <p><em>Focus:</em> Explain the psychological trust network in Discord. Explain how session token grabbers steal accounts and automate propagation.</p>
+                    <p class="hint">Consult <code>DEMO_VIDEO_PRESENTATION_SCRIPT.md</code> for full word-for-word spoken dialogue.</p>
+                </div>
+            </div>
+        </section>
+        
+        <section class="slide" data-slide="3">
+            <div class="slide-header">
+                <div class="slide-title-wrap">
+                    <span class="slide-num-pill">Slide 3 / 10</span>
+                    <span class="slide-time-pill"><i class="clock-icon">⏱</i> 2:30 - 3:30</span>
+                    <h2>Failure Modes of Deterministic Filters (AutoMod)</h2>
+                    <p class="subtitle">Why Keyword Lists & Regular Expressions Break Down</p>
+                </div>
+            </div>
+
+            <div class="action-banner">
+                <span class="action-badge">PRESENTER ACTION</span>
+                <span class="action-text">[SLIDE: Contrast regex matching vs. modern evasion tricks]</span>
+            </div>
+
+            <div class="slide-content single-col">
+                <div class="slide-text-col">
+                    <ul class="bullet-list">
+                        <li class="main-bullet">Discord AutoMod & Community Bots (MEE6, Dyno) rely almost entirely on static regexes and keyword blocklists.</li>
+<li class="main-bullet">Evasion Trick 1 ↳ Cyrillic Homoglyphs: Replacing Latin 'o' (U+006F) with Cyrillic 'о' (U+043E). Visually identical, but completely bypasses ASCII regex.</li>
+<li class="main-bullet">Evasion Trick 2 ↳ Markdown Link Masking: '[https://discord.com/nitro](https://phishing.xyz)' renders a blue trusted URL, but clicks route to a credential harvester.</li>
+<li class="main-bullet">Evasion Trick 3 ↳ Casual Pretexts: Multi-turn conversational openers ('Hey are you free right now?') contain no URLs, evading initial filters.</li>
+<li class="main-bullet">Empirical Benchmark Result: AutoMod regex F1 drops by 37.2% (0.8598 ↳  0.4876) under basic evasion.</li>
+
+                    </ul>
+                </div>
+                
+            </div>
+
+            <div class="speaker-notes-box">
+                <div class="notes-header">
+                    <strong>🎙 Presenter Speaking Cue (2:30 - 3:30)</strong>
+                    <button class="toggle-notes-btn" onclick="toggleNotes(this)">Show Full Dialogue</button>
+                </div>
+                <div class="notes-body">
+                    <p><em>Focus:</em> Highlight the 37.2% F1 collapse in AutoMod regex. Explain the difference between human rendering and regex byte matching.</p>
+                    <p class="hint">Consult <code>DEMO_VIDEO_PRESENTATION_SCRIPT.md</code> for full word-for-word spoken dialogue.</p>
+                </div>
+            </div>
+        </section>
+        
+        <section class="slide" data-slide="4">
+            <div class="slide-header">
+                <div class="slide-title-wrap">
+                    <span class="slide-num-pill">Slide 4 / 10</span>
+                    <span class="slide-time-pill"><i class="clock-icon">⏱</i> 3:30 - 5:30</span>
+                    <h2>System Architecture: Dual-Stream Feature Fusion</h2>
+                    <p class="subtitle">Pairing Semantic Context with Structural Domain Invariants</p>
+                </div>
+            </div>
+
+            <div class="action-banner">
+                <span class="action-badge">PRESENTER ACTION</span>
+                <span class="action-text">[SLIDE / ARCHITECTURE DIAGRAM: Walk through the 5-stage pipeline]</span>
+            </div>
+
+            <div class="slide-content single-col">
+                <div class="slide-text-col">
+                    <ul class="bullet-list">
+                        <li class="main-bullet">Stage 1 ↳ Normalization: Strips snowflake IDs (<@!123...>) while preserving raw URLs, Markdown, and Unicode for heuristic checks.</li>
+<li class="main-bullet">Stage 2 ↳ Stream A (Semantics): 3,000 TF-IDF word n-grams (unigrams & bigrams) capture high-pressure scam language.</li>
+<li class="main-bullet">Stage 3 ↳ Stream B (Structure): 17 engineered scalar features capture platform invariants attackers cannot easily hide.</li>
+<li class="main-bullet">Stage 4 ↳ Horizontal Stacking: Concatenates sparse TF-IDF with dense heuristics into X in R^3017.</li>
+<li class="main-bullet">Stage 5 ↳ XGBoost Ensemble: Evaluates vector in 1.2 ms on CPU. Scores >= 0.80 auto-quarantine; 0.50-0.80 human mod review.</li>
+<li class="main-bullet">Why XGBoost over DistilBERT? 1.2 ms vs 150-300 ms CPU latency, no subword tokenizer fragmentation, natural tabular tree splits.</li>
+
+                    </ul>
+                </div>
+                
+            </div>
+
+            <div class="speaker-notes-box">
+                <div class="notes-header">
+                    <strong>🎙 Presenter Speaking Cue (3:30 - 5:30)</strong>
+                    <button class="toggle-notes-btn" onclick="toggleNotes(this)">Show Full Dialogue</button>
+                </div>
+                <div class="notes-body">
+                    <p><em>Focus:</em> Explain the 5 stages. Justify XGBoost over BERT based on latency and tokenization stability. Explain the 0.80 quarantine threshold.</p>
+                    <p class="hint">Consult <code>DEMO_VIDEO_PRESENTATION_SCRIPT.md</code> for full word-for-word spoken dialogue.</p>
+                </div>
+            </div>
+        </section>
+        
+        <section class="slide" data-slide="5">
+            <div class="slide-header">
+                <div class="slide-title-wrap">
+                    <span class="slide-num-pill">Slide 5 / 10</span>
+                    <span class="slide-time-pill"><i class="clock-icon">⏱</i> 5:30 - 6:30</span>
+                    <h2>Mathematical Formulations & Algorithmic Optimizations</h2>
+                    <p class="subtitle">Levenshtein Distance, Shannon Entropy, and Minimax Hardening</p>
+                </div>
+            </div>
+
+            <div class="action-banner">
+                <span class="action-badge">PRESENTER ACTION</span>
+                <span class="action-text">[SLIDE / FORMULAS: Highlight mathematical models]</span>
+            </div>
+
+            <div class="slide-content single-col">
+                <div class="slide-text-col">
+                    <ul class="bullet-list">
+                        <li class="main-bullet">1. Minimum Levenshtein Distance (d_min): Dynamic programming edit distance to canonical platforms (discord.com, steamcommunity.com).</li>
+<li class="sub-bullet">   ↳  Optimization: Early-exit check skips O(NM) matrix if absolute string length difference > 4.</li>
+<li class="main-bullet">2. Shannon Domain Entropy (H(d)): Quantifies character distribution randomness to catch automated DGAs.</li>
+<li class="sub-bullet">   ↳  H(d) = ↳ sum p(c) * log2(p(c)). Clean platforms score 2.0-2.8; machine-generated scam strings score > 3.5.</li>
+<li class="main-bullet">3. Minimax Adversarial Formulation: Trains trees against worst-case synthetic perturbations (homoglyphs + Markdown cloaking):</li>
+<li class="sub-bullet">   ↳  min_theta E [ max_{delta in Delta} L(f_theta(x + delta), y) ].</li>
+
+                    </ul>
+                </div>
+                
+            </div>
+
+            <div class="speaker-notes-box">
+                <div class="notes-header">
+                    <strong>🎙 Presenter Speaking Cue (5:30 - 6:30)</strong>
+                    <button class="toggle-notes-btn" onclick="toggleNotes(this)">Show Full Dialogue</button>
+                </div>
+                <div class="notes-body">
+                    <p><em>Focus:</em> Walk through the math: d_min early-exit, Shannon entropy formula, and minimax objective. Keep it practical and code-oriented.</p>
+                    <p class="hint">Consult <code>DEMO_VIDEO_PRESENTATION_SCRIPT.md</code> for full word-for-word spoken dialogue.</p>
+                </div>
+            </div>
+        </section>
+        
+        <section class="slide" data-slide="6">
+            <div class="slide-header">
+                <div class="slide-title-wrap">
+                    <span class="slide-num-pill">Slide 6 / 10</span>
+                    <span class="slide-time-pill"><i class="clock-icon">⏱</i> 6:30 - 8:30</span>
+                    <h2>Data Engineering & Threat Feed Integration</h2>
+                    <p class="subtitle">3,552 Balanced Messages with MD5 Hash Deduplication</p>
+                </div>
+            </div>
+
+            <div class="action-banner">
+                <span class="action-badge">PRESENTER ACTION</span>
+                <span class="action-text">[SWITCH TO VS CODE: Open data_loader.py & feature_extractor.py]</span>
+            </div>
+
+            <div class="slide-content single-col">
+                <div class="slide-text-col">
+                    <ul class="bullet-list">
+                        <li class="main-bullet">Provenance: 2,000 Hugging Face phishing messages + 21,908 Nikolaischunk threat feed domains + 1,500 modern playbooks + 2,500 clean chat logs.</li>
+<li class="main-bullet">Platform Privacy Compliance: Built strictly from public research data to respect Discord Developer Policy Section 21.</li>
+<li class="main-bullet">Critical Deduplication Step: Raw Hugging Face data had hundreds of duplicate Nitro spam copies. Filtered via MD5 hashes to prevent train-test leakage.</li>
+<li class="main-bullet">Splits: Stratified 80% train (2,841), 10% validation (355), 10% clean test (356) + separate 356-sample adversarial evaluation set.</li>
+<li class="main-bullet">Feature Extractor Implementation: Globally precompiled regexes to avoid 15x per-message compilation bottleneck.</li>
+
+                    </ul>
+                </div>
+                
+            </div>
+
+            <div class="speaker-notes-box">
+                <div class="notes-header">
+                    <strong>🎙 Presenter Speaking Cue (6:30 - 8:30)</strong>
+                    <button class="toggle-notes-btn" onclick="toggleNotes(this)">Show Full Dialogue</button>
+                </div>
+                <div class="notes-body">
+                    <p><em>Focus:</em> Switch to VS Code. Show data_loader.py deduplication logic and feature_extractor.py globally compiled regexes.</p>
+                    <p class="hint">Consult <code>DEMO_VIDEO_PRESENTATION_SCRIPT.md</code> for full word-for-word spoken dialogue.</p>
+                </div>
+            </div>
+        </section>
+        
+        <section class="slide" data-slide="7">
+            <div class="slide-header">
+                <div class="slide-title-wrap">
+                    <span class="slide-num-pill">Slide 7 / 10</span>
+                    <span class="slide-time-pill"><i class="clock-icon">⏱</i> 8:30 - 10:30</span>
+                    <h2>Experimental Benchmarks & 3-Way Feature Ablation</h2>
+                    <p class="subtitle">Tables I & II: Validating the Invariant Signal of Stream B</p>
+                </div>
+            </div>
+
+            <div class="action-banner">
+                <span class="action-badge">PRESENTER ACTION</span>
+                <span class="action-text">[SWITCH TO TERMINAL: Run train_baselines.py & ablation_study.py]</span>
+            </div>
+
+            <div class="slide-content two-col">
+                <div class="slide-text-col">
+                    <ul class="bullet-list">
+                        <li class="main-bullet">Table I (Baselines): AutoMod regex collapses to 0.4876 F1 under attack. Naive Bayes, Logistic Regression, SVM drop to 0.44-0.49 recall.</li>
+<li class="main-bullet">Unhardened XGBoost Baseline: Maintains 0.8078 F1 under attack because structural features remain invariant.</li>
+<li class="main-bullet">Table II (Ablation Analysis):</li>
+<li class="sub-bullet">  ↳ Stream A Alone (3,000 TF-IDF): 0.9589 clean F1 ↳  0.4944 recall (0.6331 F1) under attack (-34.0% drop).</li>
+<li class="sub-bullet">  ↳ Stream B Alone (17 Heuristics): 0.9636 clean F1 ↳  0.6573 recall (0.7748 F1) under attack (+14.1% over text alone).</li>
+<li class="sub-bullet">  ↳ Dual-Stream Fused: 0.9777 clean F1 and 0.8078 adversarial F1 before hardening.</li>
+
+                    </ul>
+                </div>
+                
+            <div class="slide-image-col">
+                <div class="image-wrapper">
+                    <img src="slides_assets/workbench_analytics.png" alt="Demonstration Screenshot" />
+                    <div class="image-caption">Live Interface Screenshot</div>
+                </div>
+            </div>
+            
+            </div>
+
+            <div class="speaker-notes-box">
+                <div class="notes-header">
+                    <strong>🎙 Presenter Speaking Cue (8:30 - 10:30)</strong>
+                    <button class="toggle-notes-btn" onclick="toggleNotes(this)">Show Full Dialogue</button>
+                </div>
+                <div class="notes-body">
+                    <p><em>Focus:</em> Switch to Terminal. Run the scripts, show Table I and Table II output. Explain why Stream B outperforms Stream A under attack.</p>
+                    <p class="hint">Consult <code>DEMO_VIDEO_PRESENTATION_SCRIPT.md</code> for full word-for-word spoken dialogue.</p>
+                </div>
+            </div>
+        </section>
+        
+        <section class="slide" data-slide="8">
+            <div class="slide-header">
+                <div class="slide-title-wrap">
+                    <span class="slide-num-pill">Slide 8 / 10</span>
+                    <span class="slide-time-pill"><i class="clock-icon">⏱</i> 10:30 - 12:00</span>
+                    <h2>Adversarial Hardening & Honest Review of 100% Recall</h2>
+                    <p class="subtitle">Table III: Minimax Training, Generator Overlap, and 5-Fold CV Variance</p>
+                </div>
+            </div>
+
+            <div class="action-banner">
+                <span class="action-badge">PRESENTER ACTION</span>
+                <span class="action-text">[SLIDE / TERMINAL: Discuss Table III results & threats to validity]</span>
+            </div>
+
+            <div class="slide-content single-col">
+                <div class="slide-text-col">
+                    <ul class="bullet-list">
+                        <li class="main-bullet">Minimax Hardening: Augmenting 25% of training scam samples with homoglyphs and Markdown disguises recovers adversarial F1 to 0.9780.</li>
+<li class="main-bullet">The 100% Recall Artifact: The model caught 178 of 178 test scams (1.0000 recall).</li>
+<li class="sub-bullet">  ↳  Honest Critique: Both training augmentation and test evaluation used 'build_adversarial_variant'. In this closed distribution, homoglyph_count >= 1 became a near-perfect split rule (jumping from #14 to #5 in tree importance).</li>
+<li class="main-bullet">Cross-Validation Variance: 5-fold CV with randomized mutation seeds yields 0.9888 +/↳ 0.0112 recall and 0.9780 +/↳ 0.0094 F1.</li>
+<li class="main-bullet">Real-World Zero-Day Limitations: Unseen Unicode scripts, RTL override characters, and image QR codes will inevitably lower open-world recall.</li>
+
+                    </ul>
+                </div>
+                
+            </div>
+
+            <div class="speaker-notes-box">
+                <div class="notes-header">
+                    <strong>🎙 Presenter Speaking Cue (10:30 - 12:00)</strong>
+                    <button class="toggle-notes-btn" onclick="toggleNotes(this)">Show Full Dialogue</button>
+                </div>
+                <div class="notes-body">
+                    <p><em>Focus:</em> Discuss the 100% recall result with scientific honesty. Explain the closed-generator overlap and present the 5-fold CV variance.</p>
+                    <p class="hint">Consult <code>DEMO_VIDEO_PRESENTATION_SCRIPT.md</code> for full word-for-word spoken dialogue.</p>
+                </div>
+            </div>
+        </section>
+        
+        <section class="slide" data-slide="9">
+            <div class="slide-header">
+                <div class="slide-title-wrap">
+                    <span class="slide-num-pill">Slide 9 / 10</span>
+                    <span class="slide-time-pill"><i class="clock-icon">⏱</i> 12:00 - 15:30</span>
+                    <h2>Live Demonstration: Classifier & SHAP Explainability</h2>
+                    <p class="subtitle">Real-Time 1.2ms Inference on Angular 18 & FastAPI</p>
+                </div>
+            </div>
+
+            <div class="action-banner">
+                <span class="action-badge">PRESENTER ACTION</span>
+                <span class="action-text">[SWITCH TO BROWSER: http://localhost:4200/ - Test Presets Live]</span>
+            </div>
+
+            <div class="slide-content two-col">
+                <div class="slide-text-col">
+                    <ul class="bullet-list">
+                        <li class="main-bullet">Test 1 ↳ Benign Chat: 'Hey man, hopping on Valorant tonight?' ↳  0.02% scam probability (Green Approved Badge).</li>
+<li class="main-bullet">Test 2 ↳ Classic Nitro: '@everyone Steam free nitro https://discord-nitro-gift.ru/claim' ↳  99.85% (AUTO-QUARANTINE).</li>
+<li class="main-bullet">Test 3 ↳ Cyrillic Homoglyphs: 'https://dіscord.com/gifts' (with Cyrillic 'і' U+0456) ↳  AutoMod misses, our model flags at 99.42%!</li>
+<li class="main-bullet">Test 4 ↳ Markdown Masking: '[https://discord.com/nitro](https://grabify-stealer.xyz)' ↳  Flags destination domain at 99.78%.</li>
+<li class="main-bullet">Explainability: Local SHAP waterfall charts clearly explain why each heuristic contributed to the final score.</li>
+
+                    </ul>
+                </div>
+                
+            <div class="slide-image-col">
+                <div class="image-wrapper">
+                    <img src="slides_assets/classifier_shap_demo.png" alt="Demonstration Screenshot" />
+                    <div class="image-caption">Live Interface Screenshot</div>
+                </div>
+            </div>
+            
+            </div>
+
+            <div class="speaker-notes-box">
+                <div class="notes-header">
+                    <strong>🎙 Presenter Speaking Cue (12:00 - 15:30)</strong>
+                    <button class="toggle-notes-btn" onclick="toggleNotes(this)">Show Full Dialogue</button>
+                </div>
+                <div class="notes-body">
+                    <p><em>Focus:</em> Switch to Chrome. Click the preset buttons, show the 1.2ms latency badge, explain the SHAP attribution bars.</p>
+                    <p class="hint">Consult <code>DEMO_VIDEO_PRESENTATION_SCRIPT.md</code> for full word-for-word spoken dialogue.</p>
+                </div>
+            </div>
+        </section>
+        
+        <section class="slide" data-slide="10">
+            <div class="slide-header">
+                <div class="slide-title-wrap">
+                    <span class="slide-num-pill">Slide 10 / 10</span>
+                    <span class="slide-time-pill"><i class="clock-icon">⏱</i> 15:30 - 20:00</span>
+                    <h2>Live Demonstration: Interactive Pop-Out Chatbox</h2>
+                    <p class="subtitle">Simulated Discord Chat & Post-Mortem Engineering Takeaways</p>
+                </div>
+            </div>
+
+            <div class="action-banner">
+                <span class="action-badge">PRESENTER ACTION</span>
+                <span class="action-text">[BROWSER: Open floating Chat Playground dialog. Then CAMERA for conclusion]</span>
+            </div>
+
+            <div class="slide-content two-col">
+                <div class="slide-text-col">
+                    <ul class="bullet-list">
+                        <li class="main-bullet">Pop-Out Chat Playground: Floating action button opens inline chat dialog simulating live server conversation.</li>
+<li class="main-bullet">Instant Interception: Simulated multi-turn dialogue auto-quarantines payload with red warning banner in 1.2 ms.</li>
+<li class="main-bullet">Architectural Post-Mortem: Why we abandoned user metadata (Discord bot DM sandboxing returning 403 Forbidden & Developer Policy Section 21 privacy bans).</li>
+<li class="main-bullet">Why the Pivot Succeeded: Pure payload string invariants made the detector completely self-contained, fast, and privacy-preserving.</li>
+<li class="main-bullet">Final Scorecard: 0.9777 clean F1, 0.9780 hardened F1, 1.2 ms latency, production-ready full-stack architecture.</li>
+
+                    </ul>
+                </div>
+                
+            <div class="slide-image-col">
+                <div class="image-wrapper">
+                    <img src="slides_assets/popout_chat_demo.png" alt="Demonstration Screenshot" />
+                    <div class="image-caption">Live Interface Screenshot</div>
+                </div>
+            </div>
+            
+            </div>
+
+            <div class="speaker-notes-box">
+                <div class="notes-header">
+                    <strong>🎙 Presenter Speaking Cue (15:30 - 20:00)</strong>
+                    <button class="toggle-notes-btn" onclick="toggleNotes(this)">Show Full Dialogue</button>
+                </div>
+                <div class="notes-body">
+                    <p><em>Focus:</em> Click the floating Chat Playground button. Send benign then malicious messages. Transition to post-mortem and wrap up video.</p>
+                    <p class="hint">Consult <code>DEMO_VIDEO_PRESENTATION_SCRIPT.md</code> for full word-for-word spoken dialogue.</p>
+                </div>
+            </div>
+        </section>
+        
+        </div>
+    </main>
+
+    <footer class="footer-legend">
+        <span><span class="kbd-key">←</span> or <span class="kbd-key">→</span> Navigate Slides</span>
+        <span><span class="kbd-key">Space</span> Next Slide</span>
+        <span><span class="kbd-key">N</span> Toggle Speaker Notes</span>
+        <span><span class="kbd-key">F</span> Fullscreen Mode</span>
+    </footer>
+
+    <script>
+        let currentSlide = 1;
+        const totalSlides = 10;
+
+        function showSlide(n) {
+            document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
+            const target = document.querySelector(`.slide[data-slide="${n}"]`);
+            if (target) {
+                target.classList.add('active');
+                document.getElementById('slideIndicator').innerText = `${n} / ${totalSlides}`;
+                currentSlide = n;
+            }
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides) showSlide(currentSlide + 1);
+        }
+
+        function prevSlide() {
+            if (currentSlide > 1) showSlide(currentSlide - 1);
+        }
+
+        function toggleNotes(btn) {
+            const body = btn.closest('.speaker-notes-box').querySelector('.notes-body');
+            body.classList.toggle('open');
+            btn.innerText = body.classList.contains('open') ? 'Hide Dialogue' : 'Show Full Dialogue';
+        }
+
+        function toggleAllNotes() {
+            const bodies = document.querySelectorAll('.notes-body');
+            const anyOpen = Array.from(bodies).some(b => b.classList.contains('open'));
+            bodies.forEach(b => {
+                if (anyOpen) b.classList.remove('open');
+                else b.classList.add('open');
+            });
+        }
+
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+                e.preventDefault();
+                nextSlide();
+            } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+                e.preventDefault();
+                prevSlide();
+            } else if (e.key.toLowerCase() === 'n') {
+                toggleAllNotes();
+            } else if (e.key.toLowerCase() === 'f') {
+                toggleFullScreen();
+            }
+        });
+
+        // Initialize slide 1
+        showSlide(1);
+    </script>
+</body>
+</html>
