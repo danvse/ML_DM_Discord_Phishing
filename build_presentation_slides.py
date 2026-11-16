@@ -4,6 +4,7 @@ Generates both:
 2. DEMO_PRESENTATION_SLIDES.html (Interactive HTML5 Slide Deck with Speaker Notes & Keyboard Controls)
 
 Coordinates directly with DEMO_VIDEO_PRESENTATION_SCRIPT.md (20-minute target).
+EVERY SLIDE FEATURES A DEDICATED VISUAL: Either a live dashboard interface screenshot or a syntax-highlighted code / architecture card!
 """
 
 import os
@@ -25,6 +26,7 @@ ACCENT_CYAN = RGBColor(0, 210, 255)
 ACCENT_GREEN = RGBColor(46, 204, 113)
 ACCENT_RED = RGBColor(231, 76, 60)
 ACCENT_PURPLE = RGBColor(155, 89, 182)
+ACCENT_YELLOW = RGBColor(241, 196, 15)
 
 SLIDES_DATA = [
     {
@@ -39,7 +41,8 @@ SLIDES_DATA = [
             "Target Operational Latency: Sub-2ms CPU inference to prevent server message queuing backlogs.",
             "Demonstration Overview: Architecture -> Code & Data -> Model Benchmarks -> Live Angular 18 Demo."
         ],
-        "image": None,
+        "image": "pipeline_overview_card.png",
+        "image_caption": "Architecture: Dual-Stream Pipeline & Decision Policy",
         "script_cue": "Introduce yourself and project partner. State the core goal of the project and set up the 20-minute agenda."
     },
     {
@@ -56,7 +59,8 @@ SLIDES_DATA = [
             "Attack Vector 3: Community tournament voting links requiring third-party OAuth token grants.",
             "Attack Vector 4: Fake cryptocurrency / wallet-drainer distribution portals."
         ],
-        "image": None,
+        "image": "code_adversarial_perturbation.png",
+        "image_caption": "Code: Homoglyph & Markdown Link Masking (data_loader.py)",
         "script_cue": "Explain the psychological trust network in Discord. Explain how session token grabbers steal accounts and automate propagation."
     },
     {
@@ -72,7 +76,8 @@ SLIDES_DATA = [
             "Evasion Trick 3 - Casual Pretexts: Multi-turn conversational openers ('Hey are you free right now?') contain no URLs, evading initial filters.",
             "Empirical Benchmark Result: AutoMod regex F1 drops by 37.2% (0.8598 -> 0.4876) under basic evasion."
         ],
-        "image": None,
+        "image": "code_automod_regex_bypass.png",
+        "image_caption": "Failure Mode: AutoMod Regex Bypass vs Evasion (-37.2% F1)",
         "script_cue": "Highlight the 37.2% F1 collapse in AutoMod regex. Explain the difference between human rendering and regex byte matching."
     },
     {
@@ -89,7 +94,8 @@ SLIDES_DATA = [
             "Stage 5 - XGBoost Ensemble: Evaluates vector in 1.2 ms on CPU. Scores >= 0.80 auto-quarantine; 0.50-0.80 human mod review.",
             "Why XGBoost over DistilBERT? 1.2 ms vs 150-300 ms CPU latency, no subword tokenizer fragmentation, natural tabular tree splits."
         ],
-        "image": None,
+        "image": "code_feature_extractor.png",
+        "image_caption": "Code: 17 Structural Domain Invariants (feature_extractor.py)",
         "script_cue": "Explain the 5 stages. Justify XGBoost over BERT based on latency and tokenization stability. Explain the 0.80 quarantine threshold."
     },
     {
@@ -106,7 +112,8 @@ SLIDES_DATA = [
             "3. Minimax Adversarial Formulation: Trains trees against worst-case synthetic perturbations (homoglyphs + Markdown cloaking):",
             "   -> min_theta E [ max_{delta in Delta} L(f_theta(x + delta), y) ]."
         ],
-        "image": None,
+        "image": "math_formulations_card.png",
+        "image_caption": "Formulations: Levenshtein, Shannon Entropy & Minimax Risk",
         "script_cue": "Walk through the math: d_min early-exit, Shannon entropy formula, and minimax objective. Keep it practical and code-oriented."
     },
     {
@@ -122,7 +129,8 @@ SLIDES_DATA = [
             "Splits: Stratified 80% train (2,841), 10% validation (355), 10% clean test (356) + separate 356-sample adversarial evaluation set.",
             "Feature Extractor Implementation: Globally precompiled regexes to avoid 15x per-message compilation bottleneck."
         ],
-        "image": None,
+        "image": "code_data_loader_dedup.png",
+        "image_caption": "Code: Threat Feeds & MD5 Hash Deduplication (data_loader.py)",
         "script_cue": "Switch to VS Code. Show data_loader.py deduplication logic and feature_extractor.py globally compiled regexes."
     },
     {
@@ -140,6 +148,7 @@ SLIDES_DATA = [
             "  - Dual-Stream Fused: 0.9777 clean F1 and 0.8078 adversarial F1 before hardening."
         ],
         "image": "workbench_analytics.png",
+        "image_caption": "Live Dashboard: Model Analytics, ROC Curves & Ablation",
         "script_cue": "Switch to Terminal. Run the scripts, show Table I and Table II output. Explain why Stream B outperforms Stream A under attack."
     },
     {
@@ -155,7 +164,8 @@ SLIDES_DATA = [
             "Cross-Validation Variance: 5-fold CV with randomized mutation seeds yields 0.9888 +/- 0.0112 recall and 0.9780 +/- 0.0094 F1.",
             "Real-World Zero-Day Limitations: Unseen Unicode scripts, RTL override characters, and image QR codes will inevitably lower open-world recall."
         ],
-        "image": None,
+        "image": "hardened_validation_analysis.png",
+        "image_caption": "Audit: XGBoost Gain Shift & 5-Fold CV Variance",
         "script_cue": "Discuss the 100% recall result with scientific honesty. Explain the closed-generator overlap and present the 5-fold CV variance."
     },
     {
@@ -172,6 +182,7 @@ SLIDES_DATA = [
             "Explainability: Local SHAP waterfall charts clearly explain why each heuristic contributed to the final score."
         ],
         "image": "classifier_shap_demo.png",
+        "image_caption": "Live Dashboard: 1.2ms Classifier & SHAP Explainability",
         "script_cue": "Switch to Chrome. Click the preset buttons, show the 1.2ms latency badge, explain the SHAP attribution bars."
     },
     {
@@ -188,6 +199,7 @@ SLIDES_DATA = [
             "Final Scorecard: 0.9777 clean F1, 0.9780 hardened F1, 1.2 ms latency, production-ready full-stack architecture."
         ],
         "image": "popout_chat_demo.png",
+        "image_caption": "Live Dashboard: Simulated Discord Pop-Out Chatbox",
         "script_cue": "Click the floating Chat Playground button. Send benign then malicious messages. Transition to post-mortem and wrap up video."
     }
 ]
@@ -219,7 +231,7 @@ def build_pptx(output_path):
         top_bar.line.fill.background()
 
         # Slide Number Badge & Timestamp
-        badge_box = slide.shapes.add_textbox(Inches(10.5), Inches(0.3), Inches(2.3), Inches(0.5))
+        badge_box = slide.shapes.add_textbox(Inches(10.2), Inches(0.28), Inches(2.6), Inches(0.5))
         tf_b = badge_box.text_frame
         tf_b.word_wrap = True
         p_b = tf_b.paragraphs[0]
@@ -231,23 +243,23 @@ def build_pptx(output_path):
         r_b.font.color.rgb = ACCENT_CYAN
 
         # Title
-        tb_title = slide.shapes.add_textbox(Inches(0.8), Inches(0.4), Inches(9.8), Inches(1.0))
+        tb_title = slide.shapes.add_textbox(Inches(0.8), Inches(0.35), Inches(9.4), Inches(1.0))
         tf_t = tb_title.text_frame
         tf_t.word_wrap = True
         p_t = tf_t.paragraphs[0]
         p_t.text = data["title"]
-        p_t.font.size = Pt(24)
+        p_t.font.size = Pt(23)
         p_t.font.bold = True
         p_t.font.color.rgb = TEXT_WHITE
 
         # Subtitle
         p_sub = tf_t.add_paragraph()
         p_sub.text = data["subtitle"]
-        p_sub.font.size = Pt(13)
+        p_sub.font.size = Pt(12)
         p_sub.font.color.rgb = TEXT_MUTED
 
         # Action Cue Banner
-        action_box = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8), Inches(1.5), Inches(11.733), Inches(0.45))
+        action_box = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8), Inches(1.42), Inches(11.733), Inches(0.42))
         action_box.fill.solid()
         action_box.fill.fore_color.rgb = CARD_BG
         action_box.line.color.rgb = ACCENT_CYAN
@@ -256,41 +268,66 @@ def build_pptx(output_path):
         p_a.alignment = PP_ALIGN.LEFT
         r_a = p_a.add_run()
         r_a.text = f"  PRESENTER ACTION: {data['action']}"
-        r_a.font.size = Pt(11)
+        r_a.font.size = Pt(10.5)
         r_a.font.bold = True
         r_a.font.color.rgb = ACCENT_CYAN
 
-        # Layout: If image exists, split columns; otherwise full-width bullets
+        # Layout: Always two-column now that every slide has an image
         has_image = data["image"] and os.path.exists(os.path.join(ASSETS_DIR, data["image"]))
-        content_w = Inches(6.0) if has_image else Inches(11.733)
+        content_w = Inches(5.9) if has_image else Inches(11.733)
 
         # Bullets Container
-        tb_body = slide.shapes.add_textbox(Inches(0.8), Inches(2.1), content_w, Inches(4.8))
+        tb_body = slide.shapes.add_textbox(Inches(0.8), Inches(1.98), content_w, Inches(5.1))
         tf_body = tb_body.text_frame
         tf_body.word_wrap = True
 
         for i, b in enumerate(data["bullets"]):
             p = tf_body.add_paragraph() if i > 0 else tf_body.paragraphs[0]
-            p.space_after = Pt(8)
+            p.space_after = Pt(5)
             p.level = 1 if b.strip().startswith("->") or b.strip().startswith("- ") else 0
             clean_b = b.replace("->", "•").replace("- ", "• ")
             r = p.add_run()
             r.text = clean_b
-            r.font.size = Pt(12.5 if p.level == 0 else 11.5)
+            r.font.size = Pt(11.0 if p.level == 0 else 10.0)
             r.font.color.rgb = TEXT_WHITE if p.level == 0 else TEXT_MUTED
 
         # Add Image if present
         if has_image:
             img_path = os.path.join(ASSETS_DIR, data["image"])
-            img_box = slide.shapes.add_picture(img_path, Inches(7.1), Inches(2.2), width=Inches(5.4))
+            # Image card background container
+            img_card = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(6.9), Inches(1.98), Inches(5.633), Inches(4.7))
+            img_card.fill.solid()
+            img_card.fill.fore_color.rgb = CARD_BG
+            img_card.line.color.rgb = RGBColor(50, 55, 66)
+
+            # Caption Pill inside card
+            cap_box = slide.shapes.add_textbox(Inches(7.0), Inches(2.05), Inches(5.4), Inches(0.35))
+            tf_cap = cap_box.text_frame
+            tf_cap.word_wrap = True
+            p_cap = tf_cap.paragraphs[0]
+            p_cap.alignment = PP_ALIGN.LEFT
+            r_cap = p_cap.add_run()
+            r_cap.text = f"VISUAL: {data['image_caption']}"
+            r_cap.font.size = Pt(9.5)
+            r_cap.font.bold = True
+            r_cap.font.color.rgb = ACCENT_CYAN
+
+            # Actual Image placement
+            slide.shapes.add_picture(img_path, Inches(7.0), Inches(2.45), width=Inches(5.433))
 
         # Presenter Notes in PPTX
         notes_slide = slide.notes_slide
         tf_notes = notes_slide.notes_text_frame
-        tf_notes.text = f"TIMESTAMP: {data['time']}\nACTION: {data['action']}\n\nTALKING POINTS / SCRIPT CUE:\n{data['script_cue']}"
+        tf_notes.text = f"TIMESTAMP: {data['time']}\nACTION: {data['action']}\nVISUAL: {data.get('image_caption', 'N/A')}\n\nTALKING POINTS / SCRIPT CUE:\n{data['script_cue']}"
 
-    prs.save(output_path)
-    print(f"PowerPoint slide deck saved successfully to: {output_path}")
+    try:
+        prs.save(output_path)
+        print(f"PowerPoint slide deck saved successfully to: {output_path}")
+    except PermissionError:
+        alt_path = output_path.replace(".pptx", "_UPDATED.pptx")
+        prs.save(alt_path)
+        print(f"Notice: '{output_path}' is currently open in Microsoft PowerPoint.")
+        print(f"Saved updated PowerPoint slide deck with all visuals to: {alt_path}")
 
 
 # ==============================================================================
@@ -311,16 +348,18 @@ def build_html(output_path):
         image_html = ""
         if d["image"]:
             img_rel = f"slides_assets/{d['image']}"
+            caption = d.get("image_caption", "Demonstration Visual")
             image_html = f'''
             <div class="slide-image-col">
                 <div class="image-wrapper">
-                    <img src="{img_rel}" alt="Demonstration Screenshot" />
-                    <div class="image-caption">Live Interface Screenshot</div>
+                    <div class="image-header">
+                        <span class="image-tag">VISUAL</span>
+                        <span class="image-title">{caption}</span>
+                    </div>
+                    <img src="{img_rel}" alt="{caption}" />
                 </div>
             </div>
             '''
-
-        grid_class = "two-col" if d["image"] else "single-col"
 
         slide_block = f'''
         <section class="slide" data-slide="{d['slide_num']}">
@@ -338,7 +377,7 @@ def build_html(output_path):
                 <span class="action-text">{d['action']}</span>
             </div>
 
-            <div class="slide-content {grid_class}">
+            <div class="slide-content two-col">
                 <div class="slide-text-col">
                     <ul class="bullet-list">
                         {bullets_li}
@@ -426,8 +465,8 @@ def build_html(output_path):
         }}
         .slide-deck {{
             width: 100%;
-            max-width: 1200px;
-            min-height: 700px;
+            max-width: 1300px;
+            min-height: 720px;
             background: var(--card-bg);
             border: 1px solid var(--border-color);
             border-radius: 12px;
@@ -437,14 +476,14 @@ def build_html(output_path):
         }}
         .slide {{
             display: none;
-            padding: 36px 44px;
+            padding: 32px 40px;
             animation: fadeIn 0.3s ease;
         }}
         .slide.active {{ display: block; }}
         @keyframes fadeIn {{ from {{ opacity: 0; transform: translateY(6px); }} to {{ opacity: 1; transform: translateY(0); }} }}
 
         /* Slide Components */
-        .slide-header {{ margin-bottom: 20px; }}
+        .slide-header {{ margin-bottom: 16px; }}
         .slide-num-pill {{
             background: rgba(0, 210, 255, 0.12);
             color: var(--accent-cyan);
@@ -464,15 +503,15 @@ def build_html(output_path):
             border-radius: 12px;
             margin-left: 8px;
         }}
-        h2 {{ font-size: 26px; font-weight: 800; color: var(--text-main); margin-top: 10px; }}
-        .subtitle {{ font-size: 14px; color: var(--text-muted); margin-top: 4px; }}
+        h2 {{ font-size: 25px; font-weight: 800; color: var(--text-main); margin-top: 8px; }}
+        .subtitle {{ font-size: 13.5px; color: var(--text-muted); margin-top: 4px; white-space: pre-line; }}
 
         .action-banner {{
             background: rgba(0, 210, 255, 0.08);
             border-left: 4px solid var(--accent-cyan);
-            padding: 10px 16px;
+            padding: 8px 14px;
             border-radius: 4px;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
             display: flex;
             align-items: center;
             gap: 12px;
@@ -486,94 +525,140 @@ def build_html(output_path):
             border-radius: 4px;
             letter-spacing: 0.5px;
         }}
-        .action-text {{ font-size: 13px; font-weight: 600; color: #d0f0ff; }}
+        .action-text {{ font-size: 12.5px; font-weight: 600; color: #d0f0ff; }}
 
         /* Grid */
-        .slide-content.two-col {{ display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: start; }}
-        .slide-content.single-col {{ display: block; }}
+        .slide-content.two-col {{ display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 28px; align-items: start; }}
 
-        .bullet-list {{ list-style: none; display: flex; flex-direction: column; gap: 14px; }}
+        .bullet-list {{ list-style: none; display: flex; flex-direction: column; gap: 10px; }}
         .bullet-list li.main-bullet {{
             position: relative;
-            padding-left: 24px;
-            font-size: 15px;
-            line-height: 1.5;
+            padding-left: 20px;
+            font-size: 14px;
+            line-height: 1.45;
             color: var(--text-main);
         }}
         .bullet-list li.main-bullet::before {{
             content: "•";
             position: absolute;
-            left: 6px;
+            left: 4px;
             color: var(--accent-cyan);
-            font-size: 20px;
+            font-size: 18px;
             top: -2px;
         }}
         .bullet-list li.sub-bullet {{
-            padding-left: 44px;
-            font-size: 14px;
-            line-height: 1.5;
+            padding-left: 36px;
+            font-size: 13px;
+            line-height: 1.4;
             color: var(--text-muted);
         }}
 
         /* Image Display */
         .image-wrapper {{
-            background: #121418;
+            background: #14171d;
             border: 1px solid var(--border-color);
             border-radius: 8px;
-            padding: 8px;
-            text-align: center;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.3);
         }}
+        .image-header {{
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            padding-bottom: 6px;
+        }}
+        .image-tag {{
+            background: rgba(0, 210, 255, 0.15);
+            color: var(--accent-cyan);
+            font-size: 9px;
+            font-weight: 800;
+            padding: 2px 6px;
+            border-radius: 3px;
+            letter-spacing: 0.5px;
+        }}
+        .image-title {{ font-size: 11.5px; color: var(--text-muted); font-weight: 600; font-family: monospace; }}
         .image-wrapper img {{
             width: 100%;
             height: auto;
-            max-height: 340px;
+            max-height: 330px;
             object-fit: contain;
             border-radius: 4px;
+            cursor: pointer;
+            transition: transform 0.2s;
         }}
-        .image-caption {{ font-size: 11px; color: var(--text-muted); margin-top: 6px; font-style: italic; }}
+        .image-wrapper img:hover {{
+            transform: scale(1.02);
+        }}
 
         /* Speaker Notes Drawer */
         .speaker-notes-box {{
-            margin-top: 28px;
+            margin-top: 22px;
             background: #15181e;
             border: 1px dashed #3a4252;
             border-radius: 8px;
-            padding: 12px 18px;
+            padding: 10px 16px;
         }}
         .notes-header {{ display: flex; justify-content: space-between; align-items: center; }}
-        .notes-header strong {{ font-size: 13px; color: #ffd166; }}
+        .notes-header strong {{ font-size: 12.5px; color: #ffd166; }}
         .toggle-notes-btn {{
             background: transparent;
             border: none;
             color: var(--accent-cyan);
-            font-size: 12px;
+            font-size: 11.5px;
             cursor: pointer;
             text-decoration: underline;
         }}
-        .notes-body {{ margin-top: 8px; font-size: 13px; color: var(--text-muted); line-height: 1.5; display: none; }}
+        .notes-body {{ margin-top: 8px; font-size: 12.5px; color: var(--text-muted); line-height: 1.45; display: none; }}
         .notes-body.open {{ display: block; }}
-        .notes-body p {{ margin-bottom: 6px; }}
+        .notes-body p {{ margin-bottom: 4px; }}
         .notes-body code {{ background: #222630; padding: 2px 6px; border-radius: 4px; color: #00d2ff; }}
 
         /* Keyboard Legend */
         .footer-legend {{
             background: #14171d;
             border-top: 1px solid var(--border-color);
-            padding: 10px 24px;
+            padding: 8px 24px;
             display: flex;
             justify-content: center;
-            gap: 24px;
-            font-size: 12px;
+            gap: 20px;
+            font-size: 11.5px;
             color: var(--text-muted);
         }}
         .kbd-key {{
             background: #252a36;
             color: var(--text-main);
-            padding: 2px 8px;
+            padding: 2px 7px;
             border-radius: 4px;
             border: 1px solid #3d4558;
             font-weight: 600;
         }}
+
+        /* Slide Thumbnails Bar */
+        .thumbs-bar {{
+            background: #111317;
+            padding: 10px 24px;
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            border-top: 1px solid var(--border-color);
+        }}
+        .thumb-btn {{
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 11.5px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }}
+        .thumb-btn:hover {{ background: #262c37; color: var(--text-main); }}
+        .thumb-btn.active {{ border-color: var(--accent-cyan); color: var(--accent-cyan); background: rgba(0, 210, 255, 0.08); }}
     </style>
 </head>
 <body>
@@ -597,11 +682,15 @@ def build_html(output_path):
         </div>
     </main>
 
+    <div class="thumbs-bar">
+        {''.join([f'<button class="thumb-btn { "active" if i == 0 else "" }" onclick="goToSlide({i+1})">Slide {i+1}</button>' for i in range(10)])}
+    </div>
+
     <footer class="footer-legend">
-        <span><span class="kbd-key">←</span> or <span class="kbd-key">→</span> Navigate Slides</span>
+        <span><span class="kbd-key">◀</span> / <span class="kbd-key">▶</span> Navigate</span>
         <span><span class="kbd-key">Space</span> Next Slide</span>
-        <span><span class="kbd-key">N</span> Toggle Speaker Notes</span>
-        <span><span class="kbd-key">F</span> Fullscreen Mode</span>
+        <span><span class="kbd-key">N</span> Toggle Speaking Notes</span>
+        <span><span class="kbd-key">F</span> Toggle Fullscreen</span>
     </footer>
 
     <script>
@@ -609,53 +698,53 @@ def build_html(output_path):
         const totalSlides = 10;
 
         function showSlide(n) {{
-            document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
-            const target = document.querySelector(`.slide[data-slide="${{n}}"]`);
-            if (target) {{
-                target.classList.add('active');
-                document.getElementById('slideIndicator').innerText = `${{n}} / ${{totalSlides}}`;
-                currentSlide = n;
-            }}
+            if (n < 1) n = 1;
+            if (n > totalSlides) n = totalSlides;
+            currentSlide = n;
+
+            document.querySelectorAll('.slide').forEach((s, idx) => {{
+                s.classList.toggle('active', (idx + 1) === currentSlide);
+            }});
+
+            document.querySelectorAll('.thumb-btn').forEach((b, idx) => {{
+                b.classList.toggle('active', (idx + 1) === currentSlide);
+            }});
+
+            document.getElementById('slideIndicator').textContent = `${{currentSlide}} / ${{totalSlides}}`;
         }}
 
-        function nextSlide() {{
-            if (currentSlide < totalSlides) showSlide(currentSlide + 1);
-        }}
-
-        function prevSlide() {{
-            if (currentSlide > 1) showSlide(currentSlide - 1);
-        }}
+        function nextSlide() {{ showSlide(currentSlide + 1); }}
+        function prevSlide() {{ showSlide(currentSlide - 1); }}
+        function goToSlide(n) {{ showSlide(n); }}
 
         function toggleNotes(btn) {{
             const body = btn.closest('.speaker-notes-box').querySelector('.notes-body');
             body.classList.toggle('open');
-            btn.innerText = body.classList.contains('open') ? 'Hide Dialogue' : 'Show Full Dialogue';
+            btn.textContent = body.classList.contains('open') ? 'Hide Dialogue' : 'Show Full Dialogue';
         }}
 
         function toggleAllNotes() {{
             const bodies = document.querySelectorAll('.notes-body');
+            const btns = document.querySelectorAll('.toggle-notes-btn');
             const anyOpen = Array.from(bodies).some(b => b.classList.contains('open'));
-            bodies.forEach(b => {{
-                if (anyOpen) b.classList.remove('open');
-                else b.classList.add('open');
-            }});
+            bodies.forEach(b => b.classList.toggle('open', !anyOpen));
+            btns.forEach(btn => btn.textContent = !anyOpen ? 'Hide Dialogue' : 'Show Full Dialogue');
         }}
 
         function toggleFullScreen() {{
             if (!document.fullscreenElement) {{
                 document.documentElement.requestFullscreen();
-            }} else {{
-                if (document.exitFullscreen) {{
-                    document.exitFullscreen();
-                }}
+            }} else if (document.exitFullscreen) {{
+                document.exitFullscreen();
             }}
         }}
 
+        // Keyboard controls
         document.addEventListener('keydown', (e) => {{
-            if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {{
+            if (e.key === 'ArrowRight' || e.key === ' ') {{
                 e.preventDefault();
                 nextSlide();
-            }} else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {{
+            }} else if (e.key === 'ArrowLeft') {{
                 e.preventDefault();
                 prevSlide();
             }} else if (e.key.toLowerCase() === 'n') {{
@@ -664,21 +753,20 @@ def build_html(output_path):
                 toggleFullScreen();
             }}
         }});
-
-        // Initialize slide 1
-        showSlide(1);
     </script>
 </body>
-</html>
-'''
-    with open(output_path, 'w', encoding='utf-8') as f:
+</html>'''
+
+    with open(output_path, "w", encoding="utf-8") as f:
         f.write(full_html)
     print(f"Interactive HTML slide deck saved successfully to: {output_path}")
 
 
 if __name__ == "__main__":
+    print("Building presentation slides...")
     pptx_path = os.path.join(OUTPUT_DIR, "DEMO_PRESENTATION_SLIDES.pptx")
     html_path = os.path.join(OUTPUT_DIR, "DEMO_PRESENTATION_SLIDES.html")
+
     build_pptx(pptx_path)
     build_html(html_path)
     print("\nAll presentation slides successfully built!")
