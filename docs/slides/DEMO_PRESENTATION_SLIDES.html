@@ -590,27 +590,25 @@ Team #18: Edwin Lin (Solo Project)</p>
             <div class="slide-header">
                 <div class="slide-title-wrap">
                     <span class="slide-num-pill">Slide 7 / 10</span>
-                    <span class="slide-time-pill"><i class="clock-icon">⏱</i> 8:30 - 10:30</span>
-                    <h2>Experimental Benchmarks & 3-Way Feature Ablation</h2>
-                    <p class="subtitle">Tables I & II: Validating the Invariant Signal of Stream B</p>
+                    <span class="slide-time-pill"><i class="clock-icon">⏱</i> 5:30 - 7:00</span>
+                    <h2>Showcase Pipeline: Model Benchmarks &amp; Justifications</h2>
+                    <p class="subtitle">Why We Evaluated Each Architecture &amp; Validated Stream B (Tables I &amp; II)</p>
                 </div>
             </div>
 
             <div class="action-banner">
                 <span class="action-badge">PRESENTER ACTION</span>
-                <span class="action-text">[SWITCH TO TERMINAL: Run train_baselines.py & ablation_study.py]</span>
+                <span class="action-text">[TERMINAL: Run 'py run_showcase_pipeline.py' &amp; explain model choices]</span>
             </div>
 
             <div class="slide-content two-col">
                 <div class="slide-text-col">
                     <ul class="bullet-list">
-                        <li class="main-bullet">Table I (Baselines): AutoMod regex collapses to 0.4876 F1 under attack. Naive Bayes, Logistic Regression, SVM drop to 0.44-0.49 recall.</li>
-<li class="main-bullet">Unhardened XGBoost Baseline: Maintains 0.8078 F1 under attack because structural features remain invariant.</li>
-<li class="main-bullet">Table II (Ablation Analysis):</li>
-<li class="sub-bullet">  ↳ Stream A Alone (3,000 TF-IDF): 0.9589 clean F1 ↳  0.4944 recall (0.6331 F1) under attack (-34.0% drop).</li>
-<li class="sub-bullet">  ↳ Stream B Alone (17 Heuristics): 0.9636 clean F1 ↳  0.6573 recall (0.7748 F1) under attack (+14.1% over text alone).</li>
-<li class="sub-bullet">  ↳ Dual-Stream Fused: 0.9777 clean F1 and 0.8078 adversarial F1 before hardening.</li>
-
+                        <li class="main-bullet"><strong>Step 1 (Ingestion &amp; Dedup):</strong> Ingests 21k threat domains; MD5 hash filter removes duplicate Nitro spam to prevent train-test data leakage.</li>
+                        <li class="main-bullet"><strong>Step 2 (AutoMod vs. Linear NLP):</strong> AutoMod crashes by 37.2% under evasion. Naive Bayes, LogReg, and SVM drop to 0.44–0.49 recall because character lookalikes fall outside their vocabulary.</li>
+                        <li class="main-bullet"><strong>Step 3 (Why XGBoost over RF &amp; BERT):</strong> Random Forest takes 3.4 ms. XGBoost was selected for production because sequential gradient boosting runs in 1.2 ms on CPU and partitions non-linear tabular heuristics naturally without BERT's subword tokenization fragmentation.</li>
+                        <li class="main-bullet"><strong>Step 4 (3-Way Feature Ablation):</strong> Stream B alone gets 0.7748 F1 under attack (+14.1% over text alone), proving link invariants remain stable when words are scrambled.</li>
+                        <li class="main-bullet"><strong>Step 5 (Minimax Hardening):</strong> Injects synthetic homoglyphs into training, recovering adversarial F1 to 0.9780.</li>
                     </ul>
                 </div>
                 
@@ -618,9 +616,9 @@ Team #18: Edwin Lin (Solo Project)</p>
                 <div class="image-wrapper">
                     <div class="image-header">
                         <span class="image-tag">VISUAL</span>
-                        <span class="image-title">Live Dashboard: Model Analytics, ROC Curves & Ablation</span>
+                        <span class="image-title">Live Dashboard: Model Analytics, ROC Curves &amp; Ablation</span>
                     </div>
-                    <img src="slides_assets/workbench_analytics.png" alt="Live Dashboard: Model Analytics, ROC Curves & Ablation" />
+                    <img src="slides_assets/workbench_analytics.png" alt="Live Dashboard: Model Analytics, ROC Curves &amp; Ablation" />
                 </div>
             </div>
             
@@ -628,11 +626,11 @@ Team #18: Edwin Lin (Solo Project)</p>
 
             <div class="speaker-notes-box">
                 <div class="notes-header">
-                    <strong>🎙 Presenter Speaking Cue (8:30 - 10:30)</strong>
+                    <strong>🎙 Presenter Speaking Cue (5:30 - 7:00)</strong>
                     <button class="toggle-notes-btn" onclick="toggleNotes(this)">Show Full Dialogue</button>
                 </div>
                 <div class="notes-body">
-                    <p><em>Walking Through Results:</em> Table I: All models do fine on clean text, but under attack, text-only models collapse to 0.44-0.49 recall. Table II (Ablation): Stream B alone gets 0.7748 F1 under attack (+14.1% over text alone). Fused dual-stream hits 0.8078 F1 before hardening.</p>
+                    <p><em>Explaining the Pipeline &amp; Models:</em> Run <code>py run_showcase_pipeline.py</code> live. Walk through the 5 steps: 1) MD5 dedup stops data leakage. 2) AutoMod crashes (-37.2%) and linear NLP models drop because lookalikes break vocabulary. 3) Explain why XGBoost was chosen over Random Forest and BERT (1.2 ms CPU latency, tabular stability). 4) Ablation: Stream B alone gets 0.7748 F1 under attack (+14.1% over text alone). 5) Minimax hardening recovers to 0.9780 F1.</p>
                     <p class="hint">Consult <code>DEMO_VIDEO_PRESENTATION_SCRIPT.md</code> for full word-for-word spoken dialogue.</p>
                 </div>
             </div>

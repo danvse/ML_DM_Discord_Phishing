@@ -140,40 +140,58 @@
 
 ---
 
-### Segment 4: Model Benchmarks & Honest 100% Recall Review (5:30 – 8:00)
+### Segment 4: Master Showcase Pipeline & Why We Chose Our Models (5:30 – 8:00)
 
-#### Slide 7: Experimental Benchmarks & Feature Ablation (5:30 – 6:45)
-**[ON SCREEN: Advance to Slide 7 showing the Studio Workbench Analytics, ROC curves, and Tables I & II.]**
+#### Slide 7: Running the Showcase Pipeline & Model Progression (5:30 – 7:00)
+**[ON SCREEN: Switch screen to Terminal in VS Code. Run the master demonstration script live.]**
+
+```powershell
+# Command run live on screen:
+py run_showcase_pipeline.py
+```
 
 > **Spoken Dialogue:**  
-> "Now let's examine the experimental results on Slide 7. I benchmarked my system against five baseline models: AutoMod regex, Naive Bayes, Logistic Regression, Linear SVM, and Random Forest.  
+> "Now let's examine our experimental results. In my terminal, I'm going to run my master pipeline script: `py run_showcase_pipeline.py`.  
 >  
-> In Table I:
-> On **clean, standard messages**, all machine learning models perform well—scoring above 0.96 F1. AutoMod regex scores 0.8598 F1.  
+> Look at how fast this executes—in just seventeen seconds, it executes the entire machine learning pipeline end-to-end: data ingestion, baseline evaluations, dual-stream training, ablation analysis, and adversarial hardening.  
 >  
-> But look what happens when we test against the **adversarial evasion set**:
-> - AutoMod crashes by 37.2% down to **0.4876 F1**.
-> - Naive Bayes, Logistic Regression, and SVM all collapse to around 0.44 to 0.49 recall because mutated Russian letters fall completely outside their vocabulary.
-> - But my unhardened XGBoost baseline holds up at **0.8078 F1** because its trees can still branch on the 17 structural features in Stream B.  
+> Let me explain what is happening on screen and **why I tested and chose each specific model**:
 >  
-> In Table II, my ablation study confirms this: Stream B alone gets **0.7748 F1** under attack—outperforming the text-only model by **14.1%**, proving that link invariants remain stable even when text is scrambled."
+> 1. **Step 1 (Data Ingestion & Deduplication):**  
+> Notice that it loaded 6,000 raw messages and deduplicated them down to **3,552 unique messages**. That eliminated hundreds of duplicate Nitro spam copies so the model wouldn't memorize the training set.  
+>  
+> 2. **Step 2 (Baseline Models Benchmark — Table I):**  
+> *Why did I evaluate AutoMod, Naive Bayes, Logistic Regression, and SVM?*  
+> Because I needed to test whether standard industry defenses and traditional NLP models could handle Discord phishing.  
+> As you can see in Table I: on clean text, they all score above 0.96 F1. But under adversarial evasion, **AutoMod regex crashes by 37.2%** down to 0.4876 F1 because regex breaks when letters are swapped. Naive Bayes, Logistic Regression, and SVM all collapse to around 0.44 to 0.49 recall because mutated Russian letters fall completely outside their vocabulary dictionary!  
+>  
+> 3. **Step 3 (Dual-Stream Fused Models — Random Forest vs. XGBoost):**  
+> *Why did I compare Random Forest against XGBoost on the 3,017 fused features?*  
+> Both models use decision trees, which naturally handle tabular data like link counts, edit distance, and entropy. Random Forest uses bagging, which scored 0.7273 F1 under attack, but takes 3.4 milliseconds.  
+> I chose **XGBoost as our primary model** because gradient boosting builds sequential trees that specifically target previously misclassified edge cases. It achieved **0.8078 F1** before hardening and runs in just **1.2 milliseconds on CPU**—which is critical for live Discord server throughput.  
+>  
+> 4. **Step 4 (3-Way Feature Ablation — Table II):**  
+> *Why run an ablation study?* To prove whether Stream B (the 17 structural clues) actually adds value.  
+> Look at the numbers: Stream A (text alone) crashes by -34% under attack. But Stream B alone gets **0.7748 F1**—beating text alone by **14.1%**! This proves that domain edit distance and entropy stay invariant even when the attacker scrambles the words."
 
 ---
 
-#### Slide 8: Adversarial Hardening & Honest Review of 100% Recall (6:45 – 8:00)
+#### Slide 8: Adversarial Hardening & Honest Review of 100% Recall (7:00 – 8:00)
 **[ON SCREEN: Advance to Slide 8 showing the Feature Gain Shift, 5-Fold CV Variance, and the Scientific Audit card.]**
 
 > **Spoken Dialogue:**  
-> "Now let's look at Slide 8, covering **Adversarial Hardening** and an important scientific finding.  
+> "Now in Step 5 of the pipeline and on Slide 8, let's look at **Minimax Adversarial Hardening**:  
 >  
-> By augmenting 25% of training scam samples with synthetic mutations, my hardened XGBoost model recovered to **0.9780 F1**, catching **178 out of 178 test scams—a 100% recall**.  
+> *Why did I add adversarial hardening?*  
+> Because a standard model only learns from clean historical data. By actively injecting synthetic lookalike characters and disguised links into 25% of training scams, the decision trees were forced to learn split rules that survive evasion.  
+> After hardening, adversarial F1 recovered to **0.9780**, catching **178 out of 178 test scams—a 100% recall**.  
 >  
-> Now, speaking to you honestly as a student presenting to my teacher:  
-> Whenever you see 100% in machine learning, that is usually a red flag. And in my case, there is a clear explanation:  
-> Because I used the same perturbation function (`build_adversarial_variant`) to create the training mutations as I did to evaluate the test set, the decision trees learned that `homoglyph_count >= 1` was an almost foolproof shortcut! That feature jumped from the #14 feature all the way up to the **#5 most important feature in tree gain**.  
+> Now, Professor, I want to address this 100% recall with complete scientific honesty:  
+> Whenever you see 100% in machine learning, that is usually a red flag. In my case, there is a clear reason why it happened:  
+> Because I used the same mutation script (`build_adversarial_variant`) to create the training mutations as I did to evaluate the test set, the decision trees learned that `homoglyph_count >= 1` was an easy shortcut! That feature jumped from the #14 feature all the way up to the **#5 most important feature in tree gain**.  
 >  
-> In the real world against brand-new zero-day attacks, recall will naturally be lower.  
-> To test true stability, I ran **5-fold cross-validation with randomized mutation seeds**: across the 5 folds, the model achieved **$0.9888 \pm 0.0112$ recall** and **$0.9780 \pm 0.0094$ F1**, proving the structural features are genuinely robust within a tight 1% variance."
+> In the open real world against brand-new zero-day attacks, recall will naturally be lower.  
+> That is why I ran **5-fold cross-validation with randomized mutation seeds**: across the 5 folds, the model achieved **$0.9888 \pm 0.0112$ recall** and **$0.9780 \pm 0.0094$ F1**. That confirms my structural features are genuinely robust within a tight 1% variance."
 
 ---
 
