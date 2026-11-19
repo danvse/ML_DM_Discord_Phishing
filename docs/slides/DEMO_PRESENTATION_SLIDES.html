@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Discord Scam Detection - 20-Min Demo Presentation Slides</title>
+    <title>Discord Scam Detection - 12-to-15 Min Demo Presentation Slides</title>
     <style>
         :root {
             --bg-dark: #121418;
@@ -149,25 +149,32 @@
             font-size: 13px;
             line-height: 1.4;
             color: var(--text-muted);
+            position: relative;
+        }
+        .bullet-list li.sub-bullet::before {
+            content: "↳";
+            position: absolute;
+            left: 20px;
+            color: var(--text-muted);
         }
 
-        /* Image Display */
+        /* Image Column */
+        .slide-image-col { display: flex; justify-content: center; }
         .image-wrapper {
             background: #14171d;
             border: 1px solid var(--border-color);
             border-radius: 8px;
-            padding: 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+            overflow: hidden;
+            width: 100%;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
         }
         .image-header {
+            background: #20242d;
+            padding: 6px 12px;
+            border-bottom: 1px solid var(--border-color);
             display: flex;
             align-items: center;
             gap: 8px;
-            border-bottom: 1px solid rgba(255,255,255,0.06);
-            padding-bottom: 6px;
         }
         .image-tag {
             background: rgba(0, 210, 255, 0.15);
@@ -176,73 +183,83 @@
             font-weight: 800;
             padding: 2px 6px;
             border-radius: 3px;
-            letter-spacing: 0.5px;
         }
-        .image-title { font-size: 11.5px; color: var(--text-muted); font-weight: 600; font-family: monospace; }
+        .image-title { font-size: 11px; font-weight: 600; color: var(--text-muted); }
         .image-wrapper img {
             width: 100%;
-            height: auto;
-            max-height: 330px;
+            display: block;
             object-fit: contain;
+            max-height: 380px;
+        }
+
+        /* Speaker Notes Box */
+        .speaker-notes-box {
+            margin-top: 24px;
+            background: #15181f;
+            border: 1px solid #282e3b;
+            border-radius: 6px;
+            padding: 12px 16px;
+        }
+        .notes-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: var(--accent-cyan);
+        }
+        .toggle-notes-btn {
+            background: none;
+            border: 1px solid #333a4a;
+            color: var(--text-muted);
+            font-size: 11px;
+            padding: 3px 8px;
             border-radius: 4px;
             cursor: pointer;
-            transition: transform 0.2s;
         }
-        .image-wrapper img:hover {
-            transform: scale(1.02);
+        .toggle-notes-btn:hover { color: var(--text-main); border-color: var(--accent-cyan); }
+        .notes-body {
+            display: none;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #232834;
+            font-size: 12.5px;
+            line-height: 1.5;
+            color: #c0c8d4;
         }
-
-        /* Speaker Notes Drawer */
-        .speaker-notes-box {
-            margin-top: 22px;
-            background: #15181e;
-            border: 1px dashed #3a4252;
-            border-radius: 8px;
-            padding: 10px 16px;
-        }
-        .notes-header { display: flex; justify-content: space-between; align-items: center; }
-        .notes-header strong { font-size: 12.5px; color: #ffd166; }
-        .toggle-notes-btn {
-            background: transparent;
-            border: none;
-            color: var(--accent-cyan);
-            font-size: 11.5px;
-            cursor: pointer;
-            text-decoration: underline;
-        }
-        .notes-body { margin-top: 8px; font-size: 12.5px; color: var(--text-muted); line-height: 1.45; display: none; }
         .notes-body.open { display: block; }
-        .notes-body p { margin-bottom: 4px; }
-        .notes-body code { background: #222630; padding: 2px 6px; border-radius: 4px; color: #00d2ff; }
+        .notes-body p { margin-bottom: 8px; }
+        .notes-body .hint { font-size: 11px; color: var(--text-muted); margin-top: 8px; font-style: italic; }
 
-        /* Keyboard Legend */
+        /* Navigation Footer */
         .footer-legend {
+            padding: 12px 24px;
             background: #14171d;
             border-top: 1px solid var(--border-color);
-            padding: 8px 24px;
             display: flex;
             justify-content: center;
-            gap: 20px;
-            font-size: 11.5px;
+            gap: 24px;
+            font-size: 12px;
             color: var(--text-muted);
         }
         .kbd-key {
-            background: #252a36;
-            color: var(--text-main);
-            padding: 2px 7px;
+            background: var(--card-bg);
+            border: 1px solid #3a4252;
+            padding: 2px 6px;
             border-radius: 4px;
-            border: 1px solid #3d4558;
-            font-weight: 600;
+            font-size: 10px;
+            color: var(--text-main);
+            font-weight: 700;
         }
 
-        /* Slide Thumbnails Bar */
+        /* Bottom thumbnails bar */
         .thumbs-bar {
-            background: #111317;
-            padding: 10px 24px;
-            display: flex;
-            gap: 10px;
-            overflow-x: auto;
+            background: #181b22;
             border-top: 1px solid var(--border-color);
+            padding: 8px 16px;
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            justify-content: center;
         }
         .thumb-btn {
             background: var(--card-bg);
@@ -281,7 +298,7 @@
             <div class="slide-header">
                 <div class="slide-title-wrap">
                     <span class="slide-num-pill">Slide 1 / 10</span>
-                    <span class="slide-time-pill"><i class="clock-icon">⏱</i> 0:00 - 1:00</span>
+                    <span class="slide-time-pill"><i class="clock-icon">⏱</i> 0:00 - 0:45</span>
                     <h2>Dual-Stream Detection of Discord Phishing Campaigns</h2>
                     <p class="subtitle">Machine Learning & Data Mining (Fall 2026) | Final Project Demo
 Team #18: Edwin Lin (Solo Project)</p>
@@ -290,16 +307,16 @@ Team #18: Edwin Lin (Solo Project)</p>
 
             <div class="action-banner">
                 <span class="action-badge">PRESENTER ACTION</span>
-                <span class="action-text">[ON CAMERA: Presenter intro with pinned webcam in corner]</span>
+                <span class="action-text">[ON CAMERA: Presenter intro with pinned webcam in corner — 13-min Demo Roadmap]</span>
             </div>
 
             <div class="slide-content two-col">
                 <div class="slide-text-col">
                     <ul class="bullet-list">
                         <li class="main-bullet">Project Goal: Fast, machine-learning-based phishing detection built for Discord's unique chat invariants.</li>
-<li class="main-bullet">Novel Dual-Stream Pipeline: 3,000 TF-IDF word n-grams + 17 engineered structural features.</li>
-<li class="main-bullet">Target Operational Latency: Sub-2ms CPU inference to prevent server message queuing backlogs.</li>
-<li class="main-bullet">Demonstration Overview: Architecture ↳  Code & Data ↳  Model Benchmarks ↳  Live Angular 18 Demo.</li>
+<li class="main-bullet">Novel Dual-Stream Pipeline: Combines 3,000 TF-IDF word n-grams (Stream A) with 17 engineered structural features (Stream B).</li>
+<li class="main-bullet">Target Operational Latency: Sub-2ms CPU inference to prevent server message queuing backlogs (achieves 1.2 ms).</li>
+<li class="main-bullet">Demonstration Overview: Architecture • Math • Data Engineering • Model Benchmarks • Live Angular 18 Demo.</li>
 
                     </ul>
                 </div>
@@ -318,12 +335,17 @@ Team #18: Edwin Lin (Solo Project)</p>
 
             <div class="speaker-notes-box">
                 <div class="notes-header">
-                    <strong>🎙 Presenter Speaking Cue (0:00 - 1:00)</strong>
+                    <strong>🎙 Presenter Spoken Dialogue (0:00 - 0:45)</strong>
                     <button class="toggle-notes-btn" onclick="toggleNotes(this)">Show Full Dialogue</button>
                 </div>
                 <div class="notes-body">
-                    <p><em>Roadmap for Professor:</em> Introduce yourself as Edwin Lin (Team #18, Solo Project). Give the 20-minute roadmap: Security threat -> Dual-stream architecture -> Code & data deduplication -> Terminal benchmarks & 100% recall audit -> Live 1.2ms Angular/FastAPI demo.</p>
-                    <p class="hint">Consult <code>DEMO_VIDEO_PRESENTATION_SCRIPT.md</code> for full word-for-word spoken dialogue.</p>
+                    <p>Hello Professor, and welcome to my final project demonstration for Machine Learning and Data Mining. My name is Edwin Lin, representing Team 18 as a solo project.</p><br><br><p>Today, I'm presenting Dual-Stream Detection of Discord Phishing Campaigns Using Words and Link Structure.</p><br><br><p>To give you a quick roadmap of what I'll cover over the next thirteen to fourteen minutes:
+First, I'll explain why Discord phishing is so dangerous and why simple keyword filters fail.
+Second, I'll explain my dual-stream architecture and the mathematical models behind it.
+Third, I'll walk through my data engineering and how I prevented data leakage using MD5 deduplication.
+Fourth, we'll look at the experimental benchmarks in the terminal and discuss my 100% recall result with scientific honesty.
+And fifth, I'll jump into my live Angular 18 and FastAPI web application to show you real-time classification in just 1.2 milliseconds.</p>
+                    <p class="hint">Consult <code>DEMO_VIDEO_PRESENTATION_SCRIPT.md</code> for additional checklist items and transitions.</p>
                 </div>
             </div>
         </section>
@@ -332,15 +354,15 @@ Team #18: Edwin Lin (Solo Project)</p>
             <div class="slide-header">
                 <div class="slide-title-wrap">
                     <span class="slide-num-pill">Slide 2 / 10</span>
-                    <span class="slide-time-pill"><i class="clock-icon">⏱</i> 1:00 - 2:30</span>
+                    <span class="slide-time-pill"><i class="clock-icon">⏱</i> 0:45 - 1:30</span>
                     <h2>Threat Context: Why Discord Phishing is Dangerous</h2>
-                    <p class="subtitle">Localized Trust Networks & Lateral Account Exploitation</p>
+                    <p class="subtitle">Localized Trust Networks & Lateral Account Hijacking</p>
                 </div>
             </div>
 
             <div class="action-banner">
                 <span class="action-badge">PRESENTER ACTION</span>
-                <span class="action-text">[SLIDE: Explain the 4 common attack pretexts]</span>
+                <span class="action-text">[SLIDE: Explain the 4 common attack pretexts & lateral spreading]</span>
             </div>
 
             <div class="slide-content two-col">
@@ -348,10 +370,10 @@ Team #18: Edwin Lin (Solo Project)</p>
                     <ul class="bullet-list">
                         <li class="main-bullet">Platform Topology: Discord is organized into semi-private servers and direct messages (DMs), not an open public feed.</li>
 <li class="main-bullet">Trust Exploitation: Compromised accounts blast malicious links to mutual servers and friends lists who inherently trust the sender.</li>
-<li class="main-bullet">Attack Vector 1: Fake Discord Nitro promotions (supposedly sponsored by Steam or Epic Games).</li>
-<li class="main-bullet">Attack Vector 2: Fake indie game beta playtest invites (.exe / .scr infostealers like RedLine).</li>
-<li class="main-bullet">Attack Vector 3: Community tournament voting links requiring third-party OAuth token grants.</li>
-<li class="main-bullet">Attack Vector 4: Fake cryptocurrency / wallet-drainer distribution portals.</li>
+<li class="main-bullet">Attack Vector 1 • Nitro Lures: Fake Discord Nitro promotions (supposedly sponsored by Steam or Epic Games).</li>
+<li class="main-bullet">Attack Vector 2 • Fake Game Tests: Indie game alpha playtest invites (.exe / .scr infostealers like RedLine).</li>
+<li class="main-bullet">Attack Vector 3 • Community Traps: Tournament voting links requiring third-party OAuth token grants.</li>
+<li class="main-bullet">Attack Vector 4 • Crypto Drainers: Fake cryptocurrency / wallet-drainer distribution portals.</li>
 
                     </ul>
                 </div>
@@ -370,12 +392,12 @@ Team #18: Edwin Lin (Solo Project)</p>
 
             <div class="speaker-notes-box">
                 <div class="notes-header">
-                    <strong>🎙 Presenter Speaking Cue (1:00 - 2:30)</strong>
+                    <strong>🎙 Presenter Spoken Dialogue (0:45 - 1:30)</strong>
                     <button class="toggle-notes-btn" onclick="toggleNotes(this)">Show Full Dialogue</button>
                 </div>
                 <div class="notes-body">
-                    <p><em>Plain Threat Explanation:</em> Explain that Discord is closed servers and friend DMs. Stolen accounts blast friends who inherently trust the sender. Walk through the 4 pretexts: Fake Nitro, game betas with infostealers, tournament votes, and crypto drainers.</p>
-                    <p class="hint">Consult <code>DEMO_VIDEO_PRESENTATION_SCRIPT.md</code> for full word-for-word spoken dialogue.</p>
+                    <p>Starting with Slide 2: why is Discord phishing unique compared to normal email spam?</p><br><br><p>Discord isn't an open public feed like Twitter—it's made of semi-private servers and direct messages between friends. When an attacker compromises an account using malware or a fake QR code login, automated scripts take over and immediately blast scam links to that user's friends list. Because the message comes from a friend you've known for months, your guard is down, and people click without thinking.</p><br><br><p>As you can see on Slide 2, scammers use four main pretexts: fake Discord Nitro giveaways, fake indie game alpha tests that contain malware, community tournament voting traps, and crypto drainers. Once a user clicks, their account gets hijacked too, and the infection spreads laterally across the server.</p>
+                    <p class="hint">Consult <code>DEMO_VIDEO_PRESENTATION_SCRIPT.md</code> for additional checklist items and transitions.</p>
                 </div>
             </div>
         </section>
@@ -384,25 +406,25 @@ Team #18: Edwin Lin (Solo Project)</p>
             <div class="slide-header">
                 <div class="slide-title-wrap">
                     <span class="slide-num-pill">Slide 3 / 10</span>
-                    <span class="slide-time-pill"><i class="clock-icon">⏱</i> 2:30 - 3:30</span>
+                    <span class="slide-time-pill"><i class="clock-icon">⏱</i> 1:30 - 2:30</span>
                     <h2>Failure Modes of Deterministic Filters (AutoMod)</h2>
-                    <p class="subtitle">Why Keyword Lists & Regular Expressions Break Down</p>
+                    <p class="subtitle">Why Keyword Blocklists & Regular Expressions Break Down</p>
                 </div>
             </div>
 
             <div class="action-banner">
                 <span class="action-badge">PRESENTER ACTION</span>
-                <span class="action-text">[SLIDE: Contrast regex matching vs. modern evasion tricks]</span>
+                <span class="action-text">[SLIDE: Contrast regex byte matching vs. modern evasion tricks]</span>
             </div>
 
             <div class="slide-content two-col">
                 <div class="slide-text-col">
                     <ul class="bullet-list">
-                        <li class="main-bullet">Discord AutoMod & Community Bots (MEE6, Dyno) rely almost entirely on static regexes and keyword blocklists.</li>
-<li class="main-bullet">Evasion Trick 1 ↳ Cyrillic Homoglyphs: Replacing Latin 'o' (U+006F) with Cyrillic 'о' (U+043E). Visually identical, but completely bypasses ASCII regex.</li>
-<li class="main-bullet">Evasion Trick 2 ↳ Markdown Link Masking: '[https://discord.com/nitro](https://phishing.xyz)' renders a blue trusted URL, but clicks route to a credential harvester.</li>
-<li class="main-bullet">Evasion Trick 3 ↳ Casual Pretexts: Multi-turn conversational openers ('Hey are you free right now?') contain no URLs, evading initial filters.</li>
-<li class="main-bullet">Empirical Benchmark Result: AutoMod regex F1 drops by 37.2% (0.8598 ↳  0.4876) under basic evasion.</li>
+                        <li class="main-bullet">Industry Standard: Discord AutoMod and bot filters (MEE6, Dyno) rely almost entirely on static regexes and keyword blocklists.</li>
+<li class="main-bullet">Evasion Trick 1 • Cyrillic Homoglyphs: Swapping Latin 'o' (U+006F) with Cyrillic 'о' (U+043E) looks identical to humans but breaks ASCII regex.</li>
+<li class="main-bullet">Evasion Trick 2 • Markdown Link Masking: '[discord.com/nitro](evil.xyz)' renders a blue trusted URL while routing clicks to credential harvesters.</li>
+<li class="main-bullet">Evasion Trick 3 • Casual Pretexts: Multi-turn openers ('Hey are you free right now?') contain no URLs to slip past entry filters.</li>
+<li class="main-bullet">Empirical Benchmark: AutoMod regex F1 crashes by 37.2% (0.8598 → 0.4876) under basic evasion.</li>
 
                     </ul>
                 </div>
@@ -421,12 +443,15 @@ Team #18: Edwin Lin (Solo Project)</p>
 
             <div class="speaker-notes-box">
                 <div class="notes-header">
-                    <strong>🎙 Presenter Speaking Cue (2:30 - 3:30)</strong>
+                    <strong>🎙 Presenter Spoken Dialogue (1:30 - 2:30)</strong>
                     <button class="toggle-notes-btn" onclick="toggleNotes(this)">Show Full Dialogue</button>
                 </div>
                 <div class="notes-body">
-                    <p><em>Why Simple Filters Fail:</em> Explain that Russian Cyrillic letters like Cyrillic o look identical to English o to a human, but break regex byte checks. Markdown hides true URLs. Emphasize that AutoMod F1 crashes by 37.2% under basic evasion.</p>
-                    <p class="hint">Consult <code>DEMO_VIDEO_PRESENTATION_SCRIPT.md</code> for full word-for-word spoken dialogue.</p>
+                    <p>To stop these scams, Discord servers usually rely on Discord AutoMod or community bots like MEE6. But almost all of them rely on basic keyword blocklists and regular expressions.</p><br><br><p>Scammers easily bypass them using three clever tricks:
+1. Cyrillic Homoglyphs: Attackers swap English letters for visually identical Russian Cyrillic letters—like using Cyrillic 'о' (Unicode U+043E) instead of English 'o'. To a human eye, discord.com looks 100% identical. But to a computer's regex matching ASCII bytes, they don't match, so AutoMod lets the scam right through!
+2. Markdown Masking: Discord chat allows Markdown formatting like [discord.com/nitro](evil.xyz). The chat displays a blue, trusted link, but clicking it sends the victim to a credential stealer.
+3. Casual Pretexts: Opening with 'Hey, are you free?' with no links at all, waiting for a reply before sending the lure.</p><br><br><p>When I benchmarked AutoMod regex against these evasion tricks, its F1-score crashed by 37.2%, dropping from 0.8598 down to 0.4876. That failure motivated my machine learning approach.</p>
+                    <p class="hint">Consult <code>DEMO_VIDEO_PRESENTATION_SCRIPT.md</code> for additional checklist items and transitions.</p>
                 </div>
             </div>
         </section>
@@ -435,7 +460,7 @@ Team #18: Edwin Lin (Solo Project)</p>
             <div class="slide-header">
                 <div class="slide-title-wrap">
                     <span class="slide-num-pill">Slide 4 / 10</span>
-                    <span class="slide-time-pill"><i class="clock-icon">⏱</i> 3:30 - 5:30</span>
+                    <span class="slide-time-pill"><i class="clock-icon">⏱</i> 2:30 - 3:30</span>
                     <h2>System Architecture: Dual-Stream Feature Fusion</h2>
                     <p class="subtitle">Pairing Semantic Context with Structural Domain Invariants</p>
                 </div>
@@ -443,18 +468,17 @@ Team #18: Edwin Lin (Solo Project)</p>
 
             <div class="action-banner">
                 <span class="action-badge">PRESENTER ACTION</span>
-                <span class="action-text">[SLIDE / ARCHITECTURE DIAGRAM: Walk through the 5-stage pipeline]</span>
+                <span class="action-text">[SLIDE: Walk through the two feature streams & explain why XGBoost beats BERT]</span>
             </div>
 
             <div class="slide-content two-col">
                 <div class="slide-text-col">
                     <ul class="bullet-list">
-                        <li class="main-bullet">Stage 1 ↳ Normalization: Strips snowflake IDs (<@!123...>) while preserving raw URLs, Markdown, and Unicode for heuristic checks.</li>
-<li class="main-bullet">Stage 2 ↳ Stream A (Semantics): 3,000 TF-IDF word n-grams (unigrams & bigrams) capture high-pressure scam language.</li>
-<li class="main-bullet">Stage 3 ↳ Stream B (Structure): 17 engineered scalar features capture platform invariants attackers cannot easily hide.</li>
-<li class="main-bullet">Stage 4 ↳ Horizontal Stacking: Concatenates sparse TF-IDF with dense heuristics into X in R^3017.</li>
-<li class="main-bullet">Stage 5 ↳ XGBoost Ensemble: Evaluates vector in 1.2 ms on CPU. Scores >= 0.80 auto-quarantine; 0.50-0.80 human mod review.</li>
-<li class="main-bullet">Why XGBoost over DistilBERT? 1.2 ms vs 150-300 ms CPU latency, no subword tokenizer fragmentation, natural tabular tree splits.</li>
+                        <li class="main-bullet">Core Security Insight: Scammers alter text in seconds, but MUST direct victims to external infrastructure they control.</li>
+<li class="main-bullet">Stream A (Semantic Meaning): 3,000 TF-IDF word n-grams (unigrams & bigrams) capture high-pressure scam language ('free', 'nitro', 'claim').</li>
+<li class="main-bullet">Stream B (Structural Invariants): 17 scalar features capture link patterns (homoglyphs, cloaked Markdown, brand edit distance, entropy).</li>
+<li class="main-bullet">Fused Representation: Concatenates into a 3,017-dimensional vector evaluated by an XGBoost gradient-boosted decision tree ensemble.</li>
+<li class="main-bullet">Why XGBoost over BERT? Runs in 1.2ms vs 150-300ms on CPU (no chat lag) and avoids subword token fragmentation on Cyrillic letters.</li>
 
                     </ul>
                 </div>
@@ -473,12 +497,17 @@ Team #18: Edwin Lin (Solo Project)</p>
 
             <div class="speaker-notes-box">
                 <div class="notes-header">
-                    <strong>🎙 Presenter Speaking Cue (3:30 - 5:30)</strong>
+                    <strong>🎙 Presenter Spoken Dialogue (2:30 - 3:30)</strong>
                     <button class="toggle-notes-btn" onclick="toggleNotes(this)">Show Full Dialogue</button>
                 </div>
                 <div class="notes-body">
-                    <p><em>Two-Stream Concept:</em> Scammers can change words in seconds, but MUST send you to a controlled link. Stream A looks at 3,000 words; Stream B extracts 17 structural clues. Explain why XGBoost (1.2 ms on CPU, stable on lookalikes) beats heavy BERT models (150-300 ms).</p>
-                    <p class="hint">Consult <code>DEMO_VIDEO_PRESENTATION_SCRIPT.md</code> for full word-for-word spoken dialogue.</p>
+                    <p>On Slide 4 is the solution I designed: a Dual-Stream Feature Fusion Pipeline.
+The core insight is: Scammers can change their words in five seconds, but to steal credentials, they MUST send you to an external website they control.</p><br><br><p>So I split feature extraction into two streams:
+- Stream A (Semantic Meaning): Takes the message text and extracts 3,000 TF-IDF word features—both unigrams and bigrams—to capture high-pressure scam language like 'free', 'nitro', and 'claim'.
+- Stream B (Structural Clues): Extracts 17 numerical features that don't depend on specific words: it counts lookalike Russian characters, detects cloaked Markdown links, checks similarity to real brand names, and measures how random the link is.</p><br><br><p>I concatenate these into a single 3,017-dimensional vector and pass it to an XGBoost gradient-boosted decision tree ensemble.</p><br><br><p>I chose XGBoost over a heavy transformer like BERT for two practical reasons:
+First, speed: BERT takes 150 to 300 ms on a CPU, which causes chat backlogs on busy servers. XGBoost runs in just 1.2 milliseconds.
+Second, BERT's subword tokenizer fragments lookalike characters into weird pieces that degrade embeddings, whereas decision trees handle tabular structural rules naturally.</p>
+                    <p class="hint">Consult <code>DEMO_VIDEO_PRESENTATION_SCRIPT.md</code> for additional checklist items and transitions.</p>
                 </div>
             </div>
         </section>
@@ -487,26 +516,26 @@ Team #18: Edwin Lin (Solo Project)</p>
             <div class="slide-header">
                 <div class="slide-title-wrap">
                     <span class="slide-num-pill">Slide 5 / 10</span>
-                    <span class="slide-time-pill"><i class="clock-icon">⏱</i> 5:30 - 6:30</span>
-                    <h2>Mathematical Formulations & Algorithmic Optimizations</h2>
-                    <p class="subtitle">Levenshtein Distance, Shannon Entropy, and Minimax Hardening</p>
+                    <span class="slide-time-pill"><i class="clock-icon">⏱</i> 3:30 - 4:30</span>
+                    <h2>Mathematical Formulations Demystified</h2>
+                    <p class="subtitle">Levenshtein Early Exit, Shannon Entropy, and Minimax Risk</p>
                 </div>
             </div>
 
             <div class="action-banner">
                 <span class="action-badge">PRESENTER ACTION</span>
-                <span class="action-text">[SLIDE / FORMULAS: Highlight mathematical models]</span>
+                <span class="action-text">[SLIDE / FORMULAS: Plain-English explanation of mathematical models]</span>
             </div>
 
             <div class="slide-content two-col">
                 <div class="slide-text-col">
                     <ul class="bullet-list">
                         <li class="main-bullet">1. Minimum Levenshtein Distance (d_min): Dynamic programming edit distance to canonical platforms (discord.com, steamcommunity.com).</li>
-<li class="sub-bullet">   ↳  Optimization: Early-exit check skips O(NM) matrix if absolute string length difference > 4.</li>
-<li class="main-bullet">2. Shannon Domain Entropy (H(d)): Quantifies character distribution randomness to catch automated DGAs.</li>
-<li class="sub-bullet">   ↳  H(d) = ↳ sum p(c) * log2(p(c)). Clean platforms score 2.0-2.8; machine-generated scam strings score > 3.5.</li>
-<li class="main-bullet">3. Minimax Adversarial Formulation: Trains trees against worst-case synthetic perturbations (homoglyphs + Markdown cloaking):</li>
-<li class="sub-bullet">   ↳  min_theta E [ max_{delta in Delta} L(f_theta(x + delta), y) ].</li>
+<li class="sub-bullet">• Optimization: Early-exit check skips O(NM) matrix calculation if absolute string length difference > 4.</li>
+<li class="main-bullet">2. Shannon Domain Entropy (H(d)): Quantifies character randomness from information theory: H(d) = -Σ p(c) log2(p(c)).</li>
+<li class="sub-bullet">• Natural language domains score 2.0–2.8; automated bot-generated scam strings score > 3.5 (red flag).</li>
+<li class="main-bullet">3. Minimax Adversarial Formulation: Actively attacks training data with synthetic homoglyphs and disguised links:</li>
+<li class="sub-bullet">• min_θ E [ max_{δ ∈ Δ} L(f_θ(x + δ), y) ] — forces decision trees to learn robust, evasive split boundaries.</li>
 
                     </ul>
                 </div>
@@ -525,12 +554,15 @@ Team #18: Edwin Lin (Solo Project)</p>
 
             <div class="speaker-notes-box">
                 <div class="notes-header">
-                    <strong>🎙 Presenter Speaking Cue (5:30 - 6:30)</strong>
+                    <strong>🎙 Presenter Spoken Dialogue (3:30 - 4:30)</strong>
                     <button class="toggle-notes-btn" onclick="toggleNotes(this)">Show Full Dialogue</button>
                 </div>
                 <div class="notes-body">
-                    <p><em>Demystifying the Math:</em> 1) Levenshtein distance checks typosquatting with an early length exit to save CPU time. 2) Shannon entropy measures how scrambled/random a domain is. 3) Minimax hardening trains on simulated attacks so the trees learn rules that survive sneaky tricks.</p>
-                    <p class="hint">Consult <code>DEMO_VIDEO_PRESENTATION_SCRIPT.md</code> for full word-for-word spoken dialogue.</p>
+                    <p>On Slide 5, let me explain the three main mathematical formulas powering Stream B in plain terms:</p><br><br><p>1. Minimum Levenshtein Distance (d_min):
+This measures the edit distance—insertions, deletions, or substitutions—between extracted links and real brands like discord.com and steamcommunity.com. If a scammer sends discoord.com, the distance is only 1. To make this fast, I added an early-exit check: if the length difference between the two words is already greater than 4 characters, I skip the expensive nested loops entirely because it's impossible for the edit distance to be small.</p><br><br><p>2. Shannon Domain Entropy (H(d)):
+This comes from information theory and measures randomness. Real company names like discord or steam use normal, pronounceable letter combinations, so they have low entropy (between 2.0 and 2.8). But automated scam bots spit out random, gibberish domains like x7k9-free-nitro.ru. Shannon entropy gives me a single number measuring how scrambled the letters are. Anything above 3.5 is an immediate red flag.</p><br><br><p>3. Minimax Adversarial Hardening:
+Instead of just training on normal scams, I formulated training as a minimax problem: my code actively attacks its own dataset during training with synthetic homoglyphs and disguised links, forcing the decision trees to learn split rules that survive sneaky tricks.</p>
+                    <p class="hint">Consult <code>DEMO_VIDEO_PRESENTATION_SCRIPT.md</code> for additional checklist items and transitions.</p>
                 </div>
             </div>
         </section>
@@ -539,25 +571,25 @@ Team #18: Edwin Lin (Solo Project)</p>
             <div class="slide-header">
                 <div class="slide-title-wrap">
                     <span class="slide-num-pill">Slide 6 / 10</span>
-                    <span class="slide-time-pill"><i class="clock-icon">⏱</i> 6:30 - 8:30</span>
-                    <h2>Data Engineering & Threat Feed Integration</h2>
-                    <p class="subtitle">3,552 Balanced Messages with MD5 Hash Deduplication</p>
+                    <span class="slide-time-pill"><i class="clock-icon">⏱</i> 4:30 - 5:30</span>
+                    <h2>Data Engineering & MD5 Deduplication</h2>
+                    <p class="subtitle">3,552 Balanced Messages with Leakage Prevention</p>
                 </div>
             </div>
 
             <div class="action-banner">
                 <span class="action-badge">PRESENTER ACTION</span>
-                <span class="action-text">[SWITCH TO VS CODE: Open data_loader.py & feature_extractor.py]</span>
+                <span class="action-text">[SLIDE / CODE: Explain data provenance, ethics compliance, and deduplication]</span>
             </div>
 
             <div class="slide-content two-col">
                 <div class="slide-text-col">
                     <ul class="bullet-list">
-                        <li class="main-bullet">Provenance: 2,000 Hugging Face phishing messages + 21,908 Nikolaischunk threat feed domains + 1,500 modern playbooks + 2,500 clean chat logs.</li>
+                        <li class="main-bullet">Data Provenance: 2,000 Hugging Face scams + 21,908 Nikolaischunk malicious domains + 1,500 attack playbooks + 2,500 clean chat logs.</li>
 <li class="main-bullet">Platform Privacy Compliance: Built strictly from public research data to respect Discord Developer Policy Section 21.</li>
-<li class="main-bullet">Critical Deduplication Step: Raw Hugging Face data had hundreds of duplicate Nitro spam copies. Filtered via MD5 hashes to prevent train-test leakage.</li>
-<li class="main-bullet">Splits: Stratified 80% train (2,841), 10% validation (355), 10% clean test (356) + separate 356-sample adversarial evaluation set.</li>
-<li class="main-bullet">Feature Extractor Implementation: Globally precompiled regexes to avoid 15x per-message compilation bottleneck.</li>
+<li class="main-bullet">Critical Deduplication Step: Raw Hugging Face data had hundreds of duplicate Nitro spam copies.</li>
+<li class="main-bullet">MD5 Hash Filtering: Cleaned exact spam duplicates in data_loader.py to prevent train-test memorization leakage.</li>
+<li class="main-bullet">Final Dataset: 3,552 unique messages split 80% train (2,841), 10% validation (355), 10% clean test (356) + 356 adversarial test samples.</li>
 
                     </ul>
                 </div>
@@ -576,12 +608,19 @@ Team #18: Edwin Lin (Solo Project)</p>
 
             <div class="speaker-notes-box">
                 <div class="notes-header">
-                    <strong>🎙 Presenter Speaking Cue (6:30 - 8:30)</strong>
+                    <strong>🎙 Presenter Spoken Dialogue (4:30 - 5:30)</strong>
                     <button class="toggle-notes-btn" onclick="toggleNotes(this)">Show Full Dialogue</button>
                 </div>
                 <div class="notes-body">
-                    <p><em>Data Engineering & Leakage:</em> 3,552 messages from public datasets and threat feeds. Emphasize MD5 deduplication: explain how removing duplicate Nitro spam prevented the model from cheating on the test set. Mention pre-compiled regexes running 15x faster.</p>
-                    <p class="hint">Consult <code>DEMO_VIDEO_PRESENTATION_SCRIPT.md</code> for full word-for-word spoken dialogue.</p>
+                    <p>Looking at Slide 6, let's discuss the dataset.
+To respect Discord's Developer Policy Section 21—which strictly bans saving private user chats for machine learning without consent—I built my dataset entirely from public research data:
+- 2,000 verified phishing messages from Hugging Face.
+- 21,908 verified malicious domains from the Nikolaischunk threat feed.
+- 1,500 modern attack playbooks modeling fake game playtests and OAuth traps.
+- Balanced against 2,500 clean, everyday gaming messages from open research logs.</p><br><br><p>But here was the most critical data engineering step: MD5 deduplication.
+The raw Hugging Face data had hundreds of duplicate copies of the exact same Nitro gift spam. If I hadn't filtered them out, the model would have memorized those exact messages and cheated on the test set.
+Using an MD5 hash and text-normalization filter in data_loader.py, I eliminated all duplicate spam copies, producing a clean, balanced corpus of 3,552 unique messages split 80% train, 10% validation, and 10% test.</p>
+                    <p class="hint">Consult <code>DEMO_VIDEO_PRESENTATION_SCRIPT.md</code> for additional checklist items and transitions.</p>
                 </div>
             </div>
         </section>
@@ -591,24 +630,25 @@ Team #18: Edwin Lin (Solo Project)</p>
                 <div class="slide-title-wrap">
                     <span class="slide-num-pill">Slide 7 / 10</span>
                     <span class="slide-time-pill"><i class="clock-icon">⏱</i> 5:30 - 7:00</span>
-                    <h2>Showcase Pipeline: Model Benchmarks &amp; Justifications</h2>
-                    <p class="subtitle">Why We Evaluated Each Architecture &amp; Validated Stream B (Tables I &amp; II)</p>
+                    <h2>Showcase Pipeline: Model Progression & Justifications</h2>
+                    <p class="subtitle">Running 'py run_showcase_pipeline.py' & Benchmarking 6 Models (Tables I & II)</p>
                 </div>
             </div>
 
             <div class="action-banner">
                 <span class="action-badge">PRESENTER ACTION</span>
-                <span class="action-text">[TERMINAL: Run 'py run_showcase_pipeline.py' &amp; explain model choices]</span>
+                <span class="action-text">[TERMINAL: Run 'py run_showcase_pipeline.py' in VS Code & explain model choices]</span>
             </div>
 
             <div class="slide-content two-col">
                 <div class="slide-text-col">
                     <ul class="bullet-list">
-                        <li class="main-bullet"><strong>Step 1 (Ingestion &amp; Dedup):</strong> Ingests 21k threat domains; MD5 hash filter removes duplicate Nitro spam to prevent train-test data leakage.</li>
-                        <li class="main-bullet"><strong>Step 2 (AutoMod vs. Linear NLP):</strong> AutoMod crashes by 37.2% under evasion. Naive Bayes, LogReg, and SVM drop to 0.44–0.49 recall because character lookalikes fall outside their vocabulary.</li>
-                        <li class="main-bullet"><strong>Step 3 (Why XGBoost over RF &amp; BERT):</strong> Random Forest takes 3.4 ms. XGBoost was selected for production because sequential gradient boosting runs in 1.2 ms on CPU and partitions non-linear tabular heuristics naturally without BERT's subword tokenization fragmentation.</li>
-                        <li class="main-bullet"><strong>Step 4 (3-Way Feature Ablation):</strong> Stream B alone gets 0.7748 F1 under attack (+14.1% over text alone), proving link invariants remain stable when words are scrambled.</li>
-                        <li class="main-bullet"><strong>Step 5 (Minimax Hardening):</strong> Injects synthetic homoglyphs into training, recovering adversarial F1 to 0.9780.</li>
+                        <li class="main-bullet">Master Showcase Script: 'py run_showcase_pipeline.py' runs all 5 ML steps end-to-end in just 17 seconds.</li>
+<li class="main-bullet">Step 1 • Ingestion: Deduplicates 6,000 raw samples to 3,552 unique messages via MD5 hashing to prevent test memorization.</li>
+<li class="main-bullet">Step 2 • Baseline Justifications: AutoMod regex crashes by -37.2% F1. Naive Bayes, LogReg, and SVM drop to 0.44-0.49 recall because Cyrillic letters are OOV.</li>
+<li class="main-bullet">Step 3 • Fused Tree Ensembles: Random Forest (bagging) scores 0.7273 F1 in 3.4ms; XGBoost (gradient boosting) targets hard edge cases, scoring 0.8078 F1 in 1.2ms.</li>
+<li class="main-bullet">Step 4 • Feature Ablation (Table II): Stream A (text alone) drops -34% under attack; Stream B (structure alone) achieves 0.7748 F1 (+14.1% over text)!</li>
+
                     </ul>
                 </div>
                 
@@ -616,9 +656,9 @@ Team #18: Edwin Lin (Solo Project)</p>
                 <div class="image-wrapper">
                     <div class="image-header">
                         <span class="image-tag">VISUAL</span>
-                        <span class="image-title">Live Dashboard: Model Analytics, ROC Curves &amp; Ablation</span>
+                        <span class="image-title">Live Dashboard: Model Analytics, ROC Curves & Ablation</span>
                     </div>
-                    <img src="slides_assets/workbench_analytics.png" alt="Live Dashboard: Model Analytics, ROC Curves &amp; Ablation" />
+                    <img src="slides_assets/workbench_analytics.png" alt="Live Dashboard: Model Analytics, ROC Curves & Ablation" />
                 </div>
             </div>
             
@@ -626,12 +666,12 @@ Team #18: Edwin Lin (Solo Project)</p>
 
             <div class="speaker-notes-box">
                 <div class="notes-header">
-                    <strong>🎙 Presenter Speaking Cue (5:30 - 7:00)</strong>
+                    <strong>🎙 Presenter Spoken Dialogue (5:30 - 7:00)</strong>
                     <button class="toggle-notes-btn" onclick="toggleNotes(this)">Show Full Dialogue</button>
                 </div>
                 <div class="notes-body">
-                    <p><em>Explaining the Pipeline &amp; Models:</em> Run <code>py run_showcase_pipeline.py</code> live. Walk through the 5 steps: 1) MD5 dedup stops data leakage. 2) AutoMod crashes (-37.2%) and linear NLP models drop because lookalikes break vocabulary. 3) Explain why XGBoost was chosen over Random Forest and BERT (1.2 ms CPU latency, tabular stability). 4) Ablation: Stream B alone gets 0.7748 F1 under attack (+14.1% over text alone). 5) Minimax hardening recovers to 0.9780 F1.</p>
-                    <p class="hint">Consult <code>DEMO_VIDEO_PRESENTATION_SCRIPT.md</code> for full word-for-word spoken dialogue.</p>
+                    <p>Now let's examine our experimental results. In my terminal, I'm going to run my master pipeline script: py run_showcase_pipeline.py.</p><br><br><p>Look at how fast this executes—in just seventeen seconds, it executes the entire machine learning pipeline end-to-end: data ingestion, baseline evaluations, dual-stream training, ablation analysis, and adversarial hardening.</p><br><br><p>Let me explain what is happening on screen and why I tested and chose each specific model:</p><br><br><p>1. Step 1 (Data Ingestion & Deduplication): Notice that it loaded 6,000 raw messages and deduplicated them down to 3,552 unique messages. That eliminated hundreds of duplicate Nitro spam copies so the model wouldn't memorize the training set.</p><br><br><p>2. Step 2 (Baseline Models Benchmark — Table I): Why did I evaluate AutoMod, Naive Bayes, Logistic Regression, and SVM? Because I needed to test whether standard industry defenses and traditional NLP models could handle Discord phishing. As you can see in Table I: on clean text, they all score above 0.96 F1. But under adversarial evasion, AutoMod regex crashes by 37.2% down to 0.4876 F1 because regex breaks when letters are swapped. Naive Bayes, Logistic Regression, and SVM all collapse to around 0.44 to 0.49 recall because mutated Russian letters fall completely outside their vocabulary dictionary!</p><br><br><p>3. Step 3 (Dual-Stream Fused Models — Random Forest vs. XGBoost): Why did I compare Random Forest against XGBoost on the 3,017 fused features? Both models use decision trees, which naturally handle tabular data like link counts, edit distance, and entropy. Random Forest uses bagging, which scored 0.7273 F1 under attack, but takes 3.4 milliseconds. I chose XGBoost as our primary model because gradient boosting builds sequential trees that specifically target previously misclassified edge cases. It achieved 0.8078 F1 before hardening and runs in just 1.2 milliseconds on CPU—which is critical for live Discord server throughput.</p><br><br><p>4. Step 4 (3-Way Feature Ablation — Table II): Why run an ablation study? To prove whether Stream B (the 17 structural clues) actually adds value. Look at the numbers: Stream A (text alone) crashes by -34% under attack. But Stream B alone gets 0.7748 F1—beating text alone by 14.1%! This proves that domain edit distance and entropy stay invariant even when the attacker scrambles the words.</p>
+                    <p class="hint">Consult <code>DEMO_VIDEO_PRESENTATION_SCRIPT.md</code> for additional checklist items and transitions.</p>
                 </div>
             </div>
         </section>
@@ -640,7 +680,7 @@ Team #18: Edwin Lin (Solo Project)</p>
             <div class="slide-header">
                 <div class="slide-title-wrap">
                     <span class="slide-num-pill">Slide 8 / 10</span>
-                    <span class="slide-time-pill"><i class="clock-icon">⏱</i> 10:30 - 12:00</span>
+                    <span class="slide-time-pill"><i class="clock-icon">⏱</i> 7:00 - 8:00</span>
                     <h2>Adversarial Hardening & Honest Review of 100% Recall</h2>
                     <p class="subtitle">Table III: Minimax Training, Generator Overlap, and 5-Fold CV Variance</p>
                 </div>
@@ -648,7 +688,7 @@ Team #18: Edwin Lin (Solo Project)</p>
 
             <div class="action-banner">
                 <span class="action-badge">PRESENTER ACTION</span>
-                <span class="action-text">[SLIDE / TERMINAL: Discuss Table III results & threats to validity]</span>
+                <span class="action-text">[SLIDE: Discuss Table III results, 100% recall critique, and cross-validation]</span>
             </div>
 
             <div class="slide-content two-col">
@@ -656,8 +696,8 @@ Team #18: Edwin Lin (Solo Project)</p>
                     <ul class="bullet-list">
                         <li class="main-bullet">Minimax Hardening: Augmenting 25% of training scam samples with homoglyphs and Markdown disguises recovers adversarial F1 to 0.9780.</li>
 <li class="main-bullet">The 100% Recall Artifact: The model caught 178 of 178 test scams (1.0000 recall).</li>
-<li class="sub-bullet">  ↳  Honest Critique: Both training augmentation and test evaluation used 'build_adversarial_variant'. In this closed distribution, homoglyph_count >= 1 became a near-perfect split rule (jumping from #14 to #5 in tree importance).</li>
-<li class="main-bullet">Cross-Validation Variance: 5-fold CV with randomized mutation seeds yields 0.9888 +/↳ 0.0112 recall and 0.9780 +/↳ 0.0094 F1.</li>
+<li class="sub-bullet">• Candid Scientific Critique: Both training augmentation and test evaluation used 'build_adversarial_variant'. In this closed distribution, homoglyph_count >= 1 became a near-perfect split rule (jumping from #14 to #5 in tree importance).</li>
+<li class="main-bullet">5-Fold Cross-Validation: With randomized mutation seeds, achieves 0.9888 ± 0.0112 recall and 0.9780 ± 0.0094 F1.</li>
 <li class="main-bullet">Real-World Zero-Day Limitations: Unseen Unicode scripts, RTL override characters, and image QR codes will inevitably lower open-world recall.</li>
 
                     </ul>
@@ -677,12 +717,14 @@ Team #18: Edwin Lin (Solo Project)</p>
 
             <div class="speaker-notes-box">
                 <div class="notes-header">
-                    <strong>🎙 Presenter Speaking Cue (10:30 - 12:00)</strong>
+                    <strong>🎙 Presenter Spoken Dialogue (7:00 - 8:00)</strong>
                     <button class="toggle-notes-btn" onclick="toggleNotes(this)">Show Full Dialogue</button>
                 </div>
                 <div class="notes-body">
-                    <p><em>Honest Review of 100% Recall:</em> Explain to the professor that 100% test recall happened because both training and evaluation used build_adversarial_variant(), making homoglyph_count an easy tree split. Show the 5-fold CV variance (0.9888 +/- 0.0112 recall) to prove real-world robustness.</p>
-                    <p class="hint">Consult <code>DEMO_VIDEO_PRESENTATION_SCRIPT.md</code> for full word-for-word spoken dialogue.</p>
+                    <p>Now in Step 5 of the pipeline and on Slide 8, let's look at Minimax Adversarial Hardening:</p><br><br><p>Why did I add adversarial hardening?
+Because a standard model only learns from clean historical data. By actively injecting synthetic lookalike characters and disguised links into 25% of training scams, the decision trees were forced to learn split rules that survive evasion. After hardening, adversarial F1 recovered to 0.9780, catching 178 out of 178 test scams—a 100% recall.</p><br><br><p>Now, Professor, I want to address this 100% recall with complete scientific honesty:
+Whenever you see 100% in machine learning, that is usually a red flag. In my case, there is a clear reason why it happened: Because I used the same mutation script (build_adversarial_variant) to create the training mutations as I did to evaluate the test set, the decision trees learned that homoglyph_count >= 1 was an easy shortcut! That feature jumped from the #14 feature all the way up to the #5 most important feature in tree gain.</p><br><br><p>In the open real world against brand-new zero-day attacks, recall will naturally be lower. That is why I ran 5-fold cross-validation with randomized mutation seeds: across the 5 folds, the model achieved 0.9888 ± 0.0112 recall and 0.9780 ± 0.0094 F1. That confirms my structural features are genuinely robust within a tight 1% variance.</p>
+                    <p class="hint">Consult <code>DEMO_VIDEO_PRESENTATION_SCRIPT.md</code> for additional checklist items and transitions.</p>
                 </div>
             </div>
         </section>
@@ -691,7 +733,7 @@ Team #18: Edwin Lin (Solo Project)</p>
             <div class="slide-header">
                 <div class="slide-title-wrap">
                     <span class="slide-num-pill">Slide 9 / 10</span>
-                    <span class="slide-time-pill"><i class="clock-icon">⏱</i> 12:00 - 15:30</span>
+                    <span class="slide-time-pill"><i class="clock-icon">⏱</i> 8:00 - 11:15</span>
                     <h2>Live Demonstration: Classifier & SHAP Explainability</h2>
                     <p class="subtitle">Real-Time 1.2ms Inference on Angular 18 & FastAPI</p>
                 </div>
@@ -699,17 +741,17 @@ Team #18: Edwin Lin (Solo Project)</p>
 
             <div class="action-banner">
                 <span class="action-badge">PRESENTER ACTION</span>
-                <span class="action-text">[SWITCH TO BROWSER: http://localhost:4200/ - Test Presets Live]</span>
+                <span class="action-text">[BROWSER: http://localhost:4200/ - Live inference on Presets 1, 2, 3 & SHAP bars]</span>
             </div>
 
             <div class="slide-content two-col">
                 <div class="slide-text-col">
                     <ul class="bullet-list">
-                        <li class="main-bullet">Test 1 ↳ Benign Chat: 'Hey man, hopping on Valorant tonight?' ↳  0.02% scam probability (Green Approved Badge).</li>
-<li class="main-bullet">Test 2 ↳ Classic Nitro: '@everyone Steam free nitro https://discord-nitro-gift.ru/claim' ↳  99.85% (AUTO-QUARANTINE).</li>
-<li class="main-bullet">Test 3 ↳ Cyrillic Homoglyphs: 'https://dіscord.com/gifts' (with Cyrillic 'і' U+0456) ↳  AutoMod misses, our model flags at 99.42%!</li>
-<li class="main-bullet">Test 4 ↳ Markdown Masking: '[https://discord.com/nitro](https://grabify-stealer.xyz)' ↳  Flags destination domain at 99.78%.</li>
-<li class="main-bullet">Explainability: Local SHAP waterfall charts clearly explain why each heuristic contributed to the final score.</li>
+                        <li class="main-bullet">Full-Stack Architecture: Angular 18 (Port 4200) frontend communicating with FastAPI (Port 8000) backend in 1.2 ms.</li>
+<li class="main-bullet">Live Test 1 • Benign Chat: 'Hey man, hopping on Valorant tonight?' → 0.02% scam probability (Green Approved, SHAP negative push).</li>
+<li class="main-bullet">Live Test 2 • Classic Nitro: '@everyone Steam free nitro https://discord-nitro-gift.ru/claim' → 99.85% (AUTO-QUARANTINE, urgency + domain flags).</li>
+<li class="main-bullet">Live Test 3 • Cyrillic Homoglyph: 'https://dіscord.com/gifts' (Cyrillic 'і' U+0456) → AutoMod misses, our model flags at 99.42%!</li>
+<li class="main-bullet">Local SHAP Attribution: Feature importance bars clearly show the exact structural rules that triggered the quarantine verdict.</li>
 
                     </ul>
                 </div>
@@ -728,12 +770,12 @@ Team #18: Edwin Lin (Solo Project)</p>
 
             <div class="speaker-notes-box">
                 <div class="notes-header">
-                    <strong>🎙 Presenter Speaking Cue (12:00 - 15:30)</strong>
+                    <strong>🎙 Presenter Spoken Dialogue (8:00 - 11:15)</strong>
                     <button class="toggle-notes-btn" onclick="toggleNotes(this)">Show Full Dialogue</button>
                 </div>
                 <div class="notes-body">
-                    <p><em>Live Interface Demo:</em> Switch to Chrome (http://localhost:4200/). Point out 1.2 ms latency counter. Test clean chat (0.02% risk, green approved), classic Nitro (99.85% quarantine), and Cyrillic homoglyph (AutoMod misses, our model catches at 99.42%). Explain the green/red SHAP bars.</p>
-                    <p class="hint">Consult <code>DEMO_VIDEO_PRESENTATION_SCRIPT.md</code> for full word-for-word spoken dialogue.</p>
+                    <p>Now let's transition to the live system demonstration. I wanted to build a complete, production-ready tool. So I wrapped the trained models and feature extractor in a FastAPI backend running on port 8000, and I built this modern dashboard in Angular 18 running on port 4200.</p><br><br><p>At the top, you can see our live status banner: connected to FastAPI, using model xgboost_hardened.joblib, and showing an end-to-end latency counter currently at 1.2 milliseconds.</p><br><br><p>Let's test the detector across real-world test cases right now:</p><br><br><p>1. Clean Everyday Chat: 'Hey man, are we still hopping on Valorant tonight?' -> I click Analyze: Inference takes just 1.1 ms. Risk gauge is completely green at 0.02% scam probability. Verdict: APPROVED (BENIGN). SHAP green bars pointing left show the absence of URLs and ordinary words actively convinced the model the message is safe.</p><br><br><p>2. Classic Unmutated Nitro Scam: '@everyone Steam free 3 months Discord Nitro: https://discord-nitro-gift.ru/claim' -> Gauge turns bright red: 99.85% scam probability! AUTO-QUARANTINE triggered. Structural clues: min_levenshtein_discord = 1, suspicious .ru domain, 3 urgency tokens. SHAP waterfall shows these pushed the score straight into quarantine.</p><br><br><p>3. The Tricky Cyrillic Homoglyph Attack: 'Steam partnership: claim complimentary subscription at https://dіscord.com/gifts' (with Cyrillic 'і' U+0456). Regex looking for discord.com returns False and misses this scam! Our model catches it instantly: 99.42% scam probability in 1.2 ms! homoglyph_count = 1 highlighted in amber. The hardened trees intercept the scam effortlessly.</p>
+                    <p class="hint">Consult <code>DEMO_VIDEO_PRESENTATION_SCRIPT.md</code> for additional checklist items and transitions.</p>
                 </div>
             </div>
         </section>
@@ -742,25 +784,25 @@ Team #18: Edwin Lin (Solo Project)</p>
             <div class="slide-header">
                 <div class="slide-title-wrap">
                     <span class="slide-num-pill">Slide 10 / 10</span>
-                    <span class="slide-time-pill"><i class="clock-icon">⏱</i> 15:30 - 20:00</span>
-                    <h2>Live Demonstration: Interactive Pop-Out Chatbox</h2>
-                    <p class="subtitle">Simulated Discord Chat & Post-Mortem Engineering Takeaways</p>
+                    <span class="slide-time-pill"><i class="clock-icon">⏱</i> 11:15 - 14:00</span>
+                    <h2>Live Demonstration: Interactive Pop-Out Chatbox & Wrap-Up</h2>
+                    <p class="subtitle">Simulated Discord Chat, Architectural Post-Mortem, and Key Takeaways</p>
                 </div>
             </div>
 
             <div class="action-banner">
                 <span class="action-badge">PRESENTER ACTION</span>
-                <span class="action-text">[BROWSER: Open floating Chat Playground dialog. Then CAMERA for conclusion]</span>
+                <span class="action-text">[BROWSER: Pop-Out Chat Playground -> CAMERA: Post-Mortem & Wrap-Up]</span>
             </div>
 
             <div class="slide-content two-col">
                 <div class="slide-text-col">
                     <ul class="bullet-list">
-                        <li class="main-bullet">Pop-Out Chat Playground: Floating action button opens inline chat dialog simulating live server conversation.</li>
-<li class="main-bullet">Instant Interception: Simulated multi-turn dialogue auto-quarantines payload with red warning banner in 1.2 ms.</li>
-<li class="main-bullet">Architectural Post-Mortem: Why we abandoned user metadata (Discord bot DM sandboxing returning 403 Forbidden & Developer Policy Section 21 privacy bans).</li>
-<li class="main-bullet">Why the Pivot Succeeded: Pure payload string invariants made the detector completely self-contained, fast, and privacy-preserving.</li>
-<li class="main-bullet">Final Scorecard: 0.9777 clean F1, 0.9780 hardened F1, 1.2 ms latency, production-ready full-stack architecture.</li>
+                        <li class="main-bullet">Live Test 4 • Pop-Out Chatbox: Floating action button simulates real Discord conversation with instant 1.2ms red quarantine banners.</li>
+<li class="main-bullet">Post-Mortem & Initial Failure: Originally planned to use user account metadata (age, mutual servers, avatar, message frequency).</li>
+<li class="main-bullet">Why We Abandoned Metadata: Discord bot sandboxing blocks reading private DMs (403 Forbidden) and Policy Section 21 bans storing chat data.</li>
+<li class="main-bullet">The Pivot: Inspecting only raw message payloads made the detector 100% self-contained, fast, and privacy-preserving.</li>
+<li class="main-bullet">Final Scorecard: 0.9777 clean F1, 0.9780 hardened F1, 1.2ms CPU latency, production-ready full-stack Angular 18 + FastAPI tool.</li>
 
                     </ul>
                 </div>
@@ -779,12 +821,17 @@ Team #18: Edwin Lin (Solo Project)</p>
 
             <div class="speaker-notes-box">
                 <div class="notes-header">
-                    <strong>🎙 Presenter Speaking Cue (15:30 - 20:00)</strong>
+                    <strong>🎙 Presenter Spoken Dialogue (11:15 - 14:00)</strong>
                     <button class="toggle-notes-btn" onclick="toggleNotes(this)">Show Full Dialogue</button>
                 </div>
                 <div class="notes-body">
-                    <p><em>Pop-Out Chatbox & Post-Mortem:</em> Open floating Chat Playground dialog. Send normal message, then scam message: auto-quarantines in 1.2ms. Explain why you pivoted away from user metadata due to Discord bot DM sandboxing and Section 21 privacy bans. Summarize the 3 takeaways.</p>
-                    <p class="hint">Consult <code>DEMO_VIDEO_PRESENTATION_SCRIPT.md</code> for full word-for-word spoken dialogue.</p>
+                    <p>To see how this works in a real chat environment, let's look at Slide 10 and test my Pop-Out Chatbox.</p><br><br><p>Down here in the bottom-right corner, I click this floating button. It opens an inline chat window simulating a live Discord server. Let's type a normal message: 'Hey, did you finish the homework?' Sent—it appears with a green approved badge. Now let's simulate the compromised account replying with a fake game test: 'Yeah! My buddy released a game demo on Steam, can you test it? https://steamcommunity-beta.top/setup.exe' I hit Enter: Instantly—in 1.2 milliseconds—the system flags the message in bright red with an AUTO-QUARANTINED warning overlay! The dangerous link is blocked from rendering clickable in chat, protecting users from accidental clicks.</p><br><br><p>Before concluding, I want to share a key learning outcome: my Architectural Post-Mortem and Initial Failure.
+When I originally started in September, my proposal was very different: I planned to build a Discord bot that checked user account metadata—account age, mutual server counts, avatar presence, and message frequency. That approach hit two brick walls within the first three weeks: Discord bot sandboxing (cannot inspect private DMs between users) and Discord Developer Policy Section 21 (bans saving user chat data for machine learning). Ditching user metadata was the best engineering pivot I made. By inspecting only the raw message payload and URLs, the final detector requires zero access to private user databases or chat history. It is completely self-contained, privacy-preserving, and fast.</p><br><br><p>To wrap up, my top three engineering takeaways:
+1. Text Models Are Fragile Under Attack: Security classifiers must be grounded in structural domain invariants that attackers cannot easily hide.
+2. Latency is a Production Constraint: An XGBoost ensemble running in 1.2 ms provides the throughput needed for live moderation without server chat lag.
+3. Verify API Boundaries Early: Always verify what data a platform permits you to access before designing machine learning features.</p><br><br><p>Final results: On 3,552 messages, my model achieves 0.9777 clean F1, recovers to 0.9780 adversarial F1 under evasion attacks (where AutoMod crashes by 37.2%), runs in 1.2 ms on CPU, and is fully deployed across FastAPI and Angular 18.
+All code, models, reports, and slide decks are available in my GitHub repository. Thank you so much for your time and guidance, Professor. I'm ready for your questions!</p>
+                    <p class="hint">Consult <code>DEMO_VIDEO_PRESENTATION_SCRIPT.md</code> for additional checklist items and transitions.</p>
                 </div>
             </div>
         </section>
