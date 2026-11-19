@@ -322,7 +322,7 @@ Team #18: Edwin Lin (Solo Project)</p>
                     <button class="toggle-notes-btn" onclick="toggleNotes(this)">Show Full Dialogue</button>
                 </div>
                 <div class="notes-body">
-                    <p><em>Focus:</em> Introduce yourself and project partner. State the core goal of the project and set up the 20-minute agenda.</p>
+                    <p><em>Roadmap for Professor:</em> Introduce yourself as Edwin Lin (Team #18, Solo Project). Give the 20-minute roadmap: Security threat -> Dual-stream architecture -> Code & data deduplication -> Terminal benchmarks & 100% recall audit -> Live 1.2ms Angular/FastAPI demo.</p>
                     <p class="hint">Consult <code>DEMO_VIDEO_PRESENTATION_SCRIPT.md</code> for full word-for-word spoken dialogue.</p>
                 </div>
             </div>
@@ -374,7 +374,7 @@ Team #18: Edwin Lin (Solo Project)</p>
                     <button class="toggle-notes-btn" onclick="toggleNotes(this)">Show Full Dialogue</button>
                 </div>
                 <div class="notes-body">
-                    <p><em>Focus:</em> Explain the psychological trust network in Discord. Explain how session token grabbers steal accounts and automate propagation.</p>
+                    <p><em>Plain Threat Explanation:</em> Explain that Discord is closed servers and friend DMs. Stolen accounts blast friends who inherently trust the sender. Walk through the 4 pretexts: Fake Nitro, game betas with infostealers, tournament votes, and crypto drainers.</p>
                     <p class="hint">Consult <code>DEMO_VIDEO_PRESENTATION_SCRIPT.md</code> for full word-for-word spoken dialogue.</p>
                 </div>
             </div>
@@ -425,7 +425,7 @@ Team #18: Edwin Lin (Solo Project)</p>
                     <button class="toggle-notes-btn" onclick="toggleNotes(this)">Show Full Dialogue</button>
                 </div>
                 <div class="notes-body">
-                    <p><em>Focus:</em> Highlight the 37.2% F1 collapse in AutoMod regex. Explain the difference between human rendering and regex byte matching.</p>
+                    <p><em>Why Simple Filters Fail:</em> Explain that Russian Cyrillic letters like Cyrillic o look identical to English o to a human, but break regex byte checks. Markdown hides true URLs. Emphasize that AutoMod F1 crashes by 37.2% under basic evasion.</p>
                     <p class="hint">Consult <code>DEMO_VIDEO_PRESENTATION_SCRIPT.md</code> for full word-for-word spoken dialogue.</p>
                 </div>
             </div>
@@ -477,7 +477,7 @@ Team #18: Edwin Lin (Solo Project)</p>
                     <button class="toggle-notes-btn" onclick="toggleNotes(this)">Show Full Dialogue</button>
                 </div>
                 <div class="notes-body">
-                    <p><em>Focus:</em> Explain the 5 stages. Justify XGBoost over BERT based on latency and tokenization stability. Explain the 0.80 quarantine threshold.</p>
+                    <p><em>Two-Stream Concept:</em> Scammers can change words in seconds, but MUST send you to a controlled link. Stream A looks at 3,000 words; Stream B extracts 17 structural clues. Explain why XGBoost (1.2 ms on CPU, stable on lookalikes) beats heavy BERT models (150-300 ms).</p>
                     <p class="hint">Consult <code>DEMO_VIDEO_PRESENTATION_SCRIPT.md</code> for full word-for-word spoken dialogue.</p>
                 </div>
             </div>
@@ -529,7 +529,7 @@ Team #18: Edwin Lin (Solo Project)</p>
                     <button class="toggle-notes-btn" onclick="toggleNotes(this)">Show Full Dialogue</button>
                 </div>
                 <div class="notes-body">
-                    <p><em>Focus:</em> Walk through the math: d_min early-exit, Shannon entropy formula, and minimax objective. Keep it practical and code-oriented.</p>
+                    <p><em>Demystifying the Math:</em> 1) Levenshtein distance checks typosquatting with an early length exit to save CPU time. 2) Shannon entropy measures how scrambled/random a domain is. 3) Minimax hardening trains on simulated attacks so the trees learn rules that survive sneaky tricks.</p>
                     <p class="hint">Consult <code>DEMO_VIDEO_PRESENTATION_SCRIPT.md</code> for full word-for-word spoken dialogue.</p>
                 </div>
             </div>
@@ -580,7 +580,7 @@ Team #18: Edwin Lin (Solo Project)</p>
                     <button class="toggle-notes-btn" onclick="toggleNotes(this)">Show Full Dialogue</button>
                 </div>
                 <div class="notes-body">
-                    <p><em>Focus:</em> Switch to VS Code. Show data_loader.py deduplication logic and feature_extractor.py globally compiled regexes.</p>
+                    <p><em>Data Engineering & Leakage:</em> 3,552 messages from public datasets and threat feeds. Emphasize MD5 deduplication: explain how removing duplicate Nitro spam prevented the model from cheating on the test set. Mention pre-compiled regexes running 15x faster.</p>
                     <p class="hint">Consult <code>DEMO_VIDEO_PRESENTATION_SCRIPT.md</code> for full word-for-word spoken dialogue.</p>
                 </div>
             </div>
@@ -632,7 +632,7 @@ Team #18: Edwin Lin (Solo Project)</p>
                     <button class="toggle-notes-btn" onclick="toggleNotes(this)">Show Full Dialogue</button>
                 </div>
                 <div class="notes-body">
-                    <p><em>Focus:</em> Switch to Terminal. Run the scripts, show Table I and Table II output. Explain why Stream B outperforms Stream A under attack.</p>
+                    <p><em>Walking Through Results:</em> Table I: All models do fine on clean text, but under attack, text-only models collapse to 0.44-0.49 recall. Table II (Ablation): Stream B alone gets 0.7748 F1 under attack (+14.1% over text alone). Fused dual-stream hits 0.8078 F1 before hardening.</p>
                     <p class="hint">Consult <code>DEMO_VIDEO_PRESENTATION_SCRIPT.md</code> for full word-for-word spoken dialogue.</p>
                 </div>
             </div>
@@ -683,7 +683,7 @@ Team #18: Edwin Lin (Solo Project)</p>
                     <button class="toggle-notes-btn" onclick="toggleNotes(this)">Show Full Dialogue</button>
                 </div>
                 <div class="notes-body">
-                    <p><em>Focus:</em> Discuss the 100% recall result with scientific honesty. Explain the closed-generator overlap and present the 5-fold CV variance.</p>
+                    <p><em>Honest Review of 100% Recall:</em> Explain to the professor that 100% test recall happened because both training and evaluation used build_adversarial_variant(), making homoglyph_count an easy tree split. Show the 5-fold CV variance (0.9888 +/- 0.0112 recall) to prove real-world robustness.</p>
                     <p class="hint">Consult <code>DEMO_VIDEO_PRESENTATION_SCRIPT.md</code> for full word-for-word spoken dialogue.</p>
                 </div>
             </div>
@@ -734,7 +734,7 @@ Team #18: Edwin Lin (Solo Project)</p>
                     <button class="toggle-notes-btn" onclick="toggleNotes(this)">Show Full Dialogue</button>
                 </div>
                 <div class="notes-body">
-                    <p><em>Focus:</em> Switch to Chrome. Click the preset buttons, show the 1.2ms latency badge, explain the SHAP attribution bars.</p>
+                    <p><em>Live Interface Demo:</em> Switch to Chrome (http://localhost:4200/). Point out 1.2 ms latency counter. Test clean chat (0.02% risk, green approved), classic Nitro (99.85% quarantine), and Cyrillic homoglyph (AutoMod misses, our model catches at 99.42%). Explain the green/red SHAP bars.</p>
                     <p class="hint">Consult <code>DEMO_VIDEO_PRESENTATION_SCRIPT.md</code> for full word-for-word spoken dialogue.</p>
                 </div>
             </div>
@@ -785,7 +785,7 @@ Team #18: Edwin Lin (Solo Project)</p>
                     <button class="toggle-notes-btn" onclick="toggleNotes(this)">Show Full Dialogue</button>
                 </div>
                 <div class="notes-body">
-                    <p><em>Focus:</em> Click the floating Chat Playground button. Send benign then malicious messages. Transition to post-mortem and wrap up video.</p>
+                    <p><em>Pop-Out Chatbox & Post-Mortem:</em> Open floating Chat Playground dialog. Send normal message, then scam message: auto-quarantines in 1.2ms. Explain why you pivoted away from user metadata due to Discord bot DM sandboxing and Section 21 privacy bans. Summarize the 3 takeaways.</p>
                     <p class="hint">Consult <code>DEMO_VIDEO_PRESENTATION_SCRIPT.md</code> for full word-for-word spoken dialogue.</p>
                 </div>
             </div>
