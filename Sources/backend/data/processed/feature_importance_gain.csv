@@ -1,0 +1,119 @@
+feature,gain,type
+has_url,64.5401,Structural Heuristic
+urgency_token_count,33.2945,Structural Heuristic
+num_urls,25.5457,Structural Heuristic
+message_length,22.7652,Structural Heuristic
+homoglyph_count,22.6328,Structural Heuristic
+word_https,15.9139,Semantic N-gram
+is_known_bad_domain,13.6939,Structural Heuristic
+word_hey,12.8364,Semantic N-gram
+word_httрs,11.6123,Semantic N-gram
+word_youtube,11.0504,Semantic N-gram
+word_600 uc,9.7959,Semantic N-gram
+word_https youtu,9.6679,Semantic N-gram
+word_500,9.4113,Semantic N-gram
+word_httpѕ,9.2408,Semantic N-gram
+word_com app,8.7589,Semantic N-gram
+word_brother,7.8005,Semantic N-gram
+word_be,7.328,Semantic N-gram
+word_600,7.1747,Semantic N-gram
+word_check out,7.1738,Semantic N-gram
+word_trading,6.6562,Semantic N-gram
+word_our,6.5281,Semantic N-gram
+word_discord,6.4348,Semantic N-gram
+domain_entropy,5.6931,Structural Heuristic
+word_steampowered,5.6168,Semantic N-gram
+word_link https,5.2796,Semantic N-gram
+word_can you,5.0749,Semantic N-gram
+word_not,4.6971,Semantic N-gram
+word_github,4.4048,Semantic N-gram
+word_store,4.1827,Semantic N-gram
+word_uc,4.1013,Semantic N-gram
+word_girl,3.9725,Semantic N-gram
+word_please,3.8199,Semantic N-gram
+word_don,3.5729,Semantic N-gram
+word_nitro,3.4375,Semantic N-gram
+word_100,3.4102,Semantic N-gram
+word_someone,3.3477,Semantic N-gram
+word_re,3.32,Semantic N-gram
+word_join,3.3179,Semantic N-gram
+word_access,3.2408,Semantic N-gram
+word_made,3.0638,Semantic N-gram
+word_check,3.031,Semantic N-gram
+word_discord gg,3.0248,Semantic N-gram
+word_your,2.9625,Semantic N-gram
+min_levenshtein_discord,2.836,Structural Heuristic
+word_giveaway,2.7977,Semantic N-gram
+word_new,2.7849,Semantic N-gram
+word_the steam,2.7002,Semantic N-gram
+word_account,2.5652,Semantic N-gram
+word_only,2.5527,Semantic N-gram
+word_active,2.4228,Semantic N-gram
+word_all,2.4187,Semantic N-gram
+word_10,2.4135,Semantic N-gram
+word_or,2.3581,Semantic N-gram
+word_mobile,2.3227,Semantic N-gram
+word_on,2.2271,Semantic N-gram
+word_com,2.1677,Semantic N-gram
+word_server,2.1607,Semantic N-gram
+word_but,2.1389,Semantic N-gram
+word_this,2.098,Semantic N-gram
+word_was,1.9672,Semantic N-gram
+word_free,1.9647,Semantic N-gram
+min_levenshtein_steam,1.9641,Structural Heuristic
+word_in,1.9054,Semantic N-gram
+word_have,1.8852,Semantic N-gram
+word_gg,1.8427,Semantic N-gram
+word_just,1.829,Semantic N-gram
+word_out,1.7872,Semantic N-gram
+word_that,1.7468,Semantic N-gram
+word_is,1.7077,Semantic N-gram
+word_discord com,1.6926,Semantic N-gram
+word_of,1.6744,Semantic N-gram
+digit_ratio,1.6614,Structural Heuristic
+word_my,1.652,Semantic N-gram
+word_pubg,1.625,Semantic N-gram
+word_giving,1.6042,Semantic N-gram
+uppercase_ratio,1.6019,Structural Heuristic
+word_how,1.5608,Semantic N-gram
+word_like,1.4757,Semantic N-gram
+word_everyone,1.4544,Semantic N-gram
+word_some,1.4487,Semantic N-gram
+word_app,1.448,Semantic N-gram
+word_the,1.3818,Semantic N-gram
+word_so,1.358,Semantic N-gram
+word_we,1.3245,Semantic N-gram
+word_https discord,1.2864,Semantic N-gram
+word_from,1.2162,Semantic N-gram
+word_do,1.2093,Semantic N-gram
+word_and,1.1199,Semantic N-gram
+word_you,1.0761,Semantic N-gram
+word_also,1.0473,Semantic N-gram
+word_me,1.0467,Semantic N-gram
+word_got,1.0154,Semantic N-gram
+word_now,1.0101,Semantic N-gram
+word_if you,1.0033,Semantic N-gram
+word_can,0.9924,Semantic N-gram
+word_anyone,0.9843,Semantic N-gram
+word_if,0.9294,Semantic N-gram
+word_play,0.9049,Semantic N-gram
+word_it,0.8598,Semantic N-gram
+word_am,0.8459,Semantic N-gram
+word_get,0.8441,Semantic N-gram
+word_with,0.8126,Semantic N-gram
+word_here,0.7958,Semantic N-gram
+word_no,0.7897,Semantic N-gram
+word_for,0.7724,Semantic N-gram
+word_official,0.7574,Semantic N-gram
+word_go,0.7517,Semantic N-gram
+word_file,0.7314,Semantic N-gram
+word_to,0.7264,Semantic N-gram
+mention_count,0.6774,Structural Heuristic
+word_here is,0.5299,Semantic N-gram
+word_by,0.5,Semantic N-gram
+word_instead,0.3851,Semantic N-gram
+word_link,0.3109,Semantic N-gram
+word_live,0.2746,Semantic N-gram
+word_are,0.2669,Semantic N-gram
+word_000,0.2483,Semantic N-gram
+word_beta,0.1121,Semantic N-gram

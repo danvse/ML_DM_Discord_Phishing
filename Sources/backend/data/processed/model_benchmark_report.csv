@@ -1,0 +1,7 @@
+Model Tier,Model Name,Input Features,Precision,Recall,F1-Score,AUROC,Adversarial F1,Delta F1 (Drop)
+Tier 1: Baseline,Regex / Keyword (AutoMod),Keyword/URL Rules,0.965,0.7753,0.8598,-,0.4876,-37.2%
+Tier 1: Baseline,Multinomial Naive Bayes,TF-IDF (Word n-grams),0.9942,0.9607,0.9771,0.9904,0.9683,-0.9%
+Tier 1: Baseline,Logistic Regression,TF-IDF (Word n-grams),0.9942,0.9663,0.9801,0.9993,0.9377,-4.2%
+Tier 1: Baseline,LinearSVC,TF-IDF (Word n-grams),0.9886,0.9775,0.9831,-,0.9157,-6.7%
+Tier 2: Classical Fusion,Random Forest,TF-IDF + 17 Heuristics,0.9773,0.9663,0.9718,0.9987,0.7273,-24.4%
+Tier 2: Classical Fusion,XGBoost Fused (Proposed),TF-IDF + 17 Heuristics,0.9722,0.9831,0.9777,0.9988,0.8078,-17.0%

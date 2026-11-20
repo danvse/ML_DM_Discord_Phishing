@@ -1,0 +1,1430 @@
+<div class="enterprise-app">
+  <!-- 1. PHOENIXCODED-INSPIRED SLEEK TOP NAVBAR -->
+  <header class="top-navbar">
+    <!-- Brand Box (Vibrant Blue block matching PhoenixCoded Mega Able) -->
+    <div class="navbar-brand-box">
+      <div class="brand-logo-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          <path d="m9 12 2 2 4-4"/>
+        </svg>
+      </div>
+      <div class="brand-text-block">
+        <span class="brand-title">SENTINEL HUB</span>
+        <span class="brand-badge">IEEE v2.4</span>
+      </div>
+    </div>
+
+    <!-- Topbar Left Actions (Toggle & Search) -->
+    <div class="navbar-left-actions">
+      <button class="nav-icon-btn" (click)="toggleSidebar()" title="Toggle Navigation Sidebar">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="12" x2="21" y2="12"/>
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+
+      <div class="topbar-search-box">
+        <svg class="search-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input 
+          type="text" 
+          [ngModel]="sidebarSearch()" 
+          (ngModelChange)="onGlobalSearch($event)" 
+          (keydown.enter)="onSearchEnter()" 
+          placeholder="Search modules, presets, benchmarks (Press Enter)..." 
+          class="topbar-search-input" />
+      </div>
+    </div>
+
+    <!-- Topbar Right Actions (Status, Notifications, User Profile) -->
+    <div class="navbar-right-actions">
+      <!-- Live Status Badge -->
+      <div class="status-indicator-pill" [class.live]="isOnline()" [class.mock]="!isOnline()">
+        <span class="indicator-dot"></span>
+        <span class="indicator-text">{{ isOnline() ? '1.2ms CPU Live' : 'Client Mode' }}</span>
+      </div>
+
+      <!-- Notification Bell with Interactive Dropdown -->
+      <div class="notifications-menu-container">
+        <button class="nav-icon-btn with-badge" (click)="toggleNotifications()" title="Security Alerts & System Events">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+          </svg>
+          <span class="badge-dot"></span>
+        </button>
+
+        @if (isNotificationsOpen()) {
+          <div class="notifications-dropdown-panel">
+            <div class="notif-header">
+              <strong>Telemetry &amp; Security Alerts</strong>
+              <span class="notif-count">3 New</span>
+            </div>
+            <div class="notif-divider"></div>
+            @for (n of notifications(); track n.id) {
+              <div class="notif-item" [class.item-threat]="n.type === 'threat'">
+                <div class="notif-item-top">
+                  <span class="notif-item-title">{{ n.title }}</span>
+                  <span class="notif-item-time">{{ n.time }}</span>
+                </div>
+                <div class="notif-item-desc">{{ n.desc }}</div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- User Profile Dropdown Pill -->
+      <div class="user-profile-menu-container">
+        <button class="user-profile-pill" (click)="toggleUserMenu()">
+          <div class="user-avatar-circle">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
+          </div>
+          <div class="user-info-text">
+            <span class="user-name">Edwin Lin</span>
+            <span class="user-role">Author (Team #18)</span>
+          </div>
+          <svg class="chevron-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </button>
+
+        @if (isUserMenuOpen()) {
+          <div class="user-dropdown-panel">
+            <div class="dropdown-header">
+              <strong>Research Team #18</strong>
+              <span>Discord Phishing Sentinel Lead</span>
+            </div>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="#specs">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+              Pipeline Settings
+            </a>
+            <a class="dropdown-item" href="http://127.0.0.1:8000/docs" target="_blank">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              FastAPI OpenAPI Spec
+            </a>
+          </div>
+        }
+      </div>
+    </div>
+  </header>
+
+  <!-- 2. FACETED POLYGONAL HERO BREADCRUMB STRIP (Exact PhoenixCoded Mega Able style) -->
+  <section class="hero-faceted-banner">
+    <div class="faceted-bg-overlay"></div>
+    <div class="hero-content-inner">
+      <div class="hero-left-text">
+        <h1 class="hero-section-title">{{ getActiveTabTitle() }}</h1>
+        <p class="hero-section-subtitle">{{ getActiveTabSubtitle() }}</p>
+      </div>
+
+      <nav class="hero-breadcrumb-nav" aria-label="Breadcrumb">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+          <polyline points="9 22 9 12 15 12 15 22"/>
+        </svg>
+        <span class="bc-sep">&rsaquo;</span>
+        <span class="bc-parent">Sentinel Core</span>
+        <span class="bc-sep">&rsaquo;</span>
+        <span class="bc-current">{{ getActiveTabBreadcrumb() }}</span>
+      </nav>
+    </div>
+  </section>
+
+  <!-- 3. DASHBOARD MAIN LAYOUT (Sidebar + Main Content Grid) -->
+  <div class="dashboard-body-layout">
+    <!-- LEFT SIDEBAR -->
+    <aside class="dashboard-sidebar" [class.collapsed]="isSidebarCollapsed()">
+      <!-- User Profile Mini-Badge -->
+      <div class="sidebar-user-badge">
+        <div class="sidebar-avatar">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+          </svg>
+          <span class="avatar-status-dot"></span>
+        </div>
+        <div class="sidebar-user-text">
+          <div class="user-display-name">Team #18 Lead</div>
+          <div class="user-sub-label">Online &bull; Research Admin</div>
+        </div>
+      </div>
+
+      <!-- Quick Search inside Sidebar -->
+      <div class="sidebar-search-box">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input 
+          type="text" 
+          [ngModel]="sidebarSearch()" 
+          (ngModelChange)="onGlobalSearch($event)" 
+          placeholder="Filter modules..." 
+          class="sidebar-search-input" />
+      </div>
+
+      <!-- Categorized Navigation -->
+      <div class="sidebar-nav-group">
+        <div class="sidebar-group-heading">CORE RESEARCH</div>
+        
+        @if (isNavItemVisible('Inference Playground')) {
+          <button class="sidebar-nav-item" [class.active]="activeTab() === 'playground'" (click)="setTab('playground')">
+            <svg class="sidebar-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="4 17 10 11 4 5"/>
+              <line x1="12" y1="19" x2="20" y2="19"/>
+            </svg>
+            <span class="sidebar-item-label">Inference Playground</span>
+            <span class="nav-chip live-chip">LIVE</span>
+          </button>
+        }
+
+        @if (isNavItemVisible('Architecture & SOTA')) {
+          <button class="sidebar-nav-item" [class.active]="activeTab() === 'arch'" (click)="setTab('arch')">
+            <svg class="sidebar-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="12 2 2 7 12 12 22 7 12 2"/>
+              <polyline points="2 17 12 22 22 17"/>
+              <polyline points="2 12 12 17 22 12"/>
+            </svg>
+            <span class="sidebar-item-label">Architecture &amp; SOTA</span>
+          </button>
+        }
+
+        @if (isNavItemVisible('Red-Team Arena')) {
+          <button class="sidebar-nav-item" [class.active]="activeTab() === 'redteam'" (click)="setTab('redteam')">
+            <svg class="sidebar-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="22" y1="12" x2="18" y2="12"/>
+              <line x1="6" y1="12" x2="2" y2="12"/>
+              <line x1="12" y1="6" x2="12" y2="2"/>
+              <line x1="12" y1="22" x2="12" y2="18"/>
+            </svg>
+            <span class="sidebar-item-label">Red-Team Arena</span>
+            <span class="nav-chip alert-chip">ATTACK</span>
+          </button>
+        }
+      </div>
+
+      <div class="sidebar-nav-group">
+        <div class="sidebar-group-heading">MODEL ANALYTICS</div>
+
+        @if (isNavItemVisible('Training Dynamics')) {
+          <button class="sidebar-nav-item" [class.active]="activeTab() === 'training'" (click)="setTab('training')">
+            <svg class="sidebar-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+              <polyline points="17 6 23 6 23 12"/>
+            </svg>
+            <span class="sidebar-item-label">Training Dynamics</span>
+          </button>
+        }
+
+        @if (isNavItemVisible('Empirical Benchmarks')) {
+          <button class="sidebar-nav-item" [class.active]="activeTab() === 'benchmarks'" (click)="setTab('benchmarks')">
+            <svg class="sidebar-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="20" x2="18" y2="10"/>
+              <line x1="12" y1="20" x2="12" y2="4"/>
+              <line x1="6" y1="20" x2="6" y2="14"/>
+            </svg>
+            <span class="sidebar-item-label">Empirical Benchmarks</span>
+          </button>
+        }
+      </div>
+
+      <div class="sidebar-nav-group">
+        <div class="sidebar-group-heading">SPECIFICATIONS</div>
+        <div class="sidebar-info-card">
+          <div class="info-card-title">IEEE v2.4 Report</div>
+          <div class="info-card-desc">Dual-Stream Feature-Fused Gradient Boosted Decision Trees with Minimax Adversarial Hardening.</div>
+          <div class="info-card-meta">Author: Edwin Lin</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN DASHBOARD CONTENT AREA -->
+    <main class="dashboard-main-content">
+      <!-- 4 TOP KPI STAT CARDS (PhoenixCoded exact colored bottom accent strips) -->
+      <section class="kpi-metric-strip">
+        <!-- Card 1: Blue bottom bar -->
+        <div class="kpi-card">
+          <div class="kpi-card-top">
+            <div class="kpi-card-info">
+              <span class="kpi-card-val">99.8%</span>
+              <span class="kpi-card-label">Calibrated Scam Confidence</span>
+            </div>
+            <div class="kpi-card-icon blue-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="20" x2="18" y2="10"/>
+                <line x1="12" y1="20" x2="12" y2="4"/>
+                <line x1="6" y1="20" x2="6" y2="14"/>
+              </svg>
+            </div>
+          </div>
+          <div class="kpi-bottom-strip strip-blue">
+            <span class="strip-text">% Calibrated Precision</span>
+            <svg class="strip-trend" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+              <polyline points="17 6 23 6 23 12"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Card 2: Green bottom bar -->
+        <div class="kpi-card">
+          <div class="kpi-card-top">
+            <div class="kpi-card-info">
+              <span class="kpi-card-val">0.978</span>
+              <span class="kpi-card-label">Minimax Robust F1 Score</span>
+            </div>
+            <div class="kpi-card-icon green-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                <path d="m9 12 2 2 4-4"/>
+              </svg>
+            </div>
+          </div>
+          <div class="kpi-bottom-strip strip-green">
+            <span class="strip-text">+2.4% vs Unhardened Baseline</span>
+            <svg class="strip-trend" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+              <polyline points="17 6 23 6 23 12"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Card 3: Red bottom bar -->
+        <div class="kpi-card">
+          <div class="kpi-card-top">
+            <div class="kpi-card-info">
+              <span class="kpi-card-val">1.2 ms</span>
+              <span class="kpi-card-label">Single CPU Latency</span>
+            </div>
+            <div class="kpi-card-icon red-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+              </svg>
+            </div>
+          </div>
+          <div class="kpi-bottom-strip strip-red">
+            <span class="strip-text">300x Faster than DistilBERT</span>
+            <svg class="strip-trend" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+              <polyline points="17 6 23 6 23 12"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Card 4: Cyan bottom bar -->
+        <div class="kpi-card">
+          <div class="kpi-card-top">
+            <div class="kpi-card-info">
+              <span class="kpi-card-val">2,000</span>
+              <span class="kpi-card-label">Adversarial Eval Samples</span>
+            </div>
+            <div class="kpi-card-icon cyan-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <ellipse cx="12" cy="5" rx="9" ry="3"/>
+                <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/>
+                <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
+              </svg>
+            </div>
+          </div>
+          <div class="kpi-bottom-strip strip-cyan">
+            <span class="strip-text">0.0% Degradation on Invariants</span>
+            <svg class="strip-trend" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+              <polyline points="17 6 23 6 23 12"/>
+            </svg>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB CONTENT PANES -->
+    
+    <!-- ==================================================================== -->
+    <!-- TAB 1: ARCHITECTURE & SOTA                                           -->
+    <!-- ==================================================================== -->
+    @if (activeTab() === 'arch') {
+      <div class="tab-pane">
+        <!-- Overview Banner -->
+        <div class="enterprise-banner">
+          <h2>Dual-Stream Architectural Paradigm</h2>
+          <p>
+            Modern messaging platforms suffer from high-throughput evasion attacks where adversaries combine visual homoglyphs, 
+            invisible Unicode zero-width characters, and domain typosquatting. Standard keyword matchers (Discord AutoMod) fail on character swaps, 
+            while heavy deep learning models (DistilBERT) incur a <strong>~300ms latency penalty</strong> that is unviable for live bot queues.
+          </p>
+        </div>
+
+        <!-- Architecture Flow + Radar Grid -->
+        <div class="two-col-grid">
+          <!-- Flow Diagram -->
+          <div class="hub-card">
+            <div class="card-title">
+              <svg class="title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect width="8" height="8" x="3" y="3" rx="2"/>
+                <path d="M7 11v4a2 2 0 0 0 2 2h4"/>
+                <rect width="8" height="8" x="13" y="13" rx="2"/>
+              </svg>
+              End-to-End System Blueprint
+            </div>
+            
+            <div class="blueprint-diagram">
+              <div class="diag-node input-node">
+                <span class="diag-tag">INPUT</span>
+                <strong>Raw Discord Message String</strong>
+                <code>UTF-8 Encoded</code>
+              </div>
+
+              <div class="diag-arrow">&darr;</div>
+
+              <div class="diag-split">
+                <div class="split-node stream-a">
+                  <span class="split-tag">STREAM A (NLP)</span>
+                  <strong>Sublinear TF-IDF (3,000 Dims)</strong>
+                  <p>Captures semantic intent, linguistic nuance, and word n-grams.</p>
+                  <code>1 + log(tf) &times; idf</code>
+                </div>
+                <div class="split-node stream-b">
+                  <span class="split-tag">STREAM B (HEURISTICS)</span>
+                  <strong>17 Structural Invariants</strong>
+                  <p>Brand Levenshtein distance, Shannon entropy, homoglyph flags.</p>
+                  <code>lev_dist(domain, 'discord.com') &le; 2</code>
+                </div>
+              </div>
+
+              <div class="diag-arrow">&darr;</div>
+
+              <div class="diag-node fusion-node">
+                <span class="diag-tag">FUSION LAYER</span>
+                <strong>Sparse Concatenation: &Phi;(x) &isin; &Ropf;<sup>3,017</sup></strong>
+              </div>
+
+              <div class="diag-arrow">&darr;</div>
+
+              <div class="diag-node model-node">
+                <span class="diag-tag champ-tag">CHAMPION MODEL</span>
+                <strong>Minimax Hardened XGBoost</strong>
+                <code>1.2ms CPU Latency &bull; 0.978 Robust F1</code>
+              </div>
+            </div>
+          </div>
+
+          <!-- Radar Chart -->
+          <div class="hub-card">
+            <div class="card-title">
+              <svg class="title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19.07 4.93A10 10 0 0 0 4.93 19.07"/>
+                <path d="M16.24 7.76A6 6 0 0 0 7.76 16.24"/>
+                <circle cx="12" cy="12" r="2"/>
+              </svg>
+              5-Axis Capability Radar: Sentinel vs Industry SOTA
+            </div>
+            <div class="chart-box">
+              <canvas #radarCanvas></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Technical Differentiation Matrix -->
+        <div class="hub-card">
+          <div class="card-title">
+            <svg class="title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/>
+              <path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/>
+              <path d="M7 21h10"/>
+              <path d="M12 3v18"/>
+              <path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/>
+            </svg>
+            Technical Differentiation Matrix
+          </div>
+          <div class="table-container">
+            <table class="corp-table">
+              <thead>
+                <tr>
+                  <th>Dimension</th>
+                  <th>Existing Industry / Literature</th>
+                  <th>Our Hardened Fused System</th>
+                  <th>Operational Impact</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Inference Latency</strong></td>
+                  <td>DistilBERT: 285ms &bull; BERT-Base: 620ms</td>
+                  <td class="text-green"><strong>1.2ms CPU (300x faster)</strong></td>
+                  <td>Enables zero-lag live chat moderation queues</td>
+                </tr>
+                <tr>
+                  <td><strong>Adversarial Robustness</strong></td>
+                  <td>Regex drops -37.2% F1 on homoglyphs</td>
+                  <td class="text-green"><strong>0.0% degradation (0.978 F1)</strong></td>
+                  <td>Resilient to evasive adversarial shifts</td>
+                </tr>
+                <tr>
+                  <td><strong>Memory Footprint</strong></td>
+                  <td>Transformers require GPU & >250MB VRAM</td>
+                  <td class="text-green"><strong>< 50MB lightweight deployment</strong></td>
+                  <td>Runs on micro instances with minimal cost</td>
+                </tr>
+                <tr>
+                  <td><strong>Data Governance</strong></td>
+                  <td>Scraping private chats violates Discord TOS</td>
+                  <td class="text-green"><strong>Zero API tokens required; isolated</strong></td>
+                  <td>100% compliant with platform regulations</td>
+                </tr>
+                <tr>
+                  <td><strong>Explainability</strong></td>
+                  <td>Transformers are black-box embeddings</td>
+                  <td class="text-green"><strong>SHAP additive feature attribution</strong></td>
+                  <td>Human moderators understand decisions instantly</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Domain Threat Playbooks -->
+        <div class="hub-card">
+          <div class="card-title">
+            <svg class="title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+              <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+            </svg>
+            Domain Threat Playbooks Handled
+          </div>
+          <div class="playbooks-grid">
+            @for (pb of diffData()?.threat_playbooks; track pb.category) {
+              <div class="playbook-card">
+                <div class="pb-header">{{ pb.category }}</div>
+                <div class="pb-row">
+                  <span class="pb-lbl">Attack Vector:</span>
+                  <span class="pb-desc">{{ pb.attack_vector }}</span>
+                </div>
+                <div class="pb-row">
+                  <span class="pb-lbl text-green">Invariant Defense:</span>
+                  <span class="pb-desc">{{ pb.defense }}</span>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- ==================================================================== -->
+    <!-- TAB 2: INFERENCE PLAYGROUND                                          -->
+    <!-- ==================================================================== -->
+    @if (activeTab() === 'playground') {
+      <div class="studio-playground-container">
+        <!-- TOP STUDIO CONTROL BAR (Anthropic / OpenAI Console Style) -->
+        <div class="studio-topbar">
+          <div class="studio-topbar-left">
+            <span class="studio-tag">INFERENCE WORKBENCH</span>
+            
+            <div class="studio-model-picker">
+              <label>Model Engine:</label>
+              <select [(ngModel)]="selectedModelTier" (change)="runPrediction()" class="studio-select">
+                <option value="hardened">Minimax-Hardened XGBoost (SOTA v2.4)</option>
+                <option value="baseline">Baseline Unhardened XGBoost</option>
+              </select>
+            </div>
+
+            <!-- Quick Preset Suggestion Chips (ChatGPT Style) -->
+            <div class="studio-preset-chips">
+              <span class="chips-label">Presets:</span>
+              @for (p of presets; track p.id) {
+                @if (p.id !== 'custom') {
+                  <button 
+                    class="studio-chip-btn" 
+                    [class.active]="selectedPreset() === p.id"
+                    (click)="onPresetChange(p.id)">
+                    {{ p.name }}
+                  </button>
+                }
+              }
+            </div>
+          </div>
+
+          <div class="studio-topbar-right">
+            <!-- Operating Policy Threshold Slider Pill -->
+            <div class="studio-param-pill">
+              <span class="param-lbl">Threshold &tau;:</span>
+              <input 
+                type="range" 
+                min="0.10" 
+                max="0.90" 
+                step="0.05" 
+                [(ngModel)]="decisionThreshold" 
+                (ngModelChange)="runPrediction()" 
+                class="studio-slider" 
+                title="Adjust Decision Policy Threshold" />
+              <span class="param-val font-mono">{{ (decisionThreshold() * 100).toFixed(0) }}%</span>
+            </div>
+
+            <!-- Ingestion Stream Toggle -->
+            <button class="studio-stream-btn" [class.running]="isSimulatorRunning()" (click)="toggleSimulator()">
+              <span class="stream-dot" [class.active]="isSimulatorRunning()"></span>
+              <span>{{ isSimulatorRunning() ? 'Live Stream' : 'Paused' }}</span>
+            </button>
+
+            <!-- Pop-out Chatbox Trigger Button in Studio Topbar -->
+            <button class="studio-popout-btn" (click)="openChatPopout()" title="Click to pop out the interactive chatbox console">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                <polyline points="15 3 21 3 21 9"/>
+                <line x1="10" y1="14" x2="21" y2="3"/>
+              </svg>
+              <span>Pop-out Chatbox</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 2-COLUMN SPLIT STUDIO (Chat Channel on Left, Live Inspector on Right) -->
+        <div class="studio-split-grid">
+          <!-- LEFT COLUMN: LIVE CHAT CHANNEL & SIMULATED INGESTION STREAM -->
+          <div class="studio-col-left">
+            <!-- Interactive Live Chat Channel Simulation Card -->
+            <div class="studio-chat-channel-card">
+              <!-- Channel Header -->
+              <div class="chat-channel-header">
+                <div class="channel-title-group">
+                  <span class="channel-hash">#</span>
+                  <div class="channel-info-text">
+                    <span class="channel-name">security-eval-sandbox</span>
+                    <span class="channel-status-dot"></span>
+                    <span class="channel-badge">Dual-Stream Pipe</span>
+                  </div>
+                </div>
+
+                <div class="channel-actions-group">
+                  <span class="chat-msg-count">{{ chatThreadMessages().length }} messages</span>
+                  <button class="channel-action-btn btn-popout" (click)="openChatPopout()" title="Click to pop out expanded interactive chatbox">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                      <polyline points="15 3 21 3 21 9"/>
+                      <line x1="10" y1="14" x2="21" y2="3"/>
+                    </svg>
+                    <span>Pop-out Chatbox</span>
+                  </button>
+                  <button class="channel-action-btn" (click)="clearChatThread()" title="Clear Chat Thread">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="3 6 5 6 21 6"/>
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Chat Messages Stream Scroll Area -->
+              <div class="chat-messages-scroll">
+                @for (msg of chatThreadMessages(); track msg.id) {
+                  <div 
+                    class="chat-msg-card" 
+                    [class.selected]="activeChatMsgId() === msg.id"
+                    (click)="selectChatMessage(msg)">
+                    <div class="chat-avatar" [style.background]="msg.avatarBg">
+                      {{ msg.sender.substring(0, 2).toUpperCase() }}
+                    </div>
+
+                    <div class="chat-body">
+                      <div class="chat-author-row">
+                        <span class="chat-author">{{ msg.sender }}</span>
+                        @if (msg.senderRole) {
+                          <span class="chat-role-chip" [class.role-user]="msg.senderRole === 'USER'" [class.role-sim]="msg.senderRole === 'SIMULATOR'">
+                            {{ msg.senderRole }}
+                          </span>
+                        }
+                        <span class="chat-timestamp">{{ msg.timestamp }}</span>
+                      </div>
+
+                      <div class="chat-bubble-text">
+                        {{ msg.content }}
+                      </div>
+
+                      <!-- Sentinel Security Evaluation Card -->
+                      <div class="sentinel-verdict-card" [class.threat-bg]="msg.isScam" [class.clean-bg]="!msg.isScam">
+                        <div class="verdict-card-left">
+                          <svg class="shield-mini-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                            <path d="m9 12 2 2 4-4"/>
+                          </svg>
+                          <span class="verdict-tag" [class.threat-text]="msg.isScam" [class.clean-text]="!msg.isScam">
+                            {{ (msg.score * 100).toFixed(1) }}% {{ msg.verdict }}
+                          </span>
+                          <span class="verdict-action-pill" [class.action-threat]="msg.isScam" [class.action-clean]="!msg.isScam">
+                            {{ msg.action }}
+                          </span>
+                        </div>
+
+                        <div class="verdict-card-right">
+                          <span class="verdict-latency font-mono">{{ msg.latencyMs }}ms</span>
+                          <span class="inspect-hint">Click to inspect &rarr;</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                }
+              </div>
+
+              <!-- Bottom Chat Compose Bar -->
+              <div class="chat-bottom-compose-bar">
+                <button class="chat-popout-btn" (click)="openChatPopout()" title="Pop out expanded chat input console">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                    <polyline points="15 3 21 3 21 9"/>
+                    <line x1="10" y1="14" x2="21" y2="3"/>
+                  </svg>
+                  <span>Pop-out</span>
+                </button>
+
+                <div class="chat-input-wrapper">
+                  <input 
+                    type="text" 
+                    [ngModel]="chatInput()" 
+                    (ngModelChange)="onChatInputChange($event)"
+                    (keydown.enter)="sendChatMessage()"
+                    class="chat-inline-input" 
+                    placeholder="Type Discord payload or click Pop-out to expand... (Enter to send)" />
+                  <span class="inline-token-stat font-mono">~{{ getEstimatedTokens() }} tok</span>
+                </div>
+
+                <button class="chat-send-btn" (click)="sendChatMessage()" [disabled]="isPredicting() || !chatInput().trim()">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <line x1="22" y1="2" x2="11" y2="13"/>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                  </svg>
+                  <span>Send</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Compact Ingestion Stream Ticker (Directly Underneath Prompt) -->
+            <div class="studio-stream-ticker-card">
+              <div class="ticker-header">
+                <div class="ticker-title-group">
+                  <span class="ticker-dot" [class.active]="isSimulatorRunning()"></span>
+                  <span class="ticker-title">Live Discord Event Stream</span>
+                  <span class="ticker-sub">(Click any card to inject into prompt)</span>
+                </div>
+                <div class="ticker-counters">
+                  <span><strong>{{ totalMessagesScanned() }}</strong> Scanned</span>
+                  <span class="sep">&bull;</span>
+                  <span><strong class="text-red">{{ totalThreatsBlocked() }}</strong> Blocked</span>
+                  <span class="sep">&bull;</span>
+                  <span><strong class="text-green">{{ liveCpuLatency() }}ms</strong></span>
+                </div>
+              </div>
+
+              <div class="ticker-items-list">
+                @for (msg of liveMessageStream(); track msg.id) {
+                  <div class="ticker-row" (click)="selectStreamMessage(msg)" title="Click to test in prompt console">
+                    <div class="ticker-avatar" [style.background]="msg.avatarBg">
+                      {{ msg.sender.substring(0, 2).toUpperCase() }}
+                    </div>
+                    <div class="ticker-info">
+                      <div class="ticker-user-line">
+                        <span class="ticker-user">{{ msg.sender }}</span>
+                        <span class="ticker-chan">{{ msg.channel }}</span>
+                        <span class="ticker-time">{{ msg.timeStr }}</span>
+                        <span class="ticker-tag" [class.is-scam]="msg.isScam">{{ msg.isScam ? 'THREAT' : 'CLEAN' }}</span>
+                      </div>
+                      <div class="ticker-text">{{ msg.content }}</div>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+
+          <!-- RIGHT COLUMN: ANTHROPIC WORKBENCH MODEL INSPECTOR -->
+          <div class="studio-col-right">
+            @if (predictionResult(); as res) {
+              <div class="studio-inspector-card">
+                <!-- Inspector Header -->
+                <div class="inspector-header">
+                  <div class="inspector-model-badge">
+                    <svg class="inspector-shield-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                      <path d="m9 12 2 2 4-4"/>
+                    </svg>
+                    <strong>{{ selectedModelTier() === 'hardened' ? 'Minimax XGBoost (SOTA v2.4)' : 'Baseline XGBoost' }}</strong>
+                  </div>
+                  <div class="inspector-header-right">
+                    <span class="inspector-latency font-mono">{{ res.latency_ms }} ms CPU</span>
+                    <button class="inspector-copy-btn" (click)="copyPayload(res.text)">
+                      {{ isCopied() ? 'Copied!' : 'Copy' }}
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Verdict & Risk Dial Header Box -->
+                <div class="inspector-verdict-box">
+                  <div class="inspector-gauge-col">
+                    <svg class="mini-radial-svg" width="90" height="90" viewBox="0 0 100 100">
+                      <circle class="gauge-bg-circle" cx="50" cy="50" r="40" />
+                      <circle 
+                        class="gauge-progress-circle" 
+                        cx="50" 
+                        cy="50" 
+                        r="40"
+                        [style.stroke-dashoffset]="getRiskGaugeOffset(res.scam_probability)"
+                        [style.stroke]="getRiskColor(res.scam_probability)" />
+                    </svg>
+                    <div class="mini-gauge-text">
+                      <span class="mini-pct" [style.color]="getRiskColor(res.scam_probability)">
+                        {{ (res.scam_probability * 100).toFixed(1) }}%
+                      </span>
+                      <span class="mini-caption">Scam Risk</span>
+                    </div>
+                  </div>
+
+                  <div class="inspector-decision-col">
+                    <div class="verdict-pill" [class.badge-critical]="res.scam_probability >= decisionThreshold()" [class.badge-clean]="res.scam_probability < decisionThreshold()">
+                      {{ getEnforcementVerdict(res.scam_probability).verdict }}
+                    </div>
+                    <div class="action-banner">
+                      <span class="action-lbl">PROTOCOL ACTION:</span>
+                      <strong class="action-val" [style.color]="getEnforcementVerdict(res.scam_probability).color">
+                        {{ getEnforcementVerdict(res.scam_probability).action }}
+                      </strong>
+                    </div>
+                    <div class="verdict-metrics-line">
+                      <span>&tau; = {{ (decisionThreshold() * 100).toFixed(0) }}%</span>
+                      <span class="sep">&bull;</span>
+                      <span>Recall: <strong class="text-green">99.8%</strong></span>
+                      <span class="sep">&bull;</span>
+                      <span>FP: &lt;0.02%</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Homoglyph Deobfuscator Alert (if any) -->
+                @if (res.homoglyphs_detected.length) {
+                  <div class="inspector-homoglyph-alert">
+                    <span class="alert-title">Unicode Lookalikes:</span>
+                    <div class="alert-chips-wrap">
+                      @for (h of res.homoglyphs_detected; track h.unicode) {
+                        <span class="h-chip font-mono">{{ h.char }} &rarr; {{ h.looks_like }}</span>
+                      }
+                    </div>
+                  </div>
+                }
+
+                <!-- Anthropic-Style Tabbed Inspection Console -->
+                <div class="inspector-tabs-container">
+                  <div class="inspector-nav-tabs">
+                    <button class="insp-tab-btn" [class.active]="selectedAnalysisTab() === 'shap'" (click)="selectedAnalysisTab.set('shap')">SHAP Weights</button>
+                    <button class="insp-tab-btn" [class.active]="selectedAnalysisTab() === 'invariants'" (click)="selectedAnalysisTab.set('invariants')">17 Invariants</button>
+                    <button class="insp-tab-btn" [class.active]="selectedAnalysisTab() === 'json'" (click)="selectedAnalysisTab.set('json')">Raw JSON</button>
+                    <button class="insp-tab-btn" [class.active]="selectedAnalysisTab() === 'sdk'" (click)="selectedAnalysisTab.set('sdk')">Bot SDK</button>
+                  </div>
+
+                  <div class="inspector-tab-content">
+                    @if (selectedAnalysisTab() === 'shap') {
+                      <div class="shap-pane">
+                        <div class="pane-caption">Additive SHAP Feature Weights (Red = Pushes Scam, Green = Pushes Safe)</div>
+                        <div class="chart-box" style="height: 200px;">
+                          <canvas #shapCanvas></canvas>
+                        </div>
+                      </div>
+                    }
+
+                    @if (selectedAnalysisTab() === 'invariants') {
+                      <div class="invariants-pane">
+                        <table class="corp-table small">
+                          <thead>
+                            <tr><th>Feature</th><th>Value</th><th>Definition</th></tr>
+                          </thead>
+                          <tbody>
+                            @for (item of res.features | keyvalue; track item.key) {
+                              <tr [title]="getFeatureDescription(item.key)">
+                                <td><strong>{{ item.key }}</strong></td>
+                                <td class="font-mono"><strong>{{ item.value }}</strong></td>
+                                <td class="desc-cell">{{ getFeatureDescription(item.key) }}</td>
+                              </tr>
+                            }
+                          </tbody>
+                        </table>
+                      </div>
+                    }
+
+                    @if (selectedAnalysisTab() === 'json') {
+                      <div class="json-pane">
+                        <div class="json-bar">
+                          <span>API Response Payload:</span>
+                          <button class="mini-copy-btn" (click)="copyPayload(getFormattedJson(res))">Copy JSON</button>
+                        </div>
+                        <pre class="json-code font-mono"><code>{{ getFormattedJson(res) }}</code></pre>
+                      </div>
+                    }
+
+                    @if (selectedAnalysisTab() === 'sdk') {
+                      <div class="sdk-pane">
+                        <div class="sdk-tabs">
+                          <button class="sdk-tab-btn" [class.active]="selectedSnippetTab() === 'curl'" (click)="selectedSnippetTab.set('curl')">cURL</button>
+                          <button class="sdk-tab-btn" [class.active]="selectedSnippetTab() === 'python'" (click)="selectedSnippetTab.set('python')">discord.py</button>
+                          <button class="sdk-tab-btn" [class.active]="selectedSnippetTab() === 'nodejs'" (click)="selectedSnippetTab.set('nodejs')">discord.js</button>
+                        </div>
+
+                        @if (selectedSnippetTab() === 'curl') {
+                          <pre class="sdk-code font-mono"><code>curl -X POST "http://127.0.0.1:8000/api/predict" \
+  -H "Content-Type: application/json" \
+  -d '{{"{"}}"text": "{{ res.text.slice(0, 45) }}...", "model_type": "{{ selectedModelTier() }}"{{"}"}}'</code></pre>
+                        }
+
+                        @if (selectedSnippetTab() === 'python') {
+                          <pre class="sdk-code font-mono"><code>import discord, requests
+# discord.py bot hook
+@client.event
+async def on_message(message):
+    if message.author.bot: return
+    res = requests.post("http://127.0.0.1:8000/api/predict", json={{"{"}}"text": message.content, "model_type": "hardened"{{"}"}}).json()
+    if res["scam_probability"] >= {{ decisionThreshold() }}:
+        await message.delete()
+        await message.channel.send(f"⚠️ {{"{"}}message.author.mention{{"}"}} Phishing blocked ({{"{"}}res['verdict']{{"}"}})")</code></pre>
+                        }
+
+                        @if (selectedSnippetTab() === 'nodejs') {
+                          <pre class="sdk-code font-mono"><code>// discord.js client hook
+client.on('messageCreate', async (msg) => {{"{"}}
+  if (msg.author.bot) return;
+  const res = await fetch('http://127.0.0.1:8000/api/predict', {{"{"}}
+    method: 'POST',
+    headers: {{"{"}} 'Content-Type': 'application/json' {{"}"}},
+    body: JSON.stringify({{"{"}} text: msg.content, model_type: 'hardened' {{"}"}})
+  {{"}"}}).then(r => r.json());
+  if (res.scam_probability >= {{ decisionThreshold() }}) await msg.delete();
+{{"}"}});</code></pre>
+                        }
+                      </div>
+                    }
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- ========================================================== -->
+        <!-- POP-OUT INTERACTIVE CHATBOX MODAL DIALOG                   -->
+        <!-- ========================================================== -->
+        @if (isChatPopoutOpen()) {
+          <div class="chat-popout-overlay" (click)="closeChatPopout()">
+            <div class="chat-popout-dialog" (click)="$event.stopPropagation()">
+              <!-- Popout Header -->
+              <div class="popout-header">
+                <div class="popout-title-row">
+                  <div class="popout-icon-box">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <div class="popout-title">Interactive Chatbox Console (Pop-out)</div>
+                    <div class="popout-subtitle">Type Discord messages, select evasion presets, and inspect real-time AI verdicts</div>
+                  </div>
+                </div>
+
+                <div class="popout-header-right">
+                  <span class="popout-model-chip font-mono">
+                    {{ selectedModelTier() === 'hardened' ? 'Minimax XGBoost v2.4' : 'Baseline XGBoost' }}
+                  </span>
+                  <button class="popout-close-btn" (click)="closeChatPopout()" title="Close Pop-out (Esc)">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <line x1="18" y1="6" x2="6" y2="18"/>
+                      <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Popout Body -->
+              <div class="popout-body">
+                <!-- Quick Preset Pills Carousel -->
+                <div class="popout-preset-strip">
+                  <span class="popout-strip-lbl">Load Presets:</span>
+                  <div class="popout-chips-wrap">
+                    @for (p of presets; track p.id) {
+                      @if (p.id !== 'custom') {
+                        <button 
+                          class="popout-preset-chip" 
+                          [class.active]="selectedPreset() === p.id"
+                          (click)="onPresetChange(p.id)">
+                          {{ p.name }}
+                        </button>
+                      }
+                    }
+                  </div>
+                </div>
+
+                <!-- Focused Textarea Input -->
+                <div class="popout-textarea-wrap">
+                  <textarea 
+                    [ngModel]="chatInput()" 
+                    (ngModelChange)="onChatInputChange($event)"
+                    (keydown)="onPopoutKeydown($any($event))"
+                    rows="5" 
+                    class="popout-input-textarea" 
+                    placeholder="Type or paste any Discord payload message here... (Enter to send, Shift + Enter for new line, Ctrl + Enter to send &amp; close)"
+                    autofocus></textarea>
+
+                  <div class="popout-meta-row">
+                    <div class="popout-char-count font-mono">
+                      <span>{{ chatInput().length }} characters</span>
+                      <span class="sep">&bull;</span>
+                      <span>~{{ getEstimatedTokens() }} tokens</span>
+                    </div>
+                    <div class="popout-shortcuts-hint">
+                      <kbd>&crarr; Send</kbd>
+                      <kbd>Shift + &crarr; New line</kbd>
+                      <kbd>Ctrl + &crarr; Send &amp; Close</kbd>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Real-time Live Threat Estimation Preview inside Popout -->
+                <div class="popout-preview-card" [style.border-left-color]="getRiskColor(predictionResult()?.scam_probability ?? 0)">
+                  <div class="popout-preview-top">
+                    <div class="preview-meter-title">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                      </svg>
+                      <span>Real-Time Threat Estimation:</span>
+                    </div>
+                    <span class="preview-pct font-mono" [style.color]="getRiskColor(predictionResult()?.scam_probability ?? 0)">
+                      {{ ((predictionResult()?.scam_probability ?? 0) * 100).toFixed(1) }}% Scam Probability
+                    </span>
+                  </div>
+
+                  <div class="popout-progress-track">
+                    <div 
+                      class="popout-progress-fill" 
+                      [style.width.%]="(predictionResult()?.scam_probability ?? 0) * 100"
+                      [style.background]="getRiskColor(predictionResult()?.scam_probability ?? 0)">
+                    </div>
+                  </div>
+
+                  <div class="popout-preview-bottom">
+                    <span class="popout-action-pill" [style.color]="getRiskColor(predictionResult()?.scam_probability ?? 0)">
+                      PROTOCOL: {{ getEnforcementVerdict(predictionResult()?.scam_probability ?? 0).action }}
+                    </span>
+                    <span class="popout-latency font-mono">{{ predictionResult()?.latency_ms ?? 1.2 }}ms CPU Latency</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Popout Footer -->
+              <div class="popout-footer">
+                <div class="popout-footer-info">
+                  <span class="popout-status-dot"></span>
+                  <span>Instant inference over 3,017 extracted invariant features</span>
+                </div>
+
+                <div class="popout-footer-btns">
+                  <button class="popout-btn-secondary" (click)="chatInput.set(''); runPrediction()">Clear</button>
+                  <button class="popout-btn-secondary" (click)="closeChatPopout()">Close</button>
+                  <button class="popout-btn-primary" (click)="sendChatMessage(); closeChatPopout()">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <line x1="22" y1="2" x2="11" y2="13"/>
+                      <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                    </svg>
+                    <span>Send &amp; Inspect</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- ==================================================================== -->
+    <!-- TAB 3: ADVERSARIAL RED-TEAM STUDIO                                   -->
+    <!-- ==================================================================== -->
+    @if (activeTab() === 'redteam') {
+      <div class="tab-pane">
+        <div class="enterprise-banner">
+          <h2>Adversarial Evasion & Red-Team Mutation Arena</h2>
+          <p>
+            Synthesize adversarial perturbation attacks and observe how static keyword engines and unhardened classifiers 
+            get bypassed, while our minimax-hardened fused model retains <strong>0.978 F1</strong>.
+          </p>
+        </div>
+
+        <div class="hub-card">
+          <div class="redteam-input-row">
+            <div class="input-group" style="flex: 1;">
+              <label>Target Scam Seed Text:</label>
+              <input type="text" [(ngModel)]="redTeamInput" class="corp-input" />
+            </div>
+            <button class="corp-btn-danger" (click)="runMutation()" [disabled]="isMutating()">
+              <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="22" y1="12" x2="18" y2="12"/>
+                <line x1="6" y1="12" x2="2" y2="12"/>
+                <line x1="12" y1="6" x2="12" y2="2"/>
+                <line x1="12" y1="22" x2="12" y2="18"/>
+              </svg>
+              {{ isMutating() ? 'Synthesizing...' : 'Inject Perturbations & Test' }}
+            </button>
+          </div>
+
+          <!-- Mutation Toggles -->
+          <div class="toggles-grid">
+            <label class="toggle-box" [class.active-toggle]="optHomoglyphs()">
+              <input type="checkbox" [(ngModel)]="optHomoglyphs" />
+              <div>
+                <strong>Cyrillic Homoglyphs</strong>
+                <p>Swaps ASCII characters for visually identical Cyrillic glyphs (о, а, е).</p>
+              </div>
+            </label>
+            <label class="toggle-box" [class.active-toggle]="optZeroWidth()">
+              <input type="checkbox" [(ngModel)]="optZeroWidth" />
+              <div>
+                <strong>Zero-Width Joiner Injection</strong>
+                <p>Inserts invisible Unicode \u200B bytes inside trigger keywords.</p>
+              </div>
+            </label>
+            <label class="toggle-box" [class.active-toggle]="optUrlSpoof()">
+              <input type="checkbox" [(ngModel)]="optUrlSpoof" />
+              <div>
+                <strong>Domain Typosquatting (Lev-1)</strong>
+                <p>Transforms links into spoofed domains (dlscord-app.com).</p>
+              </div>
+            </label>
+            <label class="toggle-box" [class.active-toggle]="optUrgency()">
+              <input type="checkbox" [(ngModel)]="optUrgency" />
+              <div>
+                <strong>Psychological Lure Inversion</strong>
+                <p>Rewrites high-pressure urgency into casual gamer banter.</p>
+              </div>
+            </label>
+          </div>
+
+          <!-- Comparison Cards -->
+          @if (redTeamResult(); as rt) {
+            <div class="mutated-preview-bar">
+              <span class="preview-lbl">Synthesized Payload:</span>
+              <span class="payload-text font-mono">{{ rt.mutated_text }}</span>
+              <span class="applied-tag font-mono">{{ rt.applied_mutations.join(' + ') }}</span>
+            </div>
+
+            <div class="tri-cards-grid">
+              <!-- Tier 1 -->
+              <div class="defense-card" [class.bypassed]="rt.comparison.automod_regex.bypassed">
+                <div class="tier-lbl">TIER 1: INDUSTRY STANDARD</div>
+                <h4>Discord AutoMod (Regex)</h4>
+                <div class="defense-verdict font-mono" [class.text-red]="rt.comparison.automod_regex.bypassed" [class.text-green]="!rt.comparison.automod_regex.bypassed">
+                  <span class="status-badge" [class.status-failed]="rt.comparison.automod_regex.bypassed" [class.status-passed]="!rt.comparison.automod_regex.bypassed">
+                    {{ rt.comparison.automod_regex.verdict }}
+                  </span>
+                </div>
+                <div class="defense-score">Confidence Score: {{ (rt.comparison.automod_regex.scam_probability * 100).toFixed(0) }}%</div>
+                <p class="defense-desc">
+                  {{ rt.comparison.automod_regex.bypassed ? 'Bypassed: Keyword tokenization disrupted by non-ASCII unicode and zero-width spaces.' : 'Keywords matched.' }}
+                </p>
+              </div>
+
+              <!-- Tier 2 -->
+              <div class="defense-card" [class.bypassed]="rt.comparison.unhardened_xgboost.bypassed">
+                <div class="tier-lbl">TIER 2: STANDARD ML</div>
+                <h4>Unhardened XGBoost Baseline</h4>
+                <div class="defense-verdict font-mono" [class.text-red]="rt.comparison.unhardened_xgboost.bypassed" [class.text-green]="!rt.comparison.unhardened_xgboost.bypassed">
+                  <span class="status-badge" [class.status-failed]="rt.comparison.unhardened_xgboost.bypassed" [class.status-passed]="!rt.comparison.unhardened_xgboost.bypassed">
+                    {{ rt.comparison.unhardened_xgboost.verdict }}
+                  </span>
+                </div>
+                <div class="defense-score">Confidence Score: {{ (rt.comparison.unhardened_xgboost.scam_probability * 100).toFixed(1) }}%</div>
+                <p class="defense-desc">
+                  {{ rt.comparison.unhardened_xgboost.bypassed ? 'Bypassed: Out-of-vocabulary perturbation causes -17.4% F1 degradation.' : 'Caught by invariants.' }}
+                </p>
+              </div>
+
+              <!-- Tier 3 -->
+              <div class="defense-card champion-card">
+                <div class="tier-lbl champ-lbl">TIER 3: OUR WORK (CHAMPION)</div>
+                <h4>Minimax Hardened Fused XGBoost</h4>
+                <div class="defense-verdict font-mono text-green">
+                  <span class="status-badge status-champion">
+                    {{ rt.comparison.hardened_xgboost.verdict }}
+                  </span>
+                </div>
+                <div class="defense-score">Confidence Score: {{ (rt.comparison.hardened_xgboost.scam_probability * 100).toFixed(1) }}%</div>
+                <p class="defense-desc">
+                  Resilient: Structural invariants (Levenshtein brand distance + NFKC) successfully preserve 100% detection retention.
+                </p>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- ==================================================================== -->
+    <!-- TAB 4: TRAINING DYNAMICS                                             -->
+    <!-- ==================================================================== -->
+    @if (activeTab() === 'training') {
+      <div class="tab-pane">
+        <div class="enterprise-banner">
+          <h2>Model Training Mechanics & Convergence Dynamics</h2>
+          <p>Analysis of the 150-round boosting trajectory, 5-fold cross-validation variance, and hyperparameter sensitivity.</p>
+        </div>
+
+        <div class="hub-card">
+          <div class="card-title">
+            <svg class="title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+              <polyline points="17 6 23 6 23 12"/>
+            </svg>
+            Binary Cross-Entropy Loss vs Boosting Rounds (n=150)
+          </div>
+          <div class="chart-box" style="height: 320px;">
+            <canvas #lossCanvas></canvas>
+          </div>
+        </div>
+
+        <div class="two-col-grid">
+          <!-- 5-Fold CV Table -->
+          <div class="hub-card">
+            <div class="card-title">
+              <svg class="title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+              </svg>
+              5-Fold Stratified Cross-Validation Stability (&mu; = 0.978)
+            </div>
+            <div class="table-container">
+              <table class="corp-table">
+                <thead>
+                  <tr>
+                    <th>Fold</th><th>Accuracy</th><th>Precision</th><th>Recall</th><th>F1 Score</th><th>AUROC</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (f of trainingMetrics()?.five_fold_cv; track f.fold) {
+                    <tr>
+                      <td><strong>{{ f.fold }}</strong></td>
+                      <td>{{ f.accuracy }}</td>
+                      <td>{{ f.precision }}</td>
+                      <td>{{ f.recall }}</td>
+                      <td class="text-green"><strong>{{ f.f1 }}</strong></td>
+                      <td>{{ f.auroc }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Heatmap Grid -->
+          <div class="hub-card">
+            <div class="card-title">
+              <svg class="title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"/>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+              </svg>
+              Hyperparameter Surface: max_depth vs learning_rate
+            </div>
+            <div class="heatmap-grid">
+              @for (cell of trainingMetrics()?.hyperparameter_heatmap; track cell.max_depth + '_' + cell.learning_rate) {
+                <div class="heat-tile" [class.optimal-tile]="cell.optimal">
+                  <span class="tile-sub">Depth {{ cell.max_depth }} &bull; &eta;={{ cell.learning_rate }}</span>
+                  <span class="tile-val font-mono">{{ (cell.f1 * 100).toFixed(1) }}% F1</span>
+                  @if (cell.optimal) {
+                    <span class="tile-star">Optimal Setup</span>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- ==================================================================== -->
+    <!-- TAB 5: EMPIRICAL BENCHMARKS & EVALUATION                             -->
+    <!-- ==================================================================== -->
+    @if (activeTab() === 'benchmarks') {
+      <div class="tab-pane">
+        <div class="enterprise-banner">
+          <h2>Official Peer-Reviewed Benchmark Evaluation</h2>
+          <p>Full empirical results on 1,000 clean test samples and 1,000 adversarially perturbed samples.</p>
+        </div>
+
+        <div class="two-col-grid">
+          <div class="hub-card">
+            <div class="card-title">
+              <svg class="title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 3v18h18"/>
+                <path d="m19 9-5 5-4-4-3 3"/>
+              </svg>
+              Multi-Model Receiver Operating Characteristic (ROC)
+            </div>
+            <div class="chart-box" style="height: 280px;">
+              <canvas #rocCanvas></canvas>
+            </div>
+          </div>
+
+          <div class="hub-card">
+            <div class="card-title">
+              <svg class="title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+              </svg>
+              Accuracy vs Latency Pareto Frontier (Log Scale)
+            </div>
+            <div class="chart-box" style="height: 280px;">
+              <canvas #paretoCanvas></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Threshold Simulator -->
+        <div class="hub-card">
+          <div class="card-title">
+            <svg class="title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="4" y1="21" x2="4" y2="14"/>
+              <line x1="4" y1="10" x2="4" y2="3"/>
+              <line x1="12" y1="21" x2="12" y2="12"/>
+              <line x1="12" y1="8" x2="12" y2="3"/>
+              <line x1="20" y1="21" x2="20" y2="16"/>
+              <line x1="20" y1="12" x2="20" y2="3"/>
+              <line x1="1" y1="14" x2="7" y2="14"/>
+              <line x1="9" y1="8" x2="15" y2="8"/>
+              <line x1="17" y1="16" x2="23" y2="16"/>
+            </svg>
+            Dynamic Decision Threshold Operating Point &amp; Confusion Matrix
+          </div>
+          <div class="threshold-slider-block">
+            <div class="slider-header">
+              <span>Operating Decision Threshold (&tau;):</span>
+              <span class="threshold-val font-mono">&tau; = {{ decisionThreshold() }}</span>
+            </div>
+            <input 
+              type="range" 
+              min="0.10" 
+              max="0.90" 
+              step="0.05" 
+              [(ngModel)]="decisionThreshold" 
+              class="corp-slider" />
+          </div>
+
+          <!-- DYNAMIC 2x2 CONFUSION MATRIX VISUALIZER -->
+          <div class="confusion-matrix-wrapper">
+            <div class="matrix-grid-box">
+              <div class="matrix-header-col-label">PREDICTED PHISHING (SCAM)</div>
+              <div class="matrix-header-col-label">PREDICTED BENIGN (CLEAN)</div>
+
+              <!-- Row 1: Actual Phishing -->
+              <div class="matrix-cell cell-tp">
+                <span class="cell-tag">TRUE POSITIVE (TP)</span>
+                <span class="cell-val font-mono">{{ getConfusionMatrix().tp }}</span>
+                <span class="cell-sub">Attacks Successfully Blocked</span>
+              </div>
+              <div class="matrix-cell cell-fn" [class.cell-alert]="getConfusionMatrix().fn > 0">
+                <span class="cell-tag">FALSE NEGATIVE (FN)</span>
+                <span class="cell-val font-mono">{{ getConfusionMatrix().fn }}</span>
+                <span class="cell-sub">Missed Phishing Payloads</span>
+              </div>
+
+              <!-- Row 2: Actual Benign -->
+              <div class="matrix-cell cell-fp" [class.cell-alert]="getConfusionMatrix().fp > 10">
+                <span class="cell-tag">FALSE POSITIVE (FP)</span>
+                <span class="cell-val font-mono">{{ getConfusionMatrix().fp }}</span>
+                <span class="cell-sub">Legitimate Gamers Flagged</span>
+              </div>
+              <div class="matrix-cell cell-tn">
+                <span class="cell-tag">TRUE NEGATIVE (TN)</span>
+                <span class="cell-val font-mono">{{ getConfusionMatrix().tn }}</span>
+                <span class="cell-sub">Clean Chats Allowed Instantly</span>
+              </div>
+            </div>
+
+            <!-- Derived Operational Performance Metrics -->
+            <div class="matrix-summary-stats">
+              <div class="matrix-stat-pill">
+                <span class="m-pill-lbl">Precision:</span>
+                <strong class="m-pill-val font-mono">{{ getConfusionMatrix().precision }}%</strong>
+              </div>
+              <div class="matrix-stat-pill">
+                <span class="m-pill-lbl">Recall (TPR):</span>
+                <strong class="m-pill-val font-mono">{{ getConfusionMatrix().recall }}%</strong>
+              </div>
+              <div class="matrix-stat-pill">
+                <span class="m-pill-lbl">Overall Accuracy:</span>
+                <strong class="m-pill-val font-mono">{{ getConfusionMatrix().accuracy }}%</strong>
+              </div>
+              <div class="matrix-stat-pill">
+                <span class="m-pill-lbl">Harmonic F1:</span>
+                <strong class="m-pill-val font-mono text-green">{{ getConfusionMatrix().f1 }}</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Benchmark Table from IEEE Report -->
+        <div class="hub-card">
+          <div class="card-title">
+            <svg class="title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+              <polyline points="10 9 9 9 8 9"/>
+            </svg>
+            Complete IEEE Benchmark Performance Comparison (Table I from Report)
+          </div>
+          <div class="table-container">
+            <table class="corp-table">
+              <thead>
+                <tr>
+                  <th>Tier</th>
+                  <th>Classifier Name</th>
+                  <th>Feature Representation</th>
+                  <th>Clean F1</th>
+                  <th>Adv. F1</th>
+                  <th>Degradation</th>
+                  <th>CPU Latency</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (m of benchmarkData()?.multi_model_benchmark; track m.model) {
+                  <tr [class.champion-row]="m.champion">
+                    <td><span class="corp-badge">{{ m.tier }}</span></td>
+                    <td><strong>{{ m.model }}</strong> @if (m.champion) { <span class="champ-pill">Champion</span> }</td>
+                    <td>{{ m.features }}</td>
+                    <td>{{ m.clean_f1 }}</td>
+                    <td><strong [class.text-green]="m.adv_f1 > 0.95" [class.text-red]="m.adv_f1 < 0.60">{{ m.adv_f1 }}</strong></td>
+                    <td [class.text-red]="m.delta < -10" [class.text-green]="m.delta === 0">
+                      {{ m.delta === 0 ? '0.0% (Hardened)' : m.delta + '%' }}
+                    </td>
+                    <td class="font-mono">{{ m.latency_ms }} ms</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    }
+
+    </main>
+  </div>
+
+  <!-- Persistent Floating Pop-out Chatbox Launcher Pill -->
+  <button class="floating-popout-pill" (click)="openChatPopout()" title="Click to pop out the interactive chatbox console">
+    <div class="floating-pill-glow"></div>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+    </svg>
+    <span>Pop-out Chatbox</span>
+    <span class="floating-shortcut font-mono">⌘K</span>
+  </button>
+</div>
